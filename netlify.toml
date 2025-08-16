@@ -5,3 +5,16 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin.html"
+  status = 200
+
+# Autorise l'accès à /admin/* uniquement aux users rôle "admin"
+[[redirects]]
+  from = "/admin/*"
+  to = "/login.html"
+  status = 302
+  force = true
+  conditions = { role = ["admin"] }
