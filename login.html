@@ -5,38 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Velvet — Connexion</title>
   <link href="styles.css" rel="stylesheet" />
+
+  <!-- Fallback minime au cas où ton styles.css n'aurait pas encore ces classes -->
+  <style>
+    .auth-card { max-width: 440px; margin: 10vh auto 0; padding: 28px 24px; }
+    .auth-form label { display:block; font-weight:600; margin:14px 0 6px; }
+    .auth-form input { width:100%; height:44px; border-radius:10px; padding:0 12px; }
+    .auth-submit { margin-top:10px; width:100%; height:46px; display:block; font-weight:700; border-radius:12px; }
+    .form-hint { margin-top:12px; text-align:center; opacity:.9; }
+  </style>
 </head>
 <body>
+
   <header class="header">
     <nav class="nav">
-      <a href="index.html">Accueil</a>
-      <a class="cta" href="signup.html">S’inscrire</a>
+      <a class="cta" href="index.html">Accueil</a>
+      <a class="cta gold" href="signup.html">S’inscrire</a>
     </nav>
   </header>
 
   <main class="hero">
-    <section class="hero-card">
-      <h1 class="auth-title">Connexion</h1>
-      <p class="auth-sub">Accédez à votre profil en toute sécurité.</p>
+    <section class="hero-card auth-card" role="main" aria-labelledby="title">
+      <h1 id="title">Connexion</h1>
+      <p class="lead" style="max-width:420px;margin:6px auto 18px;text-align:center;">
+        Accédez à votre profil en toute sécurité.
+      </p>
 
-      <form class="auth-form" action="#" method="post" onsubmit="return false;">
-        <label for="login" class="input-label">Pseudo ou e‑mail</label>
-        <input id="login" name="login" type="text" autocomplete="username" required />
+      <!-- Formulaire de connexion simple (pseudo/email + mot de passe) -->
+      <!-- L'action ci-dessous est un placeholder : tu pourras la pointer vers ta fonction Netlify quand tu l’activeras -->
+      <form id="login-form" class="auth-form" method="post" action="/.netlify/functions/login">
+        <label for="login">Pseudo ou e‑mail</label>
+        <input type="text" id="login" name="login" inputmode="email" autocomplete="username" required />
 
-        <label for="password" class="input-label">Mot de passe</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
 
         <button type="submit" class="btn gold auth-submit">Se connecter</button>
 
-        <p class="auth-extra">
+        <p class="form-hint">
           Pas encore de compte ? <a href="signup.html">Créer un compte</a>
         </p>
       </form>
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer" style="text-align:center;margin:32px 0 18px;">
     <a href="legal.html">Mentions légales &amp; CGU</a>
   </footer>
+
+  <!-- (Optionnel) ton script cookies existant si tu l’utilises sur cette page -->
+  <script src="assets/js/cookies.js"></script>
 </body>
 </html>
