@@ -1,53 +1,307 @@
-<!DOCTYPE html><html lang="fr"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin • Dashboard ventes</title><link rel="stylesheet" href="styles.css">
-<style>
-.wrap{max-width:1100px;margin:7vh auto 12vh;padding:22px;background:rgba(18,18,18,.92);border-radius:18px}
-table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.09)}
-.right{text-align:right}.btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(233,200,122,.35);background:linear-gradient(180deg,#f4d88f,#d8b565);color:#141414;font-weight:700;cursor:pointer}
-.small{font-size:.9rem;opacity:.8}.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-</style></head><body>
-<header class="header"><nav class="nav">
-<a class="cta" href="index.html">Accueil</a>
-<a class="cta" href="admin-items.html">Créer un item</a>
-</nav></header>
-<main class="wrap">
-<h1>Dashboard ventes & reversements</h1>
-<p class="small">Vue temps réel des ventes. Calcul auto 70% créatrice / 30% plateforme (Velvet). Tes propres ventes (Velvet) restent à 100% pour toi.</p>
-<div id="sum"></div>
-<table id="t"><thead><tr>
-<th>Créatrice</th><th class="right">Ventes (CHF)</th><th class="right">Pour elle (70%)</th><th class="right">Pour Velvet (30%)</th><th class="right">Impayé (à verser)</th><th></th>
-</tr></thead><tbody id="tb"></tbody></table>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Admin — Velvet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{--bg:#0f0f12;--card:#16161b;--line:#24242b;--txt:#f2f2f3;--muted:#a8a8ad;--gold:#e8c372;--red:#ff6b6b;--green:#7bd88f}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);font:14.5px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    header{position:sticky;top:0;background:linear-gradient(180deg,#0f0f12 75%,transparent);padding:14px 18px;border-bottom:1px solid #111}
+    h1{margin:0;font-size:22px}
+    main{max-width:1200px;margin:24px auto;padding:0 18px 64px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{background:linear-gradient(180deg,#f6d57f,#d7b463);color:#111;border:1px solid #b3954f;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+    .btn.secondary{background:#1e1e24;color:var(--txt);border:1px solid var(--line)}
+    .btn.danger{background:#2b0e0e;color:#f8b;border:1px solid #4a1b1b}
+    .btn.warn{background:#3a2b12;color:#ffd58a;border:1px solid #5a4417}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    label{color:var(--muted);font-weight:600}
+    select,input{background:#11131a;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+    th{color:var(--muted);text-align:left}
+    td.right,th.right{text-align:right}
+    .kpi{display:inline-block;background:#1a1a21;border:1px solid #272730;border-radius:12px;padding:10px 12px;margin:4px 8px 8px 0}
+    .ok{color:var(--green)} .err{color:var(--red)}
+    .hint{font-size:12.5px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Dashboard — Velvet (admin)</h1>
+</header>
+
+<main>
+
+  <!-- INSCRIPTIONS / COMPTES -->
+  <section class="card">
+    <div class="row" style="justify-content:space-between;gap:12px">
+      <div>
+        <h2 style="margin:0 0 6px">Comptes — valider / suspendre / supprimer</h2>
+        <div class="hint">Actionne sur les comptes nouveaux ou problématiques. “Suspendre” bloque l’accès sans supprimer les données.</div>
+      </div>
+      <div class="row">
+        <label>Statut
+          <select id="fStatus">
+            <option value="">Tous</option>
+            <option value="pending" selected>En attente</option>
+            <option value="approved">Validés</option>
+            <option value="suspended">Suspendus</option>
+            <option value="rejected">Refusés</option>
+            <option value="deleted">Supprimés</option>
+          </select>
+        </label>
+        <label>Rôle
+          <select id="fRole">
+            <option value="">Tous</option>
+            <option value="creator">Créatrice</option>
+            <option value="client">Client</option>
+          </select>
+        </label>
+        <button class="btn secondary" id="btnReloadUsers">Rafraîchir</button>
+      </div>
+    </div>
+
+    <div class="hint" id="usersMsg" style="margin-top:6px">Chargement…</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </section>
+
+  <!-- VENTES -->
+  <section class="card">
+    <div class="row" style="justify-content:space-between;gap:12px">
+      <div>
+        <h2 style="margin:0 0 6px">Ventes & répartition (70% / 30%)</h2>
+        <div class="hint">Marque “payé” après virement PayPal aux créatrices.</div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnExportCsv">Exporter CSV</button>
+        <button class="btn secondary" id="btnReloadSales">Rafraîchir</button>
+      </div>
+    </div>
+
+    <div id="kpis"></div>
+
+    <h3 style="margin:6px 0">Récap par créatrice</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Créatrice</th>
+          <th class="right">Ventes (CHF)</th>
+          <th class="right">Pour elle (70%)</th>
+          <th class="right">Pour Velvet (30%)</th>
+          <th class="right">Impayé</th>
+          <th class="right">Déjà versé</th>
+          <th class="right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tb-ledger"></tbody>
+    </table>
+
+    <h3 style="margin:18px 0 6px">Détail des ventes</h3>
+    <div class="hint" id="salesMsg">Chargement…</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th class="right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tb-sales"></tbody>
+    </table>
+  </section>
 </main>
+
 <script>
+const $ = s => document.querySelector(s);
 const fmt = n => Number(n||0).toFixed(2);
-async function load() {
-  const r = await fetch('/api/list-ledger'); const j = await r.json();
-  if(!r.ok) { document.getElementById('sum').textContent='Erreur: '+(j.error||''); return; }
-  const tb = document.getElementById('tb'); tb.innerHTML='';
-  let tot=0, tot70=0, tot30=0, totDue=0;
-  Object.keys(j.creators||{}).forEach(id=>{
-    const c=j.creators[id];
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td><span class="mono">${id}</span></td>
-      <td class="right">${fmt(c.total)}</td>
-      <td class="right">${fmt(c.dueToCreator)}</td>
-      <td class="right">${fmt(c.toVelvet)}</td>
-      <td class="right">${fmt(c.unpaid)}</td>
-      <td class="right">${id==='velvet'?'—':`<button class="btn" data-id="${id}">Marquer payé</button>`}</td>`;
-    tb.appendChild(tr);
-    tot+=c.total; tot70+=c.dueToCreator; tot30+=c.toVelvet; totDue+=c.unpaid;
-  });
-  document.getElementById('sum').innerHTML = `
-    <div>Totaux — Ventes: <b>${fmt(tot)} CHF</b> • 70% créatrices: <b>${fmt(tot70)}</b> • 30% Velvet: <b>${fmt(tot30)}</b> • Impayés: <b>${fmt(totDue)}</b></div>`;
-  tb.querySelectorAll('button[data-id]').forEach(b=>{
-    b.onclick = async ()=>{
-      const id=b.getAttribute('data-id');
-      if(!confirm('Valider le paiement à '+id+' ?')) return;
-      const r = await fetch('/api/mark-paid',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({creatorId:id})});
-      if(r.ok) load(); else alert('Erreur'); };
-  });
+const fmtDate = s => s ? new Date(s).toLocaleString() : '';
+
+/* ======= USERS ======= */
+async function loadUsers(){
+  try{
+    const st = $('#fStatus').value, rl = $('#fRole').value;
+    const url = new URL('/.netlify/functions/list-users', location.origin);
+    if (st) url.searchParams.set('status', st);
+    if (rl) url.searchParams.set('role', rl);
+
+    $('#usersMsg').textContent = 'Chargement…';
+    const r = await fetch(url); const arr = await r.json();
+    $('#usersMsg').textContent = '';
+
+    const body = $('#usersBody'); body.innerHTML = '';
+    if (!Array.isArray(arr) || arr.length===0){ $('#usersMsg').textContent='Aucun compte.'; return; }
+
+    arr.forEach(u=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${fmtDate(u.createdAt)}</td>
+        <td>${u.username||'-'}</td>
+        <td>${u.email}</td>
+        <td>${(u.role||'client')}</td>
+        <td>${u.status}</td>
+        <td class="right">
+          ${u.status!=='approved'  ? `<button class="btn" data-act="approve"  data-id="${u.id}" data-email="${u.email}" data-role="${u.role||'client'}">Valider</button>` : ''}
+          ${u.status!=='rejected'  ? `<button class="btn danger" data-act="reject"   data-id="${u.id}" data-email="${u.email}">Refuser</button>` : ''}
+          ${u.status!=='suspended' ? `<button class="btn warn"   data-act="suspend"  data-id="${u.id}" data-email="${u.email}">Suspendre</button>` : `<button class="btn" data-act="restore" data-id="${u.id}" data-email="${u.email}">Restaurer</button>`}
+          <button class="btn danger" data-act="delete" data-id="${u.id}" data-email="${u.email}">Supprimer</button>
+        </td>`;
+      body.appendChild(tr);
+    });
+
+    body.querySelectorAll('button[data-act]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const act   = btn.getAttribute('data-act');
+        const email = btn.getAttribute('data-email');
+        const id    = btn.getAttribute('data-id');
+        const role  = btn.getAttribute('data-role') || 'client';
+
+        if (act==='delete'){
+          const hard = confirm("Suppression DÉFINITIVE ? (OK = hard delete, Annuler = suppression logique)");
+          btn.disabled = true;
+          const res = await fetch('/.netlify/functions/delete-user',{
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ email, id, hard })
+          });
+          btn.disabled = false;
+          if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
+          loadUsers(); return;
+        }
+
+        const status = (
+          act==='approve' ? 'approved' :
+          act==='reject'  ? 'rejected' :
+          act==='suspend' ? 'suspended' :
+          act==='restore' ? 'approved'  :
+          'pending'
+        );
+
+        btn.disabled = true;
+        const res = await fetch('/.netlify/functions/set-user-status',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, id, status, role })
+        });
+        btn.disabled = false;
+        if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
+        loadUsers();
+      };
+    });
+  }catch(e){
+    $('#usersMsg').textContent = 'Erreur: '+e.message;
+  }
 }
-load();
+$('#btnReloadUsers').onclick = loadUsers;
+$('#fStatus').onchange = loadUsers;
+$('#fRole').onchange   = loadUsers;
+
+/* ======= SALES / LEDGER ======= */
+let lastSales=[], lastLedger={};
+
+async function loadSales(){
+  try{
+    $('#salesMsg').textContent='Chargement…';
+    const r = await fetch('/.netlify/functions/list-ledger');
+    const data = await r.json();
+    $('#salesMsg').textContent='';
+
+    const sales  = Array.isArray(data) ? data : (data.sales || []);
+    const ledger = Array.isArray(data) ? {}   : (data.ledger || {});
+    lastSales=sales; lastLedger=ledger;
+
+    const totals = sales.reduce((a,s)=>{
+      const amt=Number(s.amount||0);
+      a.gross+=amt;
+      a.creator+=Number(s.creatorShare||amt*0.70);
+      a.platform+=Number(s.platformShare||amt*0.30);
+      if(!s.paid) a.unpaid+=Number(s.creatorShare||amt*0.70);
+      return a;
+    },{gross:0,creator:0,platform:0,unpaid:0});
+
+    $('#kpis').innerHTML = `
+      <span class="kpi">CA total: <b>${fmt(totals.gross)} CHF</b></span>
+      <span class="kpi">Créatrices (70%): <b>${fmt(totals.creator)} CHF</b></span>
+      <span class="kpi">Velvet (30%): <b>${fmt(totals.platform)} CHF</b></span>
+      <span class="kpi">Impayés: <b class="err">${fmt(totals.unpaid)} CHF</b></span>`;
+
+    const tbLed=$('#tb-ledger'); tbLed.innerHTML='';
+    Object.keys(ledger).forEach(cid=>{
+      const L = ledger[cid]||{};
+      const total=Number(L.total||0);
+      const due=Number(L.owed||0);
+      const paidOut=Number(L.paidOut||0);
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${cid}</td>
+        <td class="right">${fmt(total)}</td>
+        <td class="right">${fmt(total*0.70)}</td>
+        <td class="right">${fmt(total*0.30)}</td>
+        <td class="right">${fmt(due)}</td>
+        <td class="right">${fmt(paidOut)}</td>
+        <td class="right">
+          ${cid==='velvet'?'—':`<button class="btn" data-pay-creator="${cid}">Marquer payé (tout)</button>`}
+        </td>`;
+      tbLed.appendChild(tr);
+    });
+
+    tbLed.querySelectorAll('button[data-pay-creator]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const cid = btn.getAttribute('data-pay-creator');
+        btn.disabled=true;
+        const unpaid = lastSales.filter(s=>!s.paid && s.creatorId===cid);
+        for(const s of unpaid){
+          const saleId = s.id || s.saleId; if(!saleId) continue;
+          await fetch('/.netlify/functions/mark-paid',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ saleId })});
+        }
+        btn.disabled=false; loadSales();
+      };
+    });
+
+    const tb=$('#tb-sales'); tb.innerHTML='';
+    sales.sort((a,b)=> (a.ts>b.ts?-1:1)).forEach(s=>{
+      const saleId = s.id || s.saleId || '';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${fmtDate(s.ts)}</td>
+        <td>${s.creatorId||''}</td>
+        <td>${s.itemType||''}</td>
+        <td class="right">${fmt(s.amount||0)} ${s.currency||'CHF'}</td>
+        <td>${s.paypalTxnId||''}</td>
+        <td>${s.payerEmail||''}</td>
+        <td>${s.paid?'<span class="ok">Payé</span>':'<span class="err">Impayé</span>'}</td>
+        <td class="right">
+          ${s.paid?'—':`<button class="btn secondary" data-pay-sale="${saleId}">Marquer payé</button>`}
+        </td>`;
+      tb.appendChild(tr);
+    });
+
+    tb.querySelectorAll('button[data-pay-sale]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const saleId=btn.getAttribute('data-pay-sale');
+        btn.disabled=true;
+        const r=await fetch('/.netlify/functions/mark-paid',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ saleId })});
+        btn.disabled=false;
+        if(!r.ok){const j=await r.json(); alert(j.error||'Erreur');return;}
+        loadSales();
+      };
+    });
+
+  }catch(e){ $('#salesMsg').textContent='Erreur : '+e.message; }
+}
+$('#btnReloadSales').onclick = loadSales;
+
+function toCsv(rows){return rows.map(r=>r.map(v=>{const s=v==null?"":String(v);return /[",;\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(";")).join("\n");}
+$('#btnExportCsv').onclick=()=>{const rows=[["date","creatorId","itemType","amount","currency","txnId","payerEmail","paid"]];(lastSales||[]).forEach(s=>{rows.push([s.ts,s.creatorId,s.itemType,s.amount,s.currency||"CHF",s.paypalTxnId||"",s.payerEmail||"",s.paid?"yes":"no"]);});const blob=new Blob([toCsv(rows)],{type:"text/csv;charset=utf-8"});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ventes.csv';a.click();};
+
+/* INIT */
+document.addEventListener('DOMContentLoaded',()=>{loadUsers();loadSales();});
 </script>
-</body></html>
+</body>
+</html>
