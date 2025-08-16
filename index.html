@@ -3,69 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velvet Creators VIP</title>
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- PayPal SDK avec ton vrai Client ID -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AfQktUT9wtwRSXbudljfhWf-jbwzaQhWF8oA88XREeFTwHjXkTsrOdVZRzih7s6pXao6RKNsYvrYt9rD&currency=CHF"></script>
+  <title>Test Paiement PayPal</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=TON_CLIENT_ID&currency=CHF"></script>
 </head>
 <body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="cgu.html">Conditions d'utilisation</a></li>
-        <li><a href="login.html">Connexion</a></li>
-        <li><a href="register.html">Inscription</a></li>
-      </ul>
-    </nav>
-  </header>
+  <h1>Paiement sécurisé avec PayPal</h1>
+  <div id="paypal-button-container"></div>
 
-  <main>
-    <section class="hero">
-      <img src="logo-hero.png" alt="Velvet Creators VIP" class="hero-logo">
-      <h1>Bienvenue sur Velvet Creators VIP</h1>
-      <p>La plateforme luxe où les créateurs peuvent partager, vendre et échanger avec élégance et sécurité.</p>
-    </section>
-
-    <section class="paiement">
-      <h2>Paiement sécurisé</h2>
-      <p>Les paiements sont traités via PayPal Business. Cliquez ci-dessous pour régler votre abonnement :</p>
-      
-      <!-- Conteneur du bouton PayPal -->
-      <div id="paypal-button-container"></div>
-
-      <script>
-        paypal.Buttons({
-          style: {
-            layout: 'vertical',
-            color: 'gold',
-            shape: 'rect',
-            label: 'paypal'
-          },
-          createOrder: function(data, actions) {
-            return actions.order.create({
-              purchase_units: [{
-                amount: {
-                  value: '49.00', // montant de l'abonnement (exemple)
-                  currency_code: 'CHF'
-                },
-                description: "Abonnement Velvet Creators VIP"
-              }]
-            });
-          },
-          onApprove: function(data, actions) {
-            return actions.order.capture().then(function(details) {
-              alert("Merci " + details.payer.name.given_name + ", votre paiement a bien été reçu !");
-            });
-          }
-        }).render('#paypal-button-container');
-      </script>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Velvet Creators VIP - Tous droits réservés</p>
-  </footer>
+  <script>
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: { value: '49.00', currency_code: 'CHF' }
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert("Merci " + details.payer.name.given_name + ", paiement réussi !");
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
 </body>
 </html>
