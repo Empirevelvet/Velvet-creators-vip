@@ -1,83 +1,108 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Velvet — Dashboard admin</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Velvet — Admin Dashboard (VIP)</title>
+<style>
+  /* ========= THEME LUXE ========= */
+  :root{
+    --bg:#0b0c10; --panel:#11131a; --elev:#151827; --ink:#e9ecf5;
+    --muted:#9aa3b2; --line:#23283b; --chip:#1a1f30;
+    --brand:#b39bff; --brand-2:#7c5cff; --gold:#f0c674;
+    --ok:#28c79a; --warn:#ffb020; --danger:#ff567a;
+    --thead:#0f1322; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:linear-gradient(180deg,#0a0b0f 0%,#0b0c10 70%);color:var(--ink);font:14px/1.45 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  a{color:var(--gold);text-decoration:none}
+  .wrap{max-width:1240px;margin:0 auto;padding:18px 14px}
 
-  <!-- STYLE autonome sombre (aucune dépendance externe) -->
-  <style>
-    :root{
-      --bg:#0f1115; --panel:#161a24; --muted:#9aa4b2; --text:#e9edf4;
-      --brand:#7c5cff; --ok:#25c08a; --warn:#ffb020; --danger:#ff5a7a;
-      --line:#23293a; --chip:#1b2130; --thead:#121827;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
-    a{color:var(--brand);text-decoration:none}
-    .wrap{max-width:1180px;margin:0 auto;padding:18px 14px}
-    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(10,12,18,.75),rgba(10,12,18,0));backdrop-filter:blur(8px);z-index:5}
-    .top{display:flex;gap:10px;align-items:center}
-    .logo{font-weight:800;font-size:18px}
-    .muted{color:var(--muted)}
-    .top .sp{flex:1}
-    .btn{background:var(--brand);border:0;color:#fff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
-    .btn.ghost{background:var(--chip);color:var(--text);border:1px solid var(--line)}
-    .btn.small{padding:7px 10px;font-size:12px;border-radius:8px}
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
-    h1{font-size:20px;margin:0 0 8px}
-    h2{font-size:16px;margin:0 0 8px}
-    .help{font-size:12px;color:var(--muted);margin:4px 0 10px}
+  /* ======= TOP BAR ======= */
+  header{position:sticky;top:0;z-index:10;background:rgba(8,10,16,.65);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
+  .top{display:flex;align-items:center;gap:12px}
+  .logo{font-weight:800;letter-spacing:.2px}
+  .badge{background:linear-gradient(90deg,#7c5cff,#b39bff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+  .sp{flex:1}
+  .btn{background:var(--brand-2);border:0;color:#fff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+  .btn.ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn.small{padding:7px 10px;font-size:12px;border-radius:8px}
+  .btn.flat{box-shadow:none}
+  .btn.destruct{background:#2a1320;border:1px solid #4a1c2f;color:#ff9fb1}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{padding:8px 10px;border-radius:9px;background:var(--chip);border:1px solid var(--line);cursor:pointer;font-weight:700}
+  .tab.active{background:linear-gradient(180deg,#181c2c,#121622);border-color:#3a4160}
 
-    .filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:8px;margin:8px 0 10px}
-    .input, select{width:100%;background:#0f141e;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 10px}
+  /* ======= PANELS & CARDS ======= */
+  .grid{display:grid;grid-template-columns:2.2fr 1.1fr;gap:14px}
+  .panel{background:linear-gradient(180deg,#121523,#0f121d);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+  .panel h1{font-size:20px;margin:0 0 10px}
+  .panel h2{font-size:16px;margin:0 0 10px}
+  .muted{color:var(--muted)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 2px}
+  .kpi{background:linear-gradient(180deg,#151a2a,#121626);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .kpi .l{color:var(--muted);font-size:12px}
+  .kpi .v{font-size:20px;font-weight:900;margin-top:6px;color:#fff}
+  .searchbar{display:grid;grid-template-columns:160px 160px 1fr 120px;gap:8px;margin:10px 0}
+  .input,select{width:100%;background:#0f141e;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px}
+  .input::placeholder{color:#8e96a6}
 
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-    .kpi{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px}
-    .kpi .l{color:var(--muted);font-size:12px}
-    .kpi .v{font-size:20px;font-weight:800;margin-top:6px}
+  /* ======= TABLES ======= */
+  .tablewrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  thead th{position:sticky;top:0;background:var(--thead);color:#b7c0d8;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#13182a}
+  .right{text-align:right}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:var(--chip)}
+  .chip.ok{background:rgba(40,199,154,.12);border-color:rgba(40,199,154,.36);color:#9ef0d2}
+  .chip.warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.36);color:#ffd993}
+  .chip.bad{background:rgba(255,86,122,.12);border-color:rgba(255,86,122,.36);color:#ffb5c3}
 
-    .tablewrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:780px}
-    thead th{position:sticky;top:0;background:var(--thead);color:#b7c0d8;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
-    tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}
-    tbody tr:hover{background:#151c2a}
-    .right{text-align:right}
-    .row-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:var(--chip)}
-    .chip.ok{background:rgba(37,192,138,.12);border-color:rgba(37,192,138,.35);color:#9af0cf}
-    .chip.warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.35);color:#ffd993}
-    .chip.bad{background:rgba(255,90,122,.12);border-color:rgba(255,90,122,.35);color:#ffb5c3}
-    .toast{position:fixed;right:14px;bottom:14px;background:#0f1726;border:1px solid var(--line);padding:12px 14px;border-radius:12px;display:none;box-shadow:0 10px 26px rgba(0,0,0,.35);font-weight:700}
-    footer{color:var(--muted);text-align:center;padding:22px 0}
-    @media(max-width:860px){
-      .filters{grid-template-columns:1fr 1fr}
-      .kpis{grid-template-columns:1fr 1fr}
-      table, thead, tbody, th, td, tr{display:block;width:100%}
-      thead{display:none}
-      tbody td{border:none;padding:6px 0}
-      .tablewrap{border-radius:10px}
-    }
-  </style>
+  /* ======= SIDECARD ======= */
+  .side .card{background:linear-gradient(180deg,#14182a,#111629);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .side .card h3{margin:0 0 8px;font-size:15px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#d4d9e8}
+
+  /* ======= TOAST ======= */
+  .toast{position:fixed;right:14px;bottom:14px;background:#0f1726;border:1px solid var(--line);padding:12px 14px;border-radius:12px;display:none;box-shadow:var(--shadow);font-weight:800}
+
+  /* ======= MOBILE ======= */
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr 1fr}
+    .searchbar{grid-template-columns:1fr 1fr}
+    table,thead,tbody,tr,td,th{display:block;width:100%}
+    thead{display:none}
+    tbody td{border:none;padding:6px 0}
+    .row-actions{justify-content:flex-start}
+  }
+</style>
 </head>
 <body>
-  <header>
-    <div class="wrap top">
-      <div class="logo">Velvet — <span class="muted">Dashboard (admin)</span></div>
-      <span class="sp"></span>
-      <a class="btn ghost small" href="/index.html">Accueil</a>
-      <a class="btn ghost small" href="/admin-items.html">Créer un item</a>
-      <button id="reloadAll" class="btn small">Rafraîchir</button>
+<header>
+  <div class="wrap top">
+    <div class="logo">Velvet <span class="badge">VIP</span> — Dashboard</div>
+    <div class="tabs">
+      <div class="tab active" data-tab="accounts">Comptes</div>
+      <div class="tab" data-tab="ledger">Ventes</div>
+      <div class="tab" data-tab="moderation">Modération</div>
     </div>
-  </header>
+    <span class="sp"></span>
+    <a class="btn ghost small" href="/index.html">Accueil</a>
+    <a class="btn ghost small" href="/admin-items.html">Admin Items</a>
+    <button id="reloadAll" class="btn small">Rafraîchir</button>
+  </div>
+</header>
 
-  <main class="wrap">
-    <!-- COMPTES -->
-    <section class="panel">
-      <h1>Comptes — valider / suspendre / supprimer</h1>
-      <div class="help">“Suspendre” bloque l’accès sans supprimer les données. Tu peux réactiver ensuite.</div>
-
-      <div class="filters">
+<main class="wrap grid">
+  <!-- ========== COLONNE PRINCIPALE ========== -->
+  <section class="panel main">
+    <!-- ===== Comptes ===== -->
+    <div class="view" id="view-accounts">
+      <h1>Comptes — valider · suspendre · supprimer</h1>
+      <div class="searchbar">
         <select id="fStatus">
           <option value="">Statut : Tous</option>
           <option value="pending">En attente</option>
@@ -90,31 +115,38 @@
           <option value="client">Client</option>
           <option value="admin">Admin</option>
         </select>
-        <input id="fQuery" class="input" placeholder="🔎 pseudo / email"/>
-        <div class="kpi"><div class="l">Comptes</div><div class="v" id="kUsers">—</div></div>
-        <button id="applyUsersFilters" class="btn small">Filtrer</button>
+        <input id="fQuery" class="input" placeholder="🔎 Pseudo, email…"/>
+        <button class="btn flat" id="applyUsers">Filtrer</button>
       </div>
 
-      <div class="tablewrap">
+      <div class="kpis">
+        <div class="kpi"><div class="l">Total comptes</div><div class="v" id="kUsers">—</div></div>
+        <div class="kpi"><div class="l">En attente</div><div class="v" id="kPending">—</div></div>
+        <div class="kpi"><div class="l">Créatrices</div><div class="v" id="kCreators">—</div></div>
+        <div class="kpi"><div class="l">Clients</div><div class="v" id="kClients">—</div></div>
+      </div>
+
+      <div class="tablewrap" style="margin-top:10px">
         <table>
           <thead><tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th></tr></thead>
           <tbody id="tbUsers"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
         </table>
       </div>
-    </section>
+    </div>
 
-    <!-- VENTES -->
-    <section class="panel">
+    <!-- ===== Ledger ===== -->
+    <div class="view" id="view-ledger" style="display:none">
       <h1>Ventes & répartition (70% / 30%)</h1>
-      <div class="help">Clique sur <b>“Marquer payé”</b> après ton virement PayPal à la créatrice.</div>
+      <p class="muted">Clique “Marquer payé” après ton virement PayPal à la créatrice.</p>
 
-      <div class="kpis" style="margin-bottom:10px">
+      <div class="kpis">
         <div class="kpi"><div class="l">Ventes (CHF)</div><div class="v" id="kTot">—</div></div>
-        <div class="kpi"><div class="l">Pour créatrices (70%)</div><div class="v" id="k70">—</div></div>
-        <div class="kpi"><div class="l">Pour Velvet (30%)</div><div class="v" id="k30">—</div></div>
+        <div class="kpi"><div class="l">Créatrices (70%)</div><div class="v" id="k70">—</div></div>
+        <div class="kpi"><div class="l">Velvet (30%)</div><div class="v" id="k30">—</div></div>
         <div class="kpi"><div class="l">Impayé total</div><div class="v" id="kUnpaid">—</div></div>
       </div>
 
+      <h2 style="margin-top:12px">Récap par créatrice</h2>
       <div class="tablewrap">
         <table>
           <thead><tr><th>Créatrice</th><th class="right">Ventes</th><th class="right">70%</th><th class="right">30%</th><th class="right">Impayé</th><th class="right">Action</th></tr></thead>
@@ -122,153 +154,205 @@
         </table>
       </div>
 
+      <h2 style="margin-top:14px">Détail des ventes</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th></tr></thead>
+          <tbody id="tbSales"><tr><td colspan="7" class="muted">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         <button id="exportCsv" class="btn ghost small">Exporter CSV</button>
         <button id="refreshLedger" class="btn ghost small">Rafraîchir</button>
       </div>
-    </section>
+    </div>
 
-    <!-- DÉTAIL DES VENTES -->
-    <section class="panel">
-      <h2>Détail des ventes</h2>
+    <!-- ===== Modération ===== -->
+    <div class="view" id="view-moderation" style="display:none">
+      <h1>Modération & sécurité</h1>
+      <p class="muted">Ici s’afficheront les signalements, documents d’identité à revérifier et historiques de suspension.</p>
       <div class="tablewrap">
         <table>
-          <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th></tr></thead>
-        <tbody id="tbSales"><tr><td colspan="7" class="muted">Chargement…</td></tr></tbody>
+          <thead><tr><th>Date</th><th>Type</th><th>Utilisateur</th><th>Détail</th><th class="right">Action</th></tr></thead>
+          <tbody id="tbMod"><tr><td colspan="5" class="muted">Aucun élément pour l’instant.</td></tr></tbody>
         </table>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <div id="toast" class="toast"></div>
+  <!-- ========== SIDE ========== -->
+  <aside class="side">
+    <div class="panel card">
+      <h2>Raccourcis</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn ghost small" href="/admin-items.html">Créer un item</a>
+        <a class="btn ghost small" href="/paiement.html">Paiement direct</a>
+        <button class="btn ghost small" id="btnReload">Rafraîchir</button>
+      </div>
+    </div>
 
-  <!-- LOGIQUE (autonome) -->
-  <script>
-    // Helpers
-    const $ = (sel,root=document)=>root.querySelector(sel);
-    const $$ = (sel,root=document)=>[...root.querySelectorAll(sel)];
-    const fmt = n => Number(n||0).toFixed(2).replace('.',',')+' CHF';
-    const toast=(t,ok=true)=>{const el=$("#toast");el.textContent=t;el.style.display="block";el.style.borderColor=ok?"#214c36":"#5e2020";setTimeout(()=>el.style.display="none",2200);};
-    const J = async (url,opt)=>{try{const r=await fetch(url,{headers:{'Content-Type':'application/json'},...opt});const d=await r.json().catch(()=>null);return {ok:r.ok, status:r.status, data:d};}catch(e){return {ok:false,status:0,data:null};}};
+    <div class="panel card">
+      <h2>Derniers statuts</h2>
+      <div id="lastStatus" class="mono muted">—</div>
+    </div>
 
-    // -------- USERS --------
-    let USERS=[];
-    function badge(s){ if(s==='approved')return '<span class="chip ok">validé</span>'; if(s==='suspended')return '<span class="chip warn">suspendu</span>'; return '<span class="chip">en attente</span>'; }
+    <div class="panel card">
+      <h2>Aide rapide</h2>
+      <div class="muted" style="font-size:13px;line-height:1.5">
+        • <b>Valider</b> : active un compte approuvé.<br/>
+        • <b>Suspendre</b> : bloque l’accès (réversible).<br/>
+        • <b>Supprimer</b> : suppression définitive.<br/>
+        • <b>Marquer payé</b> : après virement PayPal (passe “impayé” à 0).<br/>
+      </div>
+    </div>
+  </aside>
+</main>
 
-    async function loadUsers(){
-      $("#tbUsers").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
-      const r = await J('/api/list-users');
-      if(!r.ok){ $("#tbUsers").innerHTML=`<tr><td colspan="6" class="muted">Impossible de charger /api/list-users (status ${r.status}).</td></tr>`; return; }
-      USERS = r.data?.users || r.data || [];
-      renderUsers();
-    }
-    function renderUsers(){
-      const st=$("#fStatus").value, ro=$("#fRole").value, q=($("#fQuery").value||'').toLowerCase();
-      const rows = USERS.filter(u=>(!st||u.status===st)&&(!ro||u.role===ro)&&(!q||String(u.username||'').toLowerCase().includes(q)||String(u.email||'').toLowerCase().includes(q)))
-        .sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')))
-        .map(u=>{
-          const d = u.created ? new Date(u.created).toLocaleString() : '—';
-          return `<tr>
-            <td>${d}</td><td>@${esc(u.username||'')}</td><td>${esc(u.email||'')}</td>
-            <td><span class="chip">${u.role||'client'}</span></td><td>${badge(u.status)}</td>
-            <td class="right row-actions">
-              ${u.status!=='approved'? `<button class="btn small ghost" data-a="approve" data-id="${u.id}">Valider</button>`:''}
-              ${u.status!=='suspended'? `<button class="btn small ghost" data-a="suspend" data-id="${u.id}">Suspendre</button>`:''}
-              <button class="btn small ghost" data-a="delete" data-id="${u.id}" style="border-color:#5f1e2a;color:#ff94a8">Supprimer</button>
-            </td>
-          </tr>`;
-        }).join('');
-      $("#tbUsers").innerHTML = rows || `<tr><td colspan="6" class="muted">Aucun compte.</td></tr>`;
-    }
-    $("#tbUsers").addEventListener('click', async (e)=>{
-      const b = e.target.closest('button[data-a]'); if(!b) return;
-      const id=b.dataset.id, a=b.dataset.a;
-      if(a==='delete' && !confirm('Supprimer définitivement ce profil ?')) return;
-      let body={id};
-      if(a==='suspend'){ const reason=prompt('Motif (interne) :','Non conforme'); if(reason===null) return; body.reason=reason; }
-      const r = await J('/api/admin-users',{method:'POST',body:JSON.stringify({action:a,...body})});
-      r.ok ? (toast('OK'), loadUsers()) : toast('Erreur action admin-users', false);
+<div id="toast" class="toast"></div>
+
+<script>
+  // ===== Helpers =====
+  const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const fmtCHF=v=>`${Number(v||0).toFixed(2)} CHF`; const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  const toast=(t,ok=true)=>{const el=$("#toast"); el.textContent=t; el.style.display="block"; el.style.borderColor=ok?"#244e39":"#5b1f2e"; setTimeout(()=>el.style.display="none",2400);};
+  const J=async(u,o)=>{try{const r=await fetch(u,{headers:{'Content-Type':'application/json'},...o});const d=await r.json().catch(()=>null);return{ok:r.ok,status:r.status,data:d}}catch(e){return{ok:false,status:0,data:null}}};
+
+  // ===== Tabs =====
+  $$(".tab").forEach(t=>t.onclick=()=>{
+    $$(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const id=t.dataset.tab;
+    $$(".view").forEach(v=>v.style.display=(v.id==="view-"+id)?"block":"none");
+  });
+
+  // ===== USERS =====
+  let USERS=[];
+  async function loadUsers(){
+    $("#tbUsers").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
+    const r=await J('/api/list-users');
+    if(!r.ok){ $("#tbUsers").innerHTML=`<tr><td colspan="6" class="muted">/api/list-users → ${r.status}</td></tr>`; setStatus('list-users: '+r.status); return; }
+    USERS=r.data?.users||r.data||[];
+    renderUsers();
+  }
+  function renderUsers(){
+    const st=$("#fStatus").value, ro=$("#fRole").value, q=($("#fQuery").value||'').toLowerCase();
+    const rows=USERS
+      .filter(u=>!st||u.status===st)
+      .filter(u=>!ro||u.role===ro)
+      .filter(u=>!q||(String(u.username||'').toLowerCase().includes(q)||String(u.email||'').toLowerCase().includes(q)))
+      .sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')));
+
+    const kTotal=USERS.length, kPending=USERS.filter(u=>u.status==='pending').length, kCreators=USERS.filter(u=>u.role==='creator').length, kClients=USERS.filter(u=>u.role==='client').length;
+    $("#kUsers").textContent=kTotal; $("#kPending").textContent=kPending; $("#kCreators").textContent=kCreators; $("#kClients").textContent=kClients;
+
+    const tb=$("#tbUsers"); tb.innerHTML= rows.length? '' : `<tr><td colspan="6" class="muted">Aucun compte.</td></tr>`;
+    rows.forEach(u=>{
+      const d=u.created?new Date(u.created).toLocaleString():'—';
+      const chip=u.status==='approved'?'<span class="chip ok">validé</span>':u.status==='suspended'?'<span class="chip warn">suspendu</span>':'<span class="chip">en attente</span>';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${d}</td>
+        <td>@${esc(u.username||'')}</td>
+        <td>${esc(u.email||'')}</td>
+        <td><span class="chip">${esc(u.role||'client')}</span></td>
+        <td>${chip}</td>
+        <td class="right row-actions">
+          ${u.status!=='approved'?`<button class="btn small ghost" data-act="approve" data-id="${u.id}">Valider</button>`:''}
+          ${u.status!=='suspended'?`<button class="btn small ghost" data-act="suspend" data-id="${u.id}">Suspendre</button>`:''}
+          <button class="btn small destruct" data-act="delete" data-id="${u.id}">Supprimer</button>
+        </td>`;
+      tb.appendChild(tr);
     });
-    $("#applyUsersFilters").onclick=renderUsers;
+  }
+  $("#tbUsers").addEventListener('click', async e=>{
+    const b=e.target.closest('button[data-act]'); if(!b) return;
+    const id=b.dataset.id, act=b.dataset.act;
+    if(act==='delete' && !confirm('Supprimer définitivement ce profil ?')) return;
+    const body={action:act,id};
+    if(act==='suspend'){ const reason=prompt('Motif (interne) :','Non conforme'); if(reason===null) return; body.reason=reason; }
+    const r=await J('/api/admin-users',{method:'POST',body:JSON.stringify(body)});
+    setStatus('admin-users:'+r.status);
+    r.ok? (toast('Action OK'), loadUsers()) : toast('Erreur admin-users',false);
+  });
+  $("#applyUsers").onclick=renderUsers;
+  $("#fStatus").onchange=$("#fRole").onchange=$("#fQuery").oninput=()=>{ clearTimeout(window.__d); window.__d=setTimeout(renderUsers,180); };
 
-    // -------- LEDGER --------
-    let SALES=[];
-    async function loadLedger(){
-      $("#tbCreators").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
-      $("#tbSales").innerHTML='<tr><td colspan="7" class="muted">Chargement…</td></tr>';
-      const r = await J('/api/list-ledger');
-      if(!r.ok){ $("#tbCreators").innerHTML=`<tr><td colspan="6" class="muted">Impossible de charger /api/list-ledger (status ${r.status}).</td></tr>`;
-                 $("#tbSales").innerHTML=`<tr><td colspan="7" class="muted">Impossible de charger /api/list-ledger (status ${r.status}).</td></tr>`; return; }
-      SALES = r.data?.sales || r.data || [];
-      renderLedger();
-    }
-    function renderLedger(){
-      const total = SALES.reduce((a,s)=>a+Number(s.amount||0),0);
-      const to70  = total*0.70, to30 = total*0.30;
-      const unpaid = SALES.filter(s=>!s.paid).reduce((a,s)=>a+Number(s.amount||0)*0.70,0);
-      $("#kTot").textContent=fmt(total);
-      $("#k70").textContent=fmt(to70);
-      $("#k30").textContent=fmt(to30);
-      $("#kUnpaid").textContent=fmt(unpaid);
+  // ===== LEDGER =====
+  let SALES=[];
+  async function loadLedger(){
+    $("#tbCreators").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
+    $("#tbSales").innerHTML='<tr><td colspan="7" class="muted">Chargement…</td></tr>';
+    const r=await J('/api/list-ledger');
+    setStatus('list-ledger:'+r.status);
+    if(!r.ok){ $("#tbCreators").innerHTML=`<tr><td colspan="6" class="muted">/api/list-ledger → ${r.status}</td></tr>`; $("#tbSales").innerHTML=`<tr><td colspan="7" class="muted">/api/list-ledger → ${r.status}</td></tr>`; return; }
+    SALES=r.data?.sales||r.data||[];
+    renderLedger();
+  }
+  function renderLedger(){
+    const total=SALES.reduce((a,s)=>a+Number(s.amount||0),0);
+    $("#kTot").textContent=fmtCHF(total);
+    $("#k70").textContent=fmtCHF(total*0.70);
+    $("#k30").textContent=fmtCHF(total*0.30);
+    const unpaid=SALES.filter(s=>!s.paid).reduce((a,s)=>a+Number(s.amount||0)*0.70,0);
+    $("#kUnpaid").textContent=fmtCHF(unpaid);
 
-      const by = {};
-      SALES.forEach(s=>{
-        const id=s.creatorId||'—';
-        if(!by[id]) by[id]={id,total:0,unpaid:0};
-        by[id].total += Number(s.amount||0);
-        if(!s.paid) by[id].unpaid += Number(s.amount||0)*0.70;
-      });
-
-      $("#tbCreators").innerHTML = Object.values(by).sort((a,b)=>b.total-a.total).map(c=>{
-        const v70=c.total*0.70, v30=c.total*0.30;
-        return `<tr>
-          <td>${esc(c.id)}</td>
-          <td class="right">${fmt(c.total)}</td>
-          <td class="right">${fmt(v70)}</td>
-          <td class="right">${fmt(v30)}</td>
-          <td class="right">${c.unpaid>0?`<span class="chip warn">${fmt(c.unpaid)}</span>`:`<span class="chip ok">0,00 CHF</span>`}</td>
-          <td class="right">${c.unpaid>0?`<button class="btn small ghost" data-mark="${esc(c.id)}">Marquer payé</button>`:'—'}</td>
-        </tr>`;
-      }).join('') || `<tr><td colspan="6" class="muted">Pas encore de ventes.</td></tr>`;
-
-      $("#tbSales").innerHTML = SALES.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).map(s=>{
-        const d = s.date ? new Date(s.date).toLocaleString() : '—';
-        return `<tr>
-          <td>${d}</td><td>${esc(s.creatorId||'')}</td><td>${esc(s.type||'ppv')}</td>
-          <td class="right">${fmt(s.amount||0)}</td>
-          <td>${esc(s.txn||'—')}</td><td>${esc(s.clientEmail||'—')}</td>
-          <td>${s.paid?'<span class="chip ok">payé</span>':'<span class="chip warn">impayé</span>'}</td>
-        </tr>`;
-      }).join('') || `<tr><td colspan="7" class="muted">Aucune vente.</td></tr>`;
-    }
-
-    // Mark paid (par créatrice)
-    $("#tbCreators").addEventListener('click', async (e)=>{
-      const b=e.target.closest('button[data-mark]'); if(!b) return;
-      if(!confirm('Confirmer : marquer PAYÉ pour cette créatrice ?')) return;
-      const r=await J('/api/mark-paid',{method:'POST',body:JSON.stringify({creatorId:b.dataset.mark})});
-      r.ok ? (toast('Marqué payé'), loadLedger()) : toast('Erreur /api/mark-paid', false);
+    const by={}; SALES.forEach(s=>{const id=s.creatorId||'—'; (by[id]||(by[id]={id,total:0,unpaid:0})).total+=Number(s.amount||0); if(!s.paid) by[id].unpaid+=Number(s.amount||0)*0.70;});
+    const tb=$("#tbCreators"); tb.innerHTML='';
+    const arr=Object.values(by).sort((a,b)=>b.total-a.total);
+    if(!arr.length) tb.innerHTML=`<tr><td colspan="6" class="muted">Pas encore de ventes.</td></tr>`;
+    arr.forEach(c=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${esc(c.id)}</td>
+        <td class="right">${fmtCHF(c.total)}</td>
+        <td class="right">${fmtCHF(c.total*0.70)}</td>
+        <td class="right">${fmtCHF(c.total*0.30)}</td>
+        <td class="right">${c.unpaid>0?`<span class="chip warn">${fmtCHF(c.unpaid)}</span>`:`<span class="chip ok">0,00 CHF</span>`}</td>
+        <td class="right">${c.unpaid>0?`<button class="btn small ghost" data-mark="${esc(c.id)}">Marquer payé</button>`:'—'}</td>`;
+      tb.appendChild(tr);
     });
 
-    // Export CSV détail
-    $("#exportCsv").onclick=()=>{
-      const head=['date','creatorId','type','amount','txn','clientEmail','paid'];
-      const rows=SALES.map(s=>[s.date||'',s.creatorId||'',s.type||'ppv',String(s.amount||0),s.txn||'',s.clientEmail||'',s.paid?'yes':'no']);
-      const csv=[head,...rows].map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
-      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-      a.download=`velvet-sales-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
-    };
+    const ts=$("#tbSales"); ts.innerHTML='';
+    if(!SALES.length) ts.innerHTML=`<tr><td colspan="7" class="muted">Aucune vente.</td></tr>`;
+    SALES.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).forEach(s=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${s.date?new Date(s.date).toLocaleString():'—'}</td>
+        <td>${esc(s.creatorId||'')}</td>
+        <td><span class="chip">${esc(s.type||'ppv')}</span></td>
+        <td class="right">${fmtCHF(s.amount||0)}</td>
+        <td>${esc(s.txn||'—')}</td>
+        <td>${esc(s.clientEmail||'—')}</td>
+        <td>${s.paid?'<span class="chip ok">payé</span>':'<span class="chip warn">impayé</span>'}</td>`;
+      ts.appendChild(tr);
+    });
+  }
+  $("#tbCreators").addEventListener('click', async e=>{
+    const b=e.target.closest('button[data-mark]'); if(!b) return;
+    if(!confirm('Confirmer : marquer payé cette créatrice ?')) return;
+    const r=await J('/api/mark-paid',{method:'POST',body:JSON.stringify({creatorId:b.dataset.mark})});
+    setStatus('mark-paid:'+r.status);
+    r.ok?(toast('Marqué payé'), loadLedger()):toast('Erreur mark-paid',false);
+  });
+  $("#exportCsv").onclick=()=>{
+    const head=['date','creatorId','type','amount','txn','clientEmail','paid'];
+    const rows=SALES.map(s=>[s.date||'',s.creatorId||'',s.type||'ppv',String(s.amount||0),s.txn||'',s.clientEmail||'',s.paid?'yes':'no']);
+    const csv=[head,...rows].map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download=`velvet-sales-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
+  };
+  $("#refreshLedger").onclick=loadLedger;
 
-    // Utils
-    function esc(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+  // ===== Status panel =====
+  function setStatus(t){ $("#lastStatus").textContent = `[${new Date().toLocaleTimeString()}] ${t}`; }
 
-    // Init / events
-    $("#reloadAll").onclick=()=>{ loadUsers(); loadLedger(); };
-    $("#refreshLedger").onclick=loadLedger;
-    $("#fStatus").onchange=$("#fRole").onchange=$("#fQuery").oninput=()=>{ clearTimeout(window.__q); window.__q=setTimeout(renderUsers,160); };
+  // ===== Global events / boot =====
+  $("#reloadAll").onclick=()=>{ loadUsers(); loadLedger(); toast('Rafraîchi'); };
+  $("#btnReload").onclick=()=>{ loadUsers(); loadLedger(); };
 
-    // Boot
-    loadUsers(); loadLedger();
-  </script>
+  // Premier chargement
+  loadUsers(); loadLedger();
+</script>
 </body>
 </html>
