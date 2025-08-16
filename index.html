@@ -1,63 +1,71 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Velvet – Accueil</title>
-  <link href="styles.css" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velvet Creators VIP</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- PayPal SDK avec ton vrai Client ID -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AfQktUT9wtwRSXbudljfhWf-jbwzaQhWF8oA88XREeFTwHjXkTsrOdVZRzih7s6pXao6RKNsYvrYt9rD&currency=CHF"></script>
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <nav class="nav">
-      <a href="login.html">Se connecter</a>
-      <a class="cta" href="signup.html">S’inscrire</a>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="cgu.html">Conditions d'utilisation</a></li>
+        <li><a href="login.html">Connexion</a></li>
+        <li><a href="register.html">Inscription</a></li>
+      </ul>
     </nav>
   </header>
 
-  <!-- Hero Section -->
-  <main class="hero">
-    <section class="hero-card">
-      <span class="badge">Adultes 18+ – Accès membre</span>
-      <img alt="Velvet Creators VIP" class="hero-logo" src="logo-hero.png"/>
-      <div class="lead">
-        <p>Bienvenue dans l’univers exclusif de <strong>VELVET CREATORS VIP</strong>.</p>
-        <p>Ici, chaque femme, homme ou personne non-binaire devient maître de son art.</p>
-        <p>Que tu sois <strong>anonyme</strong>, <strong>magnétique</strong> ou <strong>déjà célèbre</strong>, ton univers t’appartient.</p>
-        <p><strong>Photos, vidéos, objets rares ou créations sensuelles</strong>, lives privés ou collectifs : <strong>TOUT</strong> peut être vendu, à tes conditions.</p>
-        <p>Tu peux choisir de te montrer… ou de rester dans l’ombre. <strong>Sois libre. Sois puissant(e). Sois désirable.</strong></p>
-        <p><strong>Rejoins la plateforme la plus sélective du moment, où ton talent devient un EMPIRE.</strong></p>
-      </div>
-      <div class="ctas">
-        <a class="btn" href="login.html">Se connecter</a>
-        <a class="btn gold" href="signup.html">S’inscrire</a>
-      </div>
+  <main>
+    <section class="hero">
+      <img src="logo-hero.png" alt="Velvet Creators VIP" class="hero-logo">
+      <h1>Bienvenue sur Velvet Creators VIP</h1>
+      <p>La plateforme luxe où les créateurs peuvent partager, vendre et échanger avec élégance et sécurité.</p>
+    </section>
+
+    <section class="paiement">
+      <h2>Paiement sécurisé</h2>
+      <p>Les paiements sont traités via PayPal Business. Cliquez ci-dessous pour régler votre abonnement :</p>
+      
+      <!-- Conteneur du bouton PayPal -->
+      <div id="paypal-button-container"></div>
+
+      <script>
+        paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+          },
+          createOrder: function(data, actions) {
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: '49.00', // montant de l'abonnement (exemple)
+                  currency_code: 'CHF'
+                },
+                description: "Abonnement Velvet Creators VIP"
+              }]
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              alert("Merci " + details.payer.name.given_name + ", votre paiement a bien été reçu !");
+            });
+          }
+        }).render('#paypal-button-container');
+      </script>
     </section>
   </main>
 
-  <!-- Section secondaire -->
-  <section class="section">
-    <p><strong>Tout contenu est monétisable :</strong> ton art, ton mystère ou ta notoriété.</p>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <a href="legal.html">Mentions légales &amp; CGU</a>
+  <footer>
+    <p>&copy; 2025 Velvet Creators VIP - Tous droits réservés</p>
   </footer>
-
-  <!-- Cookie banner -->
-  <div class="cookie-banner" id="cookie-banner" hidden>
-    <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
-    <div class="cookie-actions">
-      <button class="btn-accept" id="cookie-accept">Accepter</button>
-      <a class="btn-ghost" href="legal.html#cookies">En savoir plus</a>
-    </div>
-  </div>
-
-  <!-- Overlay de fin -->
-  <div aria-hidden="true" class="page-fade-bottom"></div>
-
-  <!-- Script -->
-  <script src="cookies.js"></script>
 </body>
 </html>
