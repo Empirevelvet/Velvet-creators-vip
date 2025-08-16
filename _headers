@@ -1,2 +1,50 @@
+# =========================
+# 1) Protection des pages admin (mot de passe HTTP basique)
+# Remplace "velvet:supersecret" par TON couple utilisateur:motdepasse
+# =========================
 /admin-*.html
   Basic-Auth: velvet:supersecret
+  Cache-Control: no-store
+
+# =========================
+# 2) En-têtes de sécurité globaux (toutes les pages)
+# =========================
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cache-Control: public, max-age=0, must-revalidate
+
+  # CSP : autorise juste ce qu’on utilise (PayPal + Netlify + ressources locales)
+  Content-Security-Policy: default-src 'self';
+    img-src 'self' data: https:;
+    media-src 'self' https:;
+    font-src 'self' data:;
+    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' https://www.paypal.com https://www.paypalobjects.com;
+    connect-src 'self' https://api-m.paypal.com https://api-m.sandbox.paypal.com https://*.netlify.app https://*.netlify.com;
+    frame-src https://www.paypal.com;
+    frame-ancestors 'none';
+    object-src 'none';
+    base-uri 'none';
+    form-action 'self' https://www.paypal.com;
+    upgrade-insecure-requests
+
+# =========================
+# 3) CORS pour les endpoints API (si tu appelles /api/* via fetch)
+#    -> Si tu veux restreindre, remplace * par ton domaine Netlify.
+# =========================
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Cache-Control: no-store
+
+# (Optionnel) Même CORS directement sur les functions si tu les appelles en chemin natif
+/.netlify/functions/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Cache-Control: no-store
