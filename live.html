@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Live — Velvet</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    .wrap{max-width:980px;margin:8vh auto 12vh;padding:22px;background:rgba(18,18,18,.92);border-radius:18px;box-shadow:0 18px 54px rgba(0,0,0,.5)}
+    .grid{display:grid;gap:12px}
+    .row{display:grid;grid-template-columns:1fr 180px;gap:10px}
+    input,button{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#111;color:#eee}
+    button.btn{background:linear-gradient(180deg,#f8d87f,#d8b565);color:#141414;font-weight:700;border:none}
+    .note{opacity:.75}
+    #player{width:100%;height:70vh;border:0;border-radius:16px;overflow:hidden;background:#000;margin-top:16px}
+    .link{margin-top:8px}
+  </style>
+  <script src="https://meet.jit.si/external_api.js"></script>
+</head>
+<body>
+<header class="header">
+  <nav class="nav">
+    <a class="cta" href="index.html">Accueil</a>
+    <a class="cta" href="chat.html">Chat</a>
+    <a class="cta" href="login.html">Connexion</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <h1>LIVES — ticket d’entrée</h1>
+
+  <!-- Créatrice : créer un live payant -->
+  <section id="creatorPanel" class="grid" style="display:none;">
+    <p class="note">Choisissez un nom unique pour la salle et fixez le prix du ticket.</p>
+    <div class="row">
+      <input id="roomName" placeholder="Nom de la salle (ex: velvet-luna-20h)" />
+      <input id="ticketPrice" type="number" step="0.10" min="0" placeholder="Prix du ticket (CHF)" />
+    </div>
+    <button id="createLive" class="btn">Créer le live & générer le lien de paiement</button>
+    <div id="liveLink" class="link"></div>
+  </section>
+
+  <!-- Visionnage / diffusion -->
+  <section id="viewerPanel" style="display:none;">
+    <p class="note" id="roomInfo"></p>
+    <div id="player"></div>
+  </section>
+</main>
+
+<script>
+/**
+ * Modes :
+ * - Créatrice ouvre : live.html?role=creator  → crée un ITEM "live" (roomName, price) et obtient le lien de paiement
+ * - Client après paiement : redirigé vers live.html?room=<roomName>&join=1 → on embed Jitsi directement
+ */
+
+const qs = new URLSearchParams(location.search);
+const role = (qs.get('role')||'').toLowerCase();
+const roomFromQuery = qs.get('room');
+const join = qs.get('join') === '1';
+const CREATOR_ID = window.CREATOR_ID || 'creatrice-demo';
+
+// Afficher bons panneaux
+if (role === 'creator') {
+  document.getElementById('creatorPanel').style.display = 'grid';
+} else if (roomFromQuery && join) {
+  document.getElementById('viewerPanel').style.display = 'block';
+  startPlayer(roomFromQuery);
+}
+
+// Création du live (créatrice)
+document.getElementById('createLive')?.addEventListener('click', async () => {
+  const roomName = (document.getElementById('roomName').value||'').trim();
+  const price = parseFloat(document.getElementById('ticketPrice').value||'0');
+  if (!roomName) return alert('Indique un nom de salle.');
+  if (!(price > 0)) return alert('Le prix du ticket doit être > 0.');
+
+  // On enregistre un ITEM type "live" côté serveur pour générer le ticket
+  const res = await fetch('/api/upsert-item', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      creatorId: CREATOR_ID,
+      title: 'Accès live : '+roomName,
+      type: 'live',
+      previewUrl: '',         // optionnel (affichez une bannière si vous voulez)
+      price,
+      roomName
+    })
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) return alert('Erreur: '+(data.error||'serveur'));
+
+  // Lien de paiement : une fois payé, paiement.html redirigera vers live.html?room=...&join=1
+  const payUrl = location.origin + '/paiement.html?item='+encodeURIComponent(data.itemId);
+  document.getElementById('liveLink').innerHTML =
+    `🎟️ Lien ticket : <a class="cta" href="${payUrl}" target="_blank">${payUrl}</a>`;
+});
+
+// Lecture live via Jitsi Embed
+function startPlayer(room) {
+  document.getElementById('roomInfo').textContent = 'Salle : '+room;
+  const domain = "meet.jit.si";
+  const options = {
+    roomName: room,
+    parentNode: document.getElementById('player'),
+    userInfo: { displayName: "Membre Velvet" },
+    interfaceConfigOverwrite: { MOBILE_APP_PROMO: false }
+  };
+  const api = new JitsiMeetExternalAPI(domain, options);
+}
+</script>
+</body>
+</html>
