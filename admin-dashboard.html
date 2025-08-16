@@ -1,313 +1,226 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Velvet — Dashboard admin</title>
+  <meta charset="UTF-8">
+  <title>Dashboard — Velvet (admin)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- STYLE LOCAL AU DASHBOARD -->
-<style>
-:root{
-  --bg:#0f1115; --panel:#171a22; --muted:#a9b0c3; --text:#e9ecf5;
-  --brand:#7b5cff; --brand-2:#00d1b2; --warn:#ffcc00; --danger:#ff5470; --ok:#24d180;
-  --line:#232838; --chip:#1f2433;
-}
-*{box-sizing:border-box}
-html,body{background:var(--bg); color:var(--text); font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";}
-a{color:var(--brand); text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:1100px; margin:20px auto; padding:20px;}
-.header{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px}
-.breadcrumbs{color:var(--muted); font-size:13px}
-.h1{font-size:24px; font-weight:800; letter-spacing:.2px}
-.actions a{display:inline-block; background:var(--brand); color:#fff; padding:10px 14px; border-radius:10px; font-weight:700; margin-left:8px}
-.panel{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; margin:16px 0; box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.panel h2{margin:0 0 12px; font-size:16px; letter-spacing:.3px}
-.help{color:var(--muted); font-size:12px; margin:4px 0 14px}
+  <!-- Style intégré -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0d0d0d;
+      color: #f2f2f2;
+    }
 
-.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:6px 0 18px}
-.kpi{background:linear-gradient(180deg,var(--panel),#141823); border:1px solid var(--line); border-radius:14px; padding:14px}
-.kpi .label{color:var(--muted); font-size:12px}
-.kpi .value{font-size:22px; font-weight:800; margin-top:6px}
-.kpi .tag{display:inline-block; margin-top:6px; padding:4px 8px; font-size:11px; border-radius:999px; background:var(--chip); color:var(--muted)}
+    header {
+      background: #111;
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 2px solid #a6005c;
+    }
 
-.filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
-select,input[type="text"],button.btn{background:#121520; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-weight:600}
-input::placeholder{color:#66708a}
-button.btn{cursor:pointer; transition:.18s transform ease}
-button.btn:hover{transform:translateY(-1px)}
-.btn.brand{background:var(--brand); border-color:transparent}
-.btn.ghost{background:transparent}
-.btn.warn{background:var(--warn); color:#1b1d22; border-color:transparent}
-.btn.danger{background:var(--danger); border-color:transparent}
-.btn.ok{background:var(--ok); border-color:transparent; color:#0e1418}
-.btn.small{padding:6px 10px; font-size:12px; border-radius:8px}
+    nav {
+      background: #1a1a1a;
+      padding: 10px;
+      text-align: center;
+    }
+    nav a {
+      color: #f2f2f2;
+      text-decoration: none;
+      margin: 0 12px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      color: #ff0080;
+    }
 
-.table-wrap{border:1px solid var(--line); border-radius:14px; overflow:hidden}
-table{width:100%; border-collapse:collapse; font-size:13px}
-thead th{background:#121520; color:#9fb0ff; text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); letter-spacing:.2px}
-tbody td{padding:10px 12px; border-bottom:1px solid var(--line)}
-tbody tr:hover{background:#131826}
-.meta{color:var(--muted)}
-.badge{display:inline-block; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:800}
-.badge.green{background:#10251b; color:#25d28a}
-.badge.yellow{background:#2a240d; color:#ffd35a}
-.badge.red{background:#2a1318; color:#ff6a7a}
-.badge.blue{background:#101b2b; color:#7ca7ff}
-.badge.gray{background:var(--chip); color:var(--muted)}
-.t-right{text-align:right}
-.row-actions{display:flex; gap:6px; flex-wrap:wrap}
-hr.sep{border:none; height:1px; background:var(--line); margin:18px 0}
+    h2 {
+      margin-top: 25px;
+      margin-bottom: 15px;
+      text-align: center;
+      color: #ff0080;
+    }
 
-/* responsive */
-@media (max-width:1024px){ .kpis{grid-template-columns:repeat(2,1fr)} }
-@media (max-width:620px){
-  .wrap{padding:14px}
-  .kpis{grid-template-columns:1fr}
-  thead{display:none}
-  table,tbody,tr,td{display:block; width:100%}
-  tbody tr{padding:10px 12px}
-  tbody td{border:none; padding:6px 0}
-  .t-right{text-align:left}
-}
-</style>
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table th, table td {
+      padding: 12px;
+      text-align: center;
+    }
+    table th {
+      background: #a6005c;
+      color: #fff;
+      font-weight: bold;
+    }
+    table tr:nth-child(even) {
+      background: #262626;
+    }
+    table tr:hover {
+      background: #333;
+    }
+
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-suspendre { background: #ffcc00; color: #000; }
+    .btn-supprimer { background: #e60000; color: #fff; }
+    .btn-valider   { background: #009933; color: #fff; }
+    .btn-paye      { background: #0066ff; color: #fff; }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #111;
+      margin-top: 30px;
+      border-top: 2px solid #a6005c;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+      table tr {
+        margin-bottom: 15px;
+      }
+      table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+      table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        text-align: left;
+        font-weight: bold;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="header">
-      <div>
-        <div class="breadcrumbs">Dashboard → <b>Velvet (admin)</b></div>
-        <div class="h1">Pilotage de la plateforme</div>
-      </div>
-      <div class="actions">
-        <a href="index.html">Accueil</a>
-        <a href="admin-items.html">Créer un item</a>
-      </div>
-    </div>
 
-    <!-- KPIs -->
-    <div class="kpis" id="kpis">
-      <div class="kpi"><div class="label">Ventes (CHF)</div><div class="value" id="k_total">—</div><div class="tag">Toutes périodes</div></div>
-      <div class="kpi"><div class="label">Pour créatrices (70%)</div><div class="value" id="k_c70">—</div><div class="tag">À verser</div></div>
-      <div class="kpi"><div class="label">Pour Velvet (30%)</div><div class="value" id="k_v30">—</div><div class="tag">Commission</div></div>
-      <div class="kpi"><div class="label">Impayé</div><div class="value" id="k_unpaid">—</div><div class="tag">Solde non payé</div></div>
-    </div>
+  <header>
+    Dashboard — Velvet (admin)
+  </header>
 
-    <!-- Comptes -->
-    <section class="panel">
-      <h2>Comptes — <span class="meta">valider / suspendre / supprimer</span></h2>
-      <p class="help">“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</p>
+  <nav>
+    <a href="#">Accueil</a>
+    <a href="#">Créer un item</a>
+    <a href="#">Rafraîchir</a>
+  </nav>
 
-      <div class="filters">
-        <label>Status
-          <select id="f_status">
-            <option value="">Tous</option>
-            <option value="pending">En attente</option>
-            <option value="active">Actif</option>
-            <option value="suspended">Suspendu</option>
-          </select>
-        </label>
-        <label>Rôle
-          <select id="f_role">
-            <option value="">Tous</option>
-            <option value="creator">Créatrice</option>
-            <option value="client">Client</option>
-          </select>
-        </label>
-        <input type="text" id="f_q" placeholder="🔎 pseudo / email" />
-        <button class="btn small ghost" id="refreshUsers">Rafraîchir</button>
-      </div>
+  <div class="container">
+    <h2>Comptes — valider / suspendre / supprimer</h2>
+    <p>“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</p>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody id="tb_users">
-            <tr><td colspan="6" class="meta">Chargement…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Pseudo</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Date">16/08/2025</td>
+          <td data-label="Pseudo">Exemple1</td>
+          <td data-label="Email">exemple@mail.com</td>
+          <td data-label="Rôle">Créatrice</td>
+          <td data-label="Statut">En attente</td>
+          <td>
+            <button class="btn-valider">Valider</button>
+            <button class="btn-suspendre">Suspendre</button>
+            <button class="btn-supprimer">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-    <!-- Répartition -->
-    <section class="panel">
-      <h2>Ventes & répartition (70% / 30%)</h2>
-      <p class="help">Clique sur <b>“Marquer payé”</b> quand tu as fait le virement PayPal à la créatrice.</p>
+    <h2>Ventes & répartition (70% / 30%)</h2>
+    <p>Clique sur “Marquer payé” quand tu as fait le virement PayPal à la créatrice.</p>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Créatrice</th><th class="t-right">Ventes (CHF)</th>
-              <th class="t-right">Pour elle (70%)</th><th class="t-right">Pour Velvet (30%)</th>
-              <th class="t-right">Impayé</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="tb_creators">
-            <tr><td colspan="6" class="meta">Chargement…</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Créatrice</th>
+          <th>Ventes (CHF)</th>
+          <th>Pour elle (70%)</th>
+          <th>Pour Velvet (30%)</th>
+          <th>Impayé</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Créatrice">Exemple2</td>
+          <td data-label="Ventes">120 CHF</td>
+          <td data-label="Pour elle">84 CHF</td>
+          <td data-label="Pour Velvet">36 CHF</td>
+          <td data-label="Impayé">Oui</td>
+          <td><button class="btn-paye">Marquer payé</button></td>
+        </tr>
+      </tbody>
+    </table>
 
-      <div style="margin-top:10px; display:flex; gap:10px;">
-        <button id="exportCsv" class="btn ghost small">Exporter CSV</button>
-        <button id="refreshLedger" class="btn ghost small">Rafraîchir</button>
-      </div>
-    </section>
-
-    <!-- Détail des ventes -->
-    <section class="panel">
-      <h2>Détail des ventes</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th><th>Créatrice</th><th>Type</th><th class="t-right">Montant</th>
-              <th>Txn</th><th>Email client</th><th>Status</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="tb_sales">
-            <tr><td colspan="8" class="meta">Chargement…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <hr class="sep"/>
-
-    <p class="meta">Besoin d’une autre vue / filtres (par période, par créatrice) ? Dis‑moi ce que tu veux et je te le mets.</p>
+    <h2>Détail des ventes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Créatrice</th>
+          <th>Type</th>
+          <th>Montant</th>
+          <th>Txn</th>
+          <th>Email client</th>
+          <th>Statut</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Date">16/08/2025</td>
+          <td data-label="Créatrice">Exemple2</td>
+          <td data-label="Type">Abonnement</td>
+          <td data-label="Montant">39 CHF</td>
+          <td data-label="Txn">#12345</td>
+          <td data-label="Email client">client@mail.com</td>
+          <td data-label="Statut">Payé</td>
+          <td>-</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-<!-- LOGIQUE -->
-<script>
-const $ = (id)=>document.getElementById(id);
-const fmtCHF = (n)=> (Number(n||0)).toFixed(2).replace('.', ',');
+  <footer>
+    Velvet Creators VIP — Dashboard Admin © 2025
+  </footer>
 
-/* ---------- Comptes ---------- */
-let USERS_RAW = [];
-async function loadUsers(){
-  $('tb_users').innerHTML = `<tr><td colspan="6" class="meta">Chargement…</td></tr>`;
-  const r = await fetch('/api/list-users'); const j = await r.json();
-  USERS_RAW = Array.isArray(j.users) ? j.users : [];
-  renderUsers();
-}
-function renderUsers(){
-  const status = $('f_status').value, role = $('f_role').value, q = $('f_q').value.toLowerCase();
-  const rows = USERS_RAW.filter(u=>{
-    const okS = !status || u.status===status;
-    const okR = !role || u.role===role;
-    const okQ = !q || (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
-    return okS && okR && okQ;
-  }).map(u=>{
-    const badge = u.status==='active' ? 'green' : u.status==='pending' ? 'yellow' : 'red';
-    const roleB = u.role==='creator' ? 'blue' : 'gray';
-    return `<tr>
-      <td>${new Date(u.createdAt||u.created||Date.now()).toLocaleDateString()}</td>
-      <td>${u.username||'—'}</td>
-      <td class="meta">${u.email||'—'}</td>
-      <td><span class="badge ${roleB}">${u.role||'—'}</span></td>
-      <td><span class="badge ${badge}">${u.status||'—'}</span></td>
-      <td class="row-actions">
-        ${u.status!=='active' ? `<button class="btn small ok" data-act="unsuspend" data-id="${u.id||u.email}">Activer</button>` : `<button class="btn small warn" data-act="suspend" data-id="${u.id||u.email}">Suspendre</button>`}
-        <button class="btn small danger" data-act="delete" data-id="${u.id||u.email}">Supprimer</button>
-      </td>
-    </tr>`;
-  }).join('');
-  $('tb_users').innerHTML = rows || `<tr><td colspan="6" class="meta">Aucun compte.</td></tr>`;
-}
-$('refreshUsers').onclick = loadUsers;
-$('f_status').onchange = renderUsers; $('f_role').onchange = renderUsers; $('f_q').oninput = renderUsers;
-
-document.addEventListener('click', async (e)=>{
-  const b = e.target.closest('button[data-act]'); if(!b) return;
-  const id = b.getAttribute('data-id'); const act = b.getAttribute('data-act');
-  if(act==='delete' && !confirm('Supprimer ce profil ?')) return;
-  const url = act==='suspend' ? '/api/suspend-user' : act==='unsuspend' ? '/api/unsuspend-user' : '/api/delete-user';
-  const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id }) });
-  const j = await r.json();
-  if(!r.ok || j.ok!==true){ alert('Action impossible'); return; }
-  loadUsers();
-});
-
-/* ---------- Ledger (ventes) ---------- */
-let LEDGER = null;
-async function loadLedger(){
-  $('tb_creators').innerHTML = `<tr><td colspan="6" class="meta">Chargement…</td></tr>`;
-  $('tb_sales').innerHTML = `<tr><td colspan="8" class="meta">Chargement…</td></tr>`;
-  const r = await fetch('/api/list-ledger'); LEDGER = await r.json();
-
-  const t = LEDGER.totals || {};
-  $('k_total').textContent = fmtCHF(t.total||0);
-  $('k_c70').textContent   = fmtCHF(t.toCreators||0);
-  $('k_v30').textContent   = fmtCHF(t.toVelvet||0);
-  $('k_unpaid').textContent= fmtCHF(t.unpaid||0);
-
-  // recap par créatrice
-  const creators = LEDGER.creators || {};
-  const rows = Object.values(creators).map(c=>{
-    const unpaid = Number(c.unpaid||0);
-    return `<tr>
-      <td>${c.name||c.id||'—'}</td>
-      <td class="t-right">${fmtCHF(c.total||0)}</td>
-      <td class="t-right">${fmtCHF(c.toCreator||0)}</td>
-      <td class="t-right">${fmtCHF(c.toVelvet||0)}</td>
-      <td class="t-right">${unpaid>0?`<span class="badge yellow">${fmtCHF(unpaid)}</span>`:`<span class="badge green">0,00</span>`}</td>
-      <td>${unpaid>0?`<button class="btn small ok" data-pay="${c.id}">Marquer payé</button>`:'—'}</td>
-    </tr>`;
-  }).join('');
-  $('tb_creators').innerHTML = rows || `<tr><td colspan="6" class="meta">Aucune vente.</td></tr>`;
-
-  // détails
-  const sales = Array.isArray(LEDGER.sales)? LEDGER.sales : [];
-  const rows2 = sales.map(s=>{
-    const badge = s.status==='paid' ? 'green' : 'yellow';
-    return `<tr>
-      <td>${new Date(s.date||Date.now()).toLocaleString()}</td>
-      <td>${s.creatorName||s.creatorId||'—'}</td>
-      <td><span class="badge blue">${s.type||'ppv'}</span></td>
-      <td class="t-right">${fmtCHF(s.amount||0)}</td>
-      <td class="meta">${s.txn||'—'}</td>
-      <td class="meta">${s.buyerEmail||'—'}</td>
-      <td><span class="badge ${badge}">${s.status||'pending'}</span></td>
-      <td>—</td>
-    </tr>`;
-  }).join('');
-  $('tb_sales').innerHTML = rows2 || `<tr><td colspan="8" class="meta">Aucune vente pour l’instant.</td></tr>`;
-}
-$('refreshLedger').onclick = loadLedger;
-
-// Marquer payé
-document.addEventListener('click', async (e)=>{
-  const pay = e.target.closest('button[data-pay]'); if(!pay) return;
-  const creatorId = pay.getAttribute('data-pay');
-  if(!confirm('Confirmer le marquage “payé” pour cette créatrice ?')) return;
-  const r = await fetch('/api/mark-paid', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ creatorId }) });
-  const j = await r.json(); if(!r.ok || j.ok!==true){ alert('Échec marquage.'); return; }
-  loadLedger();
-});
-
-// Export CSV
-$('exportCsv').onclick = ()=>{
-  if(!LEDGER || !Array.isArray(LEDGER.sales)) return;
-  const head = ['date','creator','type','amount','txn','buyerEmail','status'];
-  const lines = [head.join(',')].concat(LEDGER.sales.map(s=>[
-    new Date(s.date||Date.now()).toISOString(),
-    (s.creatorName||s.creatorId||'').replaceAll(',',' '),
-    s.type||'ppv',
-    String(Number(s.amount||0).toFixed(2)).replace('.',','),
-    (s.txn||'').replaceAll(',',' '),
-    (s.buyerEmail||'').replaceAll(',',' '),
-    s.status||'pending'
-  ].join(',')));
-  const blob = new Blob([lines.join('\n')], { type:'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'velvet-ventes.csv'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-};
-
-// Go
-loadUsers(); loadLedger();
-</script>
 </body>
 </html>
