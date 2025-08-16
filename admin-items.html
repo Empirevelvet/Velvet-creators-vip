@@ -1,162 +1,381 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin — Créer un item</title>
-  <link href="styles.css" rel="stylesheet" />
-  <style>
-    /* petit style local pour rendre le formulaire propre */
-    .admin-box{max-width:780px;margin:8vh auto;padding:24px 22px;background:rgba(18,18,18,.92);border-radius:18px;box-shadow:0 18px 54px rgba(0,0,0,.5)}
-    .admin-box h1{margin:0 0 14px;font-size:clamp(22px,2.4vw,34px)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .grid .full{grid-column:1 / -1}
-    label{display:block;color:#e6e6e6;margin:4px 0 6px}
-    input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(12,12,12,.85);color:#f4f4f4}
-    .hint{font-size:.95rem;opacity:.75;margin-top:2px}
-    .actions{display:flex;gap:10px;align-items:center;margin-top:16px}
-    .btn{display:inline-block;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none;border:1px solid rgba(233,200,122,.35);background:linear-gradient(180deg,#f4d88f,#d8b565);color:#141414;box-shadow:0 8px 22px rgba(0,0,0,.25)}
-    .btn.ghost{background:transparent;color:#f4d88f;border-color:rgba(233,200,122,.35)}
-    .result{margin-top:18px;padding:14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
-    code, .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
-    .ok{color:#9be879}
-    .err{color:#ff6b6b}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Velvet — Admin Items</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161a24; --muted:#98a2b3; --text:#e9edf4;
+    --brand:#7c5cff; --ok:#26c08a; --warn:#ffb020; --danger:#ff5a7a;
+    --line:#23293a; --chip:#1b2130; --thead:#121827;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
+  a{color:var(--brand);text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 14px}
+  header{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .logo{font-weight:800}
+  .btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:var(--chip);color:var(--text);border:1px solid var(--line)}
+  .btn.small{padding:7px 10px;font-size:12px;border-radius:8px}
+  .muted{color:var(--muted)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+  h1{font-size:20px;margin:0 0 8px}
+  h2{font-size:16px;margin:0 0 8px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
+  @media(max-width:920px){ .grid{grid-template-columns:1fr} }
+
+  .form label{display:block;font-weight:700;margin:8px 0 4px}
+  .input, select, textarea{width:100%;background:#0f141e;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 10px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .help{font-size:12px;color:var(--muted);margin-top:4px}
+  .kpi{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+  .kpi .l{color:var(--muted);font-size:12px}
+  .kpi .v{font-size:20px;font-weight:800;margin-top:6px}
+
+  .tablewrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
+  table{width:100%;border-collapse:collapse;min-width:760px}
+  thead th{position:sticky;top:0;background:var(--thead);color:#b7c0d8;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#151c2a}
+  .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:var(--chip)}
+  .chip.ok{background:rgba(38,192,138,.12);border-color:rgba(38,192,138,.35);color:#9bf0cf}
+  .chip.warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.35);color:#ffd993}
+  .chip.bad{background:rgba(255,90,122,.12);border-color:rgba(255,90,122,.35);color:#ffb5c3}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+  .right{text-align:right}
+  .toast{position:fixed;right:14px;bottom:14px;background:#0f1726;border:1px solid var(--line);padding:12px 14px;border-radius:12px;display:none;box-shadow:0 10px 26px rgba(0,0,0,.35);font-weight:700}
+</style>
 </head>
 <body>
-
-<header class="header">
-  <nav class="nav">
-    <a class="cta" href="index.html">Accueil</a>
-    <a class="cta" href="signup.html">S’inscrire</a>
-    <a class="cta" href="login.html">Connexion</a>
-  </nav>
-</header>
-
-<main>
-  <section class="admin-box">
-    <h1>Créer un item (photo / vidéo / PPV / live)</h1>
+  <div class="wrap">
+    <header>
+      <div class="logo">Velvet — <span class="muted">Admin Items</span></div>
+      <span style="flex:1"></span>
+      <a class="btn ghost small" href="index.html">Accueil</a>
+      <a class="btn ghost small" href="admin-dashboard.html">Dashboard</a>
+      <button id="reload" class="btn small">Rafraîchir</button>
+    </header>
 
     <div class="grid">
-      <div class="full">
-        <label for="creatorId">ID créatrice</label>
-        <input id="creatorId" placeholder="ex: user_1234 (ou laisse vide pour ‘creatrice-demo’)" />
-        <div class="hint">Utilisé pour associer la vente à la créatrice (suivi des revenus).</div>
-      </div>
+      <!-- FORMULAIRE ITEM -->
+      <section class="panel">
+        <h1>Créer / éditer un item</h1>
+        <p class="muted">PPV (photo/vidéo), pourboire, abonnement, live public (ticket), live privé.</p>
 
-      <div>
-        <label for="title">Titre</label>
-        <input id="title" placeholder="ex: Live privé du samedi soir" />
-      </div>
+        <form id="itemForm" class="form" onsubmit="return false;">
+          <input type="hidden" id="itemId"/>
 
-      <div>
-        <label for="type">Type</label>
-        <select id="type">
-          <option value="image">Image (PPV)</option>
-          <option value="video">Vidéo (PPV)</option>
-          <option value="live">Live (ticket)</option>
-        </select>
-      </div>
+          <label for="title">Titre *</label>
+          <input id="title" class="input" placeholder="Ex: Photo exclusive, Live samedi 21:00" required/>
 
-      <div>
-        <label for="price">Prix (CHF)</label>
-        <input id="price" type="number" min="0" step="0.05" placeholder="ex: 29.00" />
-      </div>
+          <label for="description">Description</label>
+          <textarea id="description" class="input" rows="3" placeholder="Détail visible avant achat (optionnel)"></textarea>
 
-      <div id="roomWrap" style="display:none">
-        <label for="room">Nom de la salle (live)</label>
-        <input id="room" placeholder="ex: velvet-samedi-22h" />
-        <div class="hint">Ce nom identifie la salle live (utilisé par <span class="mono">live.html?room=...</span>).</div>
-      </div>
+          <div class="row">
+            <div>
+              <label for="type">Type *</label>
+              <select id="type" class="input" required>
+                <option value="ppv">PPV (photo/vidéo/objet)</option>
+                <option value="tip">Pourboire</option>
+                <option value="subscription">Abonnement</option>
+                <option value="live_public">Live public (ticket)</option>
+                <option value="live_private">Live privé (1:1)</option>
+                <option value="vip_access">Espace VIP (accès)</option>
+              </select>
+            </div>
+            <div>
+              <label for="price">Prix (CHF) *</label>
+              <input id="price" class="input" type="number" min="0" step="0.10" placeholder="Ex: 12.90" required/>
+              <div class="help">Pour l’abonnement normal, minimum 12.90 (à respecter manuellement).</div>
+            </div>
+          </div>
 
-      <div class="full">
-        <label for="notes">Notes privées (optionnel)</label>
-        <textarea id="notes" rows="3" placeholder="Infos internes (non visibles client)"></textarea>
-      </div>
+          <div class="row">
+            <div>
+              <label for="creatorId">ID créatrice *</label>
+              <input id="creatorId" class="input" placeholder="Ex: user_abc123" required/>
+              <div class="help">Sert au split 70/30 et au suivi.</div>
+            </div>
+            <div>
+              <label for="creatorName">Pseudo créatrice</label>
+              <input id="creatorName" class="input" placeholder="@pseudo (optionnel)"/>
+            </div>
+          </div>
+
+          <div class="row3" id="liveFields" style="display:none">
+            <div>
+              <label for="liveStart">Début (date/heure)</label>
+              <input id="liveStart" class="input" type="datetime-local"/>
+            </div>
+            <div>
+              <label for="liveDuration">Durée (min)</label>
+              <input id="liveDuration" class="input" type="number" min="5" step="5" placeholder="ex: 30"/>
+            </div>
+            <div>
+              <label for="liveCapacity">Places max</label>
+              <input id="liveCapacity" class="input" type="number" min="1" step="1" placeholder="ex: 200"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="mediaUrl">Media URL (optionnel)</label>
+              <input id="mediaUrl" class="input" placeholder="https://... (thumb/preview)"/>
+              <div class="help">Aperçu flouté/miniature si PPV.</div>
+            </div>
+            <div>
+              <label for="status">Statut *</label>
+              <select id="status" class="input" required>
+                <option value="active">Actif</option>
+                <option value="archived">Archivé</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label><input type="checkbox" id="vipOnly"/> Réservé aux membres VIP</label>
+              <div class="help">Coche si l’achat n’est visible qu’aux membres VIP.</div>
+            </div>
+            <div>
+              <label><input type="checkbox" id="isOneToOne"/> Live privé (one‑to‑one)</label>
+              <div class="help">Utilisé surtout si “Live privé”.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="saveItem" class="btn">Enregistrer</button>
+            <button id="resetForm" class="btn ghost" type="button">Réinitialiser</button>
+          </div>
+
+          <div class="kpi">
+            <div class="l">Lien d’achat (après enregistrement)</div>
+            <div class="v" id="buyLink">—</div>
+            <div class="help">Forme : <code>/paiement.html?itemId=...</code></div>
+          </div>
+        </form>
+      </section>
+
+      <!-- LISTE ITEMS -->
+      <section class="panel">
+        <h2>Items existants</h2>
+        <div class="help">Clique sur “Éditer” pour charger un item dans le formulaire. “Archiver” le cache côté clients.</div>
+
+        <div class="tablewrap" style="margin-top:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Créatrice</th>
+                <th>Titre</th>
+                <th>Type</th>
+                <th class="right">Prix</th>
+                <th>Statut</th>
+                <th>VIP</th>
+                <th>Lien</th>
+                <th class="right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbItems">
+              <tr><td colspan="8" class="muted">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
+  </div>
 
-    <div class="actions">
-      <button class="btn" id="createBtn">Créer l’item</button>
-      <button class="btn ghost" id="resetBtn">Réinitialiser</button>
-    </div>
+  <div id="toast" class="toast"></div>
 
-    <div class="result" id="resultBox" style="display:none"></div>
-  </section>
-</main>
-
-<script>
-  // Valeurs par défaut utiles
-  const input = (id) => document.getElementById(id);
-  const resultBox = document.getElementById('resultBox');
-  const typeEl = input('type');
-  const roomWrap = document.getElementById('roomWrap');
-
-  // Affiche / masque le champ "room" selon le type
-  const toggleRoom = () => {
-    roomWrap.style.display = (typeEl.value === 'live') ? '' : 'none';
+  <script>
+  // ===== Helpers UI/API =====
+  const $ = (sel, root=document)=>root.querySelector(sel);
+  const $$ = (sel, root=document)=>[...root.querySelectorAll(sel)];
+  const toast=(t, ok=true)=>{ const el=$("#toast"); el.textContent=t; el.style.display="block"; el.style.borderColor= ok ? "#214c36" : "#5e2020"; setTimeout(()=>el.style.display="none", 2200); };
+  const api = async (url, opt={})=>{
+    try{
+      const r = await fetch(url, { headers:{'Content-Type':'application/json'}, ...opt });
+      const j = await r.json().catch(()=>null);
+      return { ok:r.ok, status:r.status, data:j };
+    }catch(e){ return { ok:false, status:0, data:null }; }
   };
-  typeEl.addEventListener('change', toggleRoom);
-  toggleRoom();
+  const siteBase = location.origin; // pour fabriquer le lien d'achat
 
-  // Construit l’URL absolue du site (utile pour composer les liens)
-  const origin = window.location.origin || '';
+  // ===== Champs =====
+  const f = {
+    id: $("#itemId"),
+    title: $("#title"),
+    description: $("#description"),
+    type: $("#type"),
+    price: $("#price"),
+    creatorId: $("#creatorId"),
+    creatorName: $("#creatorName"),
+    mediaUrl: $("#mediaUrl"),
+    status: $("#status"),
+    vipOnly: $("#vipOnly"),
+    isOneToOne: $("#isOneToOne"),
+    liveStart: $("#liveStart"),
+    liveDuration: $("#liveDuration"),
+    liveCapacity: $("#liveCapacity"),
+    buyLink: $("#buyLink")
+  };
 
-  document.getElementById('createBtn').onclick = async () => {
-    const creatorId = input('creatorId').value.trim() || 'creatrice-demo';
-    const title     = input('title').value.trim();
-    const type      = typeEl.value;
-    const price     = parseFloat(input('price').value || '0');
-    const room      = input('room').value.trim();
-    const notes     = input('notes').value.trim();
+  // Afficher/masquer les champs live
+  function onTypeChange(){
+    const t = f.type.value;
+    $("#liveFields").style.display = (t==="live_public" || t==="live_private") ? "grid" : "none";
+    f.isOneToOne.checked = (t==="live_private");
+  }
+  f.type.addEventListener('change', onTypeChange);
 
-    if (!title)  return show('err', 'Le titre est requis.');
-    if (isNaN(price) || price <= 0) return show('err', 'Le prix doit être supérieur à 0.');
-    if (type === 'live' && !room)   return show('err', 'Pour un live, indique un nom de salle.');
+  // Charger la liste des items
+  async function loadItems(){
+    $("#tbItems").innerHTML = `<tr><td colspan="8" class="muted">Chargement…</td></tr>`;
+    const r = await api('/api/get-items');
+    if(!r.ok){ $("#tbItems").innerHTML = `<tr><td colspan="8" class="muted">Erreur /api/get-items (status ${r.status})</td></tr>`; return; }
+    const items = r.data?.items || r.data || [];
+    if(!items.length){ $("#tbItems").innerHTML = `<tr><td colspan="8" class="muted">Aucun item pour le moment.</td></tr>`; return; }
 
-    try {
-      const res = await fetch('/api/upsert-item', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ creatorId, title, type, price, room, notes })
-      });
-      const data = await res.json();
-      if (!res.ok || !data || !data.itemId) {
-        throw new Error(data && data.error ? data.error : 'Réponse invalide du serveur');
-      }
+    $("#tbItems").innerHTML = items.sort((a,b)=>String(b.created||'').localeCompare(String(a.created||''))).map(it=>{
+      const buy = `${siteBase}/paiement.html?itemId=${encodeURIComponent(it.id||it._id||'')}`;
+      const vip = it.vipOnly ? '<span class="chip warn">VIP</span>' : '<span class="chip">—</span>';
+      const st = it.status==='archived' ? '<span class="chip bad">archivé</span>' : '<span class="chip ok">actif</span>';
+      const price = (Number(it.price||0)).toFixed(2).replace('.', ',') + ' CHF';
+      return `<tr>
+        <td>${escapeHtml(it.creatorName||'') || escapeHtml(it.creatorId||'—')}</td>
+        <td>${escapeHtml(it.title||'')}</td>
+        <td><span class="chip">${escapeHtml(it.type||'ppv')}</span></td>
+        <td class="right">${price}</td>
+        <td>${st}</td>
+        <td>${vip}</td>
+        <td><a href="${buy}" target="_blank">payer</a></td>
+        <td class="right row-actions">
+          <button class="btn small ghost" data-edit="${it.id||it._id}">Éditer</button>
+          ${it.status==='archived'
+            ? `<button class="btn small" data-arch="${it.id||it._id}" data-to="active">Activer</button>`
+            : `<button class="btn small ghost" data-arch="${it.id||it._id}" data-to="archived">Archiver</button>`
+          }
+          <button class="btn small ghost" data-copy="${buy}">Copier lien</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
 
-      // Lien paiement / affichage selon type
-      const payLink = `${origin}/paiement.html?item=${encodeURIComponent(data.itemId)}`;
-      const liveLink = (type === 'live' && room) ? `${origin}/live.html?room=${encodeURIComponent(room)}` : null;
+  // Copier lien
+  $("#tbItems").addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-copy]');
+    if(!b) return;
+    navigator.clipboard.writeText(b.dataset.copy).then(()=>toast('Lien copié'));
+  });
 
-      show('ok', `
-        ✅ <strong>Item créé avec succès</strong><br/>
-        <span class="mono">ID</span> : <code>${data.itemId}</code><br/>
-        <span class="mono">Titre</span> : <code>${escapeHtml(title)}</code><br/>
-        <span class="mono">Type</span> : <code>${type}</code><br/>
-        <span class="mono">Prix</span> : <code>${price.toFixed(2)} CHF</code><br/>
-        ${liveLink ? `<div style="margin-top:8px">Lien salle live : <a href="${liveLink}" target="_blank">${liveLink}</a></div>` : ``}
-        <div style="margin-top:8px">Lien paiement à envoyer au client : <a href="${payLink}" target="_blank">${payLink}</a></div>
-      `);
-    } catch (err) {
-      show('err', '❌ Erreur : ' + err.message);
+  // Charger un item dans le formulaire
+  $("#tbItems").addEventListener('click', (e)=>{
+    const b = e.target.closest('button[data-edit]');
+    if(!b) return;
+    const row = b.closest('tr');
+    const tds = row.querySelectorAll('td');
+    // Récup rapide via dataset n’étant pas dispo, on refait un fetch précis par id si besoin.
+    // Pour rester simple, on relit toute la liste et on filtre :
+    fetch('/api/get-items').then(r=>r.json()).then(j=>{
+      const all = j.items || j || [];
+      const it = all.find(x=> String(x.id||x._id) === b.dataset.edit);
+      if(!it){ toast('Introuvable', false); return; }
+      fillForm(it);
+      toast('Item chargé');
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // Archiver / Activer
+  $("#tbItems").addEventListener('click', async (e)=>{
+    const b = e.target.closest('button[data-arch]');
+    if(!b) return;
+    const id = b.dataset.arch, to = b.dataset.to;
+    const r = await api('/api/upsert-item', { method:'POST', body: JSON.stringify({ id, status: to }) });
+    r.ok ? (toast(to==='archived'?'Archivé':'Activé'), loadItems()) : toast('Erreur upsert', false);
+  });
+
+  function fillForm(it){
+    f.id.value = it.id || it._id || '';
+    f.title.value = it.title || '';
+    f.description.value = it.description || '';
+    f.type.value = it.type || 'ppv';
+    f.price.value = it.price || '';
+    f.creatorId.value = it.creatorId || '';
+    f.creatorName.value = it.creatorName || '';
+    f.mediaUrl.value = it.mediaUrl || '';
+    f.status.value = it.status || 'active';
+    f.vipOnly.checked = !!it.vipOnly;
+    f.isOneToOne.checked = !!it.isOneToOne;
+
+    // live
+    const ds = it.liveStart ? new Date(it.liveStart) : null;
+    f.liveStart.value = ds ? new Date(ds.getTime() - ds.getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
+    f.liveDuration.value = it.liveDuration || '';
+    f.liveCapacity.value = it.liveCapacity || '';
+
+    onTypeChange();
+
+    const id = f.id.value;
+    f.buyLink.textContent = id ? `${siteBase}/paiement.html?itemId=${encodeURIComponent(id)}` : '—';
+  }
+
+  // Enregistrer
+  $("#saveItem").addEventListener('click', async ()=>{
+    // validations simples
+    if(!f.title.value.trim()) return toast('Titre requis', false);
+    if(!f.price.value || Number(f.price.value)<0) return toast('Prix invalide', false);
+    if(!f.creatorId.value.trim()) return toast('ID créatrice requis', false);
+
+    const payload = {
+      id: f.id.value || undefined,
+      title: f.title.value.trim(),
+      description: f.description.value.trim(),
+      type: f.type.value,
+      price: Number(f.price.value),
+      currency: 'CHF',
+      creatorId: f.creatorId.value.trim(),
+      creatorName: f.creatorName.value.trim() || undefined,
+      mediaUrl: f.mediaUrl.value.trim() || undefined,
+      status: f.status.value,
+      vipOnly: !!f.vipOnly.checked,
+      isOneToOne: !!f.isOneToOne.checked
+    };
+
+    if(f.type.value==='live_public' || f.type.value==='live_private'){
+      payload.liveStart   = f.liveStart.value ? new Date(f.liveStart.value).toISOString() : undefined;
+      payload.liveDuration= f.liveDuration.value ? Number(f.liveDuration.value) : undefined;
+      payload.liveCapacity= f.liveCapacity.value ? Number(f.liveCapacity.value) : undefined;
     }
-  };
 
-  document.getElementById('resetBtn').onclick = () => {
-    ['creatorId','title','price','room','notes'].forEach(id => input(id).value = '');
-    typeEl.value = 'image';
-    toggleRoom();
-    resultBox.style.display = 'none';
-    resultBox.innerHTML = '';
-  };
+    const r = await api('/api/upsert-item', { method:'POST', body: JSON.stringify(payload) });
+    if(!r.ok){ toast('Erreur enregistrement', false); return; }
 
-  function show(kind, html){
-    resultBox.style.display = '';
-    resultBox.innerHTML = `<div class="${kind}">${html}</div>`;
-  }
-  function escapeHtml(s){
-    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-</script>
+    const saved = r.data?.item || r.data;
+    fillForm(saved);
+    toast('Enregistré');
+    loadItems();
+  });
+
+  // Reset
+  $("#resetForm").addEventListener('click', ()=>{
+    $("#itemForm").reset();
+    f.id.value = '';
+    f.buyLink.textContent = '—';
+    onTypeChange();
+  });
+
+  // Reload
+  $("#reload").addEventListener('click', ()=> loadItems() );
+
+  // Utils
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  // Boot
+  onTypeChange();
+  loadItems();
+  </script>
 </body>
 </html>
