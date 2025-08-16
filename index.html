@@ -1,50 +1,63 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Connexion — Velvet Creators VIP</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Velvet – Accueil</title>
+  <link href="styles.css" rel="stylesheet"/>
 </head>
 <body>
-  <!-- HEADER -->
+  <!-- Header -->
   <header class="header">
-    <div class="container">
-      <h1 class="logo">Velvet Creators VIP</h1>
-      <nav class="nav">
-        <ul>
-          <li><a href="index.html">Accueil</a></li>
-          <li><a href="signup.html">Inscription</a></li>
-          <li><a href="login.html" class="active">Connexion</a></li>
-        </ul>
-      </nav>
-    </div>
+    <nav class="nav">
+      <a href="login.html">Se connecter</a>
+      <a class="cta" href="signup.html">S’inscrire</a>
+    </nav>
   </header>
 
-  <!-- MAIN -->
-  <main class="main-content">
-    <section class="form-section">
-      <h2>Connexion à votre espace</h2>
-      <p>Accédez à votre profil en toute sécurité.</p>
-
-      <form action="profile.html" method="post" class="form">
-        <label for="username">Pseudo ou e-mail</label>
-        <input type="text" id="username" name="username" required />
-
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" required />
-
-        <button type="submit" class="btn gold">Se connecter</button>
-      </form>
+  <!-- Hero Section -->
+  <main class="hero">
+    <section class="hero-card">
+      <span class="badge">Adultes 18+ – Accès membre</span>
+      <img alt="Velvet Creators VIP" class="hero-logo" src="logo-hero.png"/>
+      <div class="lead">
+        <p>Bienvenue dans l’univers exclusif de <strong>VELVET CREATORS VIP</strong>.</p>
+        <p>Ici, chaque femme, homme ou personne non-binaire devient maître de son art.</p>
+        <p>Que tu sois <strong>anonyme</strong>, <strong>magnétique</strong> ou <strong>déjà célèbre</strong>, ton univers t’appartient.</p>
+        <p><strong>Photos, vidéos, objets rares ou créations sensuelles</strong>, lives privés ou collectifs : <strong>TOUT</strong> peut être vendu, à tes conditions.</p>
+        <p>Tu peux choisir de te montrer… ou de rester dans l’ombre. <strong>Sois libre. Sois puissant(e). Sois désirable.</strong></p>
+        <p><strong>Rejoins la plateforme la plus sélective du moment, où ton talent devient un EMPIRE.</strong></p>
+      </div>
+      <div class="ctas">
+        <a class="btn" href="login.html">Se connecter</a>
+        <a class="btn gold" href="signup.html">S’inscrire</a>
+      </div>
     </section>
   </main>
 
-  <!-- FOOTER -->
+  <!-- Section secondaire -->
+  <section class="section">
+    <p><strong>Tout contenu est monétisable :</strong> ton art, ton mystère ou ta notoriété.</p>
+  </section>
+
+  <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <p>© 2025 Velvet Creators VIP — Tous droits réservés.</p>
-      <a href="legal.html">Mentions légales &amp; CGU</a>
-    </div>
+    <a href="legal.html">Mentions légales &amp; CGU</a>
   </footer>
+
+  <!-- Cookie banner -->
+  <div class="cookie-banner" id="cookie-banner" hidden>
+    <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
+    <div class="cookie-actions">
+      <button class="btn-accept" id="cookie-accept">Accepter</button>
+      <a class="btn-ghost" href="legal.html#cookies">En savoir plus</a>
+    </div>
+  </div>
+
+  <!-- Overlay de fin -->
+  <div aria-hidden="true" class="page-fade-bottom"></div>
+
+  <!-- Script -->
+  <script src="cookies.js"></script>
 </body>
 </html>
