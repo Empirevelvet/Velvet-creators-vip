@@ -1,0 +1,12 @@
+{
+  "name": "velvet-creators-vip",
+  "version": "1.0.0",
+  "description": "Fonctions Netlify pour gérer les paiements PayPal",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
