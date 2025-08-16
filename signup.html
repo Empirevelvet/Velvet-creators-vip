@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Velvet — Inscription</title>
+<link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+<header class="header">
+<nav class="nav">
+<a href="index.html">Accueil</a>
+<a class="cta" href="login.html">Se connecter</a>
+</nav>
+</header>
+<div class="panel">
+<h1>Inscription</h1>
+<p class="lead" style="text-align:center; margin:0 0 8px">Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité &amp; conformité).</p>
+<form action="merci_adhesion.html" class="form-grid" data-netlify="true" data-netlify-honeypot="bot-field" enctype="multipart/form-data" method="POST" name="signup"><input name="form-name" type="hidden" value="signup"/><input name="bot-field" style="display:none" type="text"/>
+<div>
+<label for="handle">Pseudo (obligatoire)</label>
+<input class="input" id="handle" name="handle" placeholder="@pseudo" required="" type="text"/>
+<div class="help">Ceci sera affiché publiquement sur votre profil.</div>
+</div>
+<div>
+<label for="fullname">Nom complet</label>
+<input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required="" type="text"/>
+</div>
+<div>
+<label for="email">Email</label>
+<input class="input" id="email" name="email" placeholder="vous@example.com" required="" type="email"/>
+</div><div><label for="phone">Numéro de téléphone</label><input class="input" id="phone" name="phone" pattern="^\+?[0-9\s\-]{6,20}$" placeholder="+41 79 123 45 67" required="" type="tel"/></div><div class="full"><label for="address">Adresse complète</label><textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required=""></textarea></div><div><label for="role">Je suis</label><div class="row-inline" id="role"><label><input name="role" required="True" type="radio" value="creatrice"/> Créatrice</label><label><input name="role" required="True" type="radio" value="client"/> Client</label></div></div>
+<div>
+<label for="country">Pays</label>
+<input class="input" id="country" name="country" placeholder="Suisse, France…" required="" type="text"/>
+</div>
+<div>
+<label for="dob">Date de naissance</label>
+<input class="input" id="dob" name="dob" required="" type="date"/>
+</div>
+<div>
+<label for="avatar">Avatar (photo de profil) (jpg/png)</label>
+<input accept=".jpg,.jpeg,.png" class="input" id="avatar" name="avatar" type="file"/>
+</div>
+<div class="full">
+<label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
+<input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_front" name="id_front" required="" type="file"/>
+</div>
+<div class="full">
+<label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
+<input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_back" name="id_back" required="" type="file"/>
+</div>
+<div class="full">
+<label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
+<input accept=".jpg,.jpeg,.png" class="input" id="selfie" name="selfie" required="" type="file"/>
+</div>
+<div class="full row-inline">
+<input id="consent" name="consent" required="" type="checkbox"/>
+<label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité &amp; sécurité).</label>
+</div>
+<div class="full form-actions">
+<button class="btn gold" type="submit">Envoyer ma demande</button>
+<a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
+</div>
+</form>
+<p class="help" style="text-align:center; margin-top:14px">
+      Dans votre espace privé, vous renseignerez vos coordonnées de paiement (IBAN ou PayPal).<br/>
+</p>
+</div>
+<footer class="footer">
+<a href="legal.html">Mentions légales &amp; CGU</a>
+</footer>
+<div class="cookie-banner" hidden="" id="cookie-banner">
+<p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
+<div class="cookie-actions">
+<button class="btn-accept" id="cookie-accept">Accepter</button>
+<a class="btn-ghost" href="legal.html#cookies">En savoir plus</a>
+</div>
+</div>
+<div aria-hidden="true" class="page-fade-bottom"></div>
+<script src="assets/js/cookies.js"></script>
+</body>
+</html>
