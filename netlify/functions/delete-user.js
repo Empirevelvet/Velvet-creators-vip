@@ -1,7 +1,5 @@
 // netlify/functions/delete-user.js
-// Supprime un compte : soft delete par défaut (status=deleted, retire l'index pseudo)
-// Hard delete si body.hard === true : efface la fiche utilisateur.
-// On conserve les ventes existantes (audit), mais on peut anonymiser le username si besoin.
+// Soft delete par défaut (status=deleted + reason). Hard delete si body.hard === true.
 
 import { getStore } from "@netlify/blobs";
 
@@ -14,11 +12,12 @@ export const handler = async (event) => {
     const emailInput = (body.email || "").trim().toLowerCase();
     const idInput    = (body.id || "").trim();
     const hard       = !!body.hard;
+    const reason     = (body.reason || "").trim();
 
     const users = getStore("users");
     const byUsername = getStore("by_username");
 
-    // Retrouver l'email si on a seulement l'id
+    // retrouver l'email si on a seulement l'id
     let keyEmail = emailInput;
     let userDoc  = null;
 
@@ -37,20 +36,20 @@ export const handler = async (event) => {
       userDoc = JSON.parse(raw);
     }
 
-    // Retirer l'index pseudo -> email
-    if (userDoc.usernameLower) {
-      try { await byUsername.delete(userDoc.usernameLower); } catch {}
-    }
+    // Retirer index pseudo
+    if (userDoc.usernameLower) { try { await byUsername.delete(userDoc.usernameLower); } catch {} }
 
     if (hard) {
-      // Suppression définitive du document
       await users.delete(keyEmail);
     } else {
-      // Soft delete : status=deleted + anonymisation optionnelle
       userDoc.status = "deleted";
-      // anonymiser si tu veux aller plus loin :
-      // userDoc.username = "deleted_"+userDoc.id.slice(-6);
-      // userDoc.usernameLower = userDoc.username.toLowerCase();
+      userDoc.moderation = Array.isArray(userDoc.moderation) ? userDoc.moderation : [];
+      userDoc.moderation.push({
+        at: new Date().toISOString(),
+        action: "deleted",
+        reason: reason || null
+      });
+      userDoc.statusReason = reason || null;
       await users.set(keyEmail, JSON.stringify(userDoc));
     }
 
