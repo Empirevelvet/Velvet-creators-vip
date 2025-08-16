@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.7",
-    "@netlify/blobs": "^6.5.2"
+    "@netlify/blobs": "^5.3.0"
   },
   "engines": {
     "node": ">=18"
