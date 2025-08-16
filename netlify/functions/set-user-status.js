@@ -11,8 +11,9 @@ export const handler = async (event) => {
     const body = JSON.parse(event.body || "{}");
     const emailInput = (body.email || "").trim().toLowerCase();
     const idInput    = (body.id || "").trim();
-    const newStatus  = (body.status || "").toLowerCase();
-    const newRole    = (body.role || "").toLowerCase(); // optionnel
+    const newStatus  = (body.status || "").toLowerCase();         // approved | rejected | suspended | pending | deleted
+    const newRole    = (body.role || "").toLowerCase();           // optionnel: creator | client
+    const reason     = (body.reason || "").trim();                // optionnel: motif d’admin
 
     if (!allowed.has(newStatus)) {
       return { statusCode:400, body: JSON.stringify({ error:"Statut invalide" }) };
@@ -21,6 +22,7 @@ export const handler = async (event) => {
     const users = getStore("users");
     let keyEmail = emailInput;
 
+    // retrouver l'email si on a seulement l'id
     if (!keyEmail) {
       const keys = await users.list();
       for (const b of keys.blobs || []) {
@@ -38,11 +40,21 @@ export const handler = async (event) => {
     if (newStatus === "approved") u.approvedAt = new Date().toISOString();
     if (newRole) u.role = newRole;
 
+    // Historique/modération
+    u.moderation = Array.isArray(u.moderation) ? u.moderation : [];
+    u.moderation.push({
+      at: new Date().toISOString(),
+      action: newStatus,
+      reason: reason || null
+    });
+    // dernier motif “lisible”
+    u.statusReason = reason || null;
+
     await users.set(keyEmail, JSON.stringify(u));
 
     return { statusCode:200, body: JSON.stringify({
       success:true,
-      user:{ id:u.id, email:u.email, username:u.username, role:u.role, status:u.status, approvedAt:u.approvedAt||null }
+      user:{ id:u.id, email:u.email, username:u.username, role:u.role, status:u.status, approvedAt:u.approvedAt||null, statusReason:u.statusReason||null }
     })};
   } catch (e) {
     return { statusCode:500, body: JSON.stringify({ error:"Erreur serveur" }) };
