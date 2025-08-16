@@ -3,7 +3,7 @@
 # Remplace "velvet:supersecret" par TON couple utilisateur:motdepasse
 # =========================
 /admin-*.html
-  Basic-Auth: velvet:supersecret
+  Basic-Auth: velvet:Chaves071292
   Cache-Control: no-store
 
 # =========================
