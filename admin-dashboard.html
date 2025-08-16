@@ -2,317 +2,367 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard Admin — Velvet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Velvet (admin)</title>
   <style>
-    :root{--bg:#0f0f12;--card:#16161b;--line:#24242b;--txt:#f2f2f3;--muted:#a8a8ad;--gold:#e8c372;--red:#ff6b6b;--green:#7bd88f}
+    :root{
+      --bg:#0f1115; --panel:#171a21; --muted:#8b94a7; --text:#e6e9f2;
+      --ok:#2ecc71; --warn:#f1c40f; --bad:#e74c3c; --info:#3498db;
+      --line:#252a33; --chip:#202633; --btn:#2a3040; --btnH:#32394d;
+    }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--txt);font:14.5px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    header{position:sticky;top:0;background:linear-gradient(180deg,#0f0f12 75%,transparent);padding:14px 18px;border-bottom:1px solid #111}
-    h1{margin:0;font-size:22px}
-    main{max-width:1200px;margin:24px auto;padding:0 18px 64px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
-    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .btn{background:linear-gradient(180deg,#f6d57f,#d7b463);color:#111;border:1px solid #b3954f;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
-    .btn.secondary{background:#1e1e24;color:var(--txt);border:1px solid var(--line)}
-    .btn.danger{background:#2b0e0e;color:#f8b;border:1px solid #4a1b1b}
-    .btn.warn{background:#3a2b12;color:#ffd58a;border:1px solid #5a4417}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    label{color:var(--muted);font-weight:600}
-    select,input{background:#11131a;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
-    th{color:var(--muted);text-align:left}
-    td.right,th.right{text-align:right}
-    .kpi{display:inline-block;background:#1a1a21;border:1px solid #272730;border-radius:12px;padding:10px 12px;margin:4px 8px 8px 0}
-    .ok{color:var(--green)} .err{color:var(--red)}
-    .hint{font-size:12.5px;color:var(--muted)}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:linear-gradient(180deg,#0e1014,#0b0d11);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(6px);
+      background:rgba(15,17,21,.8);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:18px 16px;}
+    .brand{font-weight:800; font-size:20px; letter-spacing:.2px}
+    .nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px}
+    .nav a{
+      padding:8px 12px; border-radius:10px; background:var(--btn);
+      border:1px solid var(--line); color:var(--text); text-decoration:none; font-weight:600;
+    }
+    .nav a:hover{background:var(--btnH)}
+    h2{margin:18px 0 10px}
+    .hint{color:var(--muted); font-size:13px; margin:4px 0 12px}
+    .cards{display:grid; grid-template-columns:1fr; gap:14px}
+    @media(min-width:900px){ .cards{grid-template-columns:1fr 1fr} }
+    .card{
+      background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px;
+      box-shadow:0 15px 35px rgba(0,0,0,.25);
+    }
+    .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px}
+    select,input[type="search"]{
+      background:var(--chip); border:1px solid var(--line); color:var(--text);
+      padding:8px 10px; border-radius:10px; outline:none;
+    }
+    .btn{
+      background:var(--btn); border:1px solid var(--line); color:var(--text);
+      padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;
+    }
+    .btn:hover{background:var(--btnH)}
+    .btn.ok{border-color:#214c36; background:#1a3c2c}
+    .btn.warn{border-color:#5a4b17; background:#3c3111}
+    .btn.bad{border-color:#5e2020; background:#3b1515}
+    .btn.small{padding:6px 10px; font-size:13px}
+    table{width:100%; border-collapse:collapse; border-spacing:0; font-size:14px}
+    thead th{
+      text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.4px;
+      color:var(--muted); padding:10px 8px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--panel);
+    }
+    tbody td{padding:10px 8px; border-bottom:1px solid var(--line)}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    .right{text-align:right}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--chip); padding:4px 8px; border-radius:999px; border:1px solid var(--line); font-size:12px;
+    }
+    .chip.ok{color:#8ff0b4; border-color:#214c36; background:#16261f}
+    .chip.warn{color:#ffe08a; border-color:#5a4b17; background:#2a2410}
+    .chip.bad{color:#ff9aa0; border-color:#5e2020; background:#2b1416}
+    .muted{color:var(--muted)}
+    .sum{margin-top:10px; font-weight:700}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .empty{padding:14px; text-align:center; color:var(--muted)}
+    .section-gap{margin-top:14px}
   </style>
 </head>
 <body>
-<header>
-  <h1>Dashboard — Velvet (admin)</h1>
-</header>
-
-<main>
-
-  <!-- COMPTES (valider / suspendre / supprimer) -->
-  <section class="card">
-    <div class="row" style="justify-content:space-between;gap:12px">
-      <div>
-        <h2 style="margin:0 0 6px">Comptes — valider / suspendre / supprimer</h2>
-        <div class="hint">“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</div>
+  <header>
+    <div class="wrap">
+      <div class="brand">Dashboard — Velvet (admin)</div>
+      <div class="nav">
+        <a href="/index.html">Accueil</a>
+        <a href="/admin-items.html">Créer un item</a>
+        <button id="reload" class="btn small">Rafraîchir</button>
+        <span id="msg" class="muted"></span>
       </div>
-      <div class="row">
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- COMPTES -->
+    <section class="card">
+      <h2>Comptes — valider / suspendre / supprimer</h2>
+      <p class="hint">“Suspendre” bloque l’accès, sans supprimer les données. Les motifs sont enregistrés.</p>
+      <div class="toolbar">
         <label>Statut
-          <select id="fStatus">
-            <option value="">Tous</option>
-            <option value="pending" selected>En attente</option>
-            <option value="approved">Validés</option>
-            <option value="suspended">Suspendus</option>
-            <option value="rejected">Refusés</option>
-            <option value="deleted">Supprimés</option>
+          <select id="fltStatus">
+            <option value="all">Tous</option>
+            <option value="pending">En attente</option>
+            <option value="active">Actif</option>
+            <option value="suspended">Suspendu</option>
           </select>
         </label>
         <label>Rôle
-          <select id="fRole">
-            <option value="">Tous</option>
+          <select id="fltRole">
+            <option value="all">Tous</option>
             <option value="creator">Créatrice</option>
             <option value="client">Client</option>
+            <option value="admin">Admin</option>
           </select>
         </label>
-        <button class="btn secondary" id="btnReloadUsers">Rafraîchir</button>
+        <input id="fltSearch" type="search" placeholder="Recherche (pseudo / email)" />
+        <button class="btn" id="refreshUsers">Rafraîchir</button>
       </div>
-    </div>
-
-    <div class="hint" id="usersMsg" style="margin-top:6px">Chargement…</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th>
-        </tr>
-      </thead>
-      <tbody id="usersBody"></tbody>
-    </table>
-  </section>
-
-  <!-- VENTES -->
-  <section class="card">
-    <div class="row" style="justify-content:space-between;gap:12px">
-      <div>
-        <h2 style="margin:0 0 6px">Ventes & répartition (70% / 30%)</h2>
-        <div class="hint">Marque “payé” après virement PayPal aux créatrices.</div>
+      <div class="tablebox">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbUsers">
+            <tr><td colspan="6" class="empty">Chargement…</td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="row">
-        <button class="btn" id="btnExportCsv">Exporter CSV</button>
-        <button class="btn secondary" id="btnReloadSales">Rafraîchir</button>
+    </section>
+
+    <!-- VENTES / RÉPARTITION -->
+    <section class="card section-gap">
+      <h2>Ventes & répartition (70% / 30%)</h2>
+      <p class="hint">Clique sur “Marquer payé” quand tu as fait le virement PayPal à la créatrice.</p>
+      <div class="toolbar">
+        <button class="btn" id="exportCsv">Exporter CSV</button>
+        <span id="sumSales" class="sum"></span>
       </div>
-    </div>
-
-    <div id="kpis"></div>
-
-    <h3 style="margin:6px 0">Récap par créatrice</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Créatrice</th>
-          <th class="right">Ventes (CHF)</th>
-          <th class="right">Pour elle (70%)</th>
-          <th class="right">Pour Velvet (30%)</th>
-          <th class="right">Impayé</th>
-          <th class="right">Déjà versé</th>
-          <th class="right">Action</th>
-        </tr>
-      </thead>
-      <tbody id="tb-ledger"></tbody>
-    </table>
-
-    <h3 style="margin:18px 0 6px">Détail des ventes</h3>
-    <div class="hint" id="salesMsg">Chargement…</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th class="right">Action</th>
-        </tr>
-      </thead>
-      <tbody id="tb-sales"></tbody>
-    </table>
-  </section>
-</main>
+      <div class="cards">
+        <div class="card">
+          <h3 style="margin-top:0">Récap par créatrice</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Créatrice</th><th class="right">Ventes (CHF)</th><th class="right">Pour elle (70%)</th><th class="right">Pour Velvet (30%)</th><th class="right">Impayé</th><th class="right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbCreators">
+              <tr><td colspan="6" class="empty">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Détail des ventes</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th class="right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbSales">
+              <tr><td colspan="8" class="empty">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
 
 <script>
-const $ = s => document.querySelector(s);
+/* ---------- Helpers UI ---------- */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
 const fmt = n => Number(n||0).toFixed(2);
-const fmtDate = s => s ? new Date(s).toLocaleString() : '';
+const msg = (t, ok=true) => { const m=$("#msg"); m.textContent=t||""; m.style.color= ok ? "#8ff0b4" : "#ff9aa0"; setTimeout(()=>m.textContent="", 4000); };
 
-/* ======= USERS (avec motif) ======= */
-async function loadUsers(){
-  try{
-    const st = $('#fStatus').value, rl = $('#fRole').value;
-    const url = new URL('/.netlify/functions/list-users', location.origin);
-    if (st) url.searchParams.set('status', st);
-    if (rl) url.searchParams.set('role', rl);
-
-    $('#usersMsg').textContent = 'Chargement…';
-    const r = await fetch(url); const arr = await r.json();
-    $('#usersMsg').textContent = '';
-
-    const body = $('#usersBody'); body.innerHTML = '';
-    if (!Array.isArray(arr) || arr.length===0){ $('#usersMsg').textContent='Aucun compte.'; return; }
-
-    arr.forEach(u=>{
-      const reasonBadge = u.statusReason ? `<div class="hint">Motif: ${u.statusReason}</div>` : '';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${fmtDate(u.createdAt)}</td>
-        <td>${u.username||'-'}</td>
-        <td>${u.email}</td>
-        <td>${(u.role||'client')}</td>
-        <td>${u.status}${reasonBadge}</td>
-        <td class="right">
-          ${u.status!=='approved'  ? `<button class="btn" data-act="approve"  data-id="${u.id}" data-email="${u.email}" data-role="${u.role||'client'}">Valider</button>` : ''}
-          ${u.status!=='rejected'  ? `<button class="btn danger" data-act="reject"   data-id="${u.id}" data-email="${u.email}">Refuser</button>` : ''}
-          ${u.status!=='suspended' ? `<button class="btn warn"   data-act="suspend"  data-id="${u.id}" data-email="${u.email}">Suspendre</button>` : `<button class="btn" data-act="restore" data-id="${u.id}" data-email="${u.email}">Restaurer</button>`}
-          <button class="btn danger" data-act="delete" data-id="${u.id}" data-email="${u.email}">Supprimer</button>
-        </td>`;
-      body.appendChild(tr);
-    });
-
-    body.querySelectorAll('button[data-act]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        const act   = btn.getAttribute('data-act');
-        const email = btn.getAttribute('data-email');
-        const id    = btn.getAttribute('data-id');
-        const role  = btn.getAttribute('data-role') || 'client';
-
-        // Motif (pour actions sensibles)
-        let reason = "";
-        if (act==='reject' || act==='suspend' || act==='delete') {
-          reason = prompt("Motif (visible dans l’admin) :") || "";
-        }
-        // (optionnel) motif à l’approve
-        // if (act==='approve') { reason = prompt("Motif (optionnel) :") || ""; }
-
-        if (act==='delete'){
-          const hard = confirm("Suppression DÉFINITIVE ? (OK = hard delete, Annuler = suppression logique)");
-          btn.disabled = true;
-          const res = await fetch('/.netlify/functions/delete-user',{
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ email, id, hard, reason })
-          });
-          btn.disabled = false;
-          if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
-          loadUsers(); return;
-        }
-
-        const status = (
-          act==='approve' ? 'approved' :
-          act==='reject'  ? 'rejected' :
-          act==='suspend' ? 'suspended' :
-          act==='restore' ? 'approved'  :
-          'pending'
-        );
-
-        btn.disabled = true;
-        const res = await fetch('/.netlify/functions/set-user-status',{
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email, id, status, role, reason })
-        });
-        btn.disabled = false;
-        if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
-        loadUsers();
-      };
-    });
-
-  }catch(e){
-    $('#usersMsg').textContent = 'Erreur: '+e.message;
-  }
+/* ---------- API wrappers ---------- */
+async function api(path, opt){
+  const r = await fetch(path, {headers:{'Content-Type':'application/json'}, ...opt});
+  let data = null;
+  try{ data = await r.json(); }catch(e){}
+  return { ok:r.ok, status:r.status, data };
 }
-$('#btnReloadUsers').onclick = loadUsers;
-$('#fStatus').onchange = loadUsers;
-$('#fRole').onchange   = loadUsers;
+const listUsers   = () => api('/api/list-users');
+const suspendUser = (id,reason) => api('/api/suspend-user',{method:'POST', body:JSON.stringify({ id, reason })});
+const unsuspendUser = (id) => api('/api/unsuspend-user',{method:'POST', body:JSON.stringify({ id })});
+const deleteUser  = (id) => api('/api/delete-user',{method:'POST', body:JSON.stringify({ id })});
 
-/* ======= SALES / LEDGER ======= */
-let lastSales=[], lastLedger={};
+const listLedger  = () => api('/api/list-ledger');
+const markPaid    = (payload) => api('/api/mark-paid',{method:'POST', body:JSON.stringify(payload)});
 
-async function loadSales(){
-  try{
-    $('#salesMsg').textContent='Chargement…';
-    const r = await fetch('/.netlify/functions/list-ledger');
-    const data = await r.json();
-    $('#salesMsg').textContent='';
+/* ---------- State ---------- */
+let USERS = [];
+let LEDGER = { creators:[], sales:[] };
 
-    const sales  = Array.isArray(data) ? data : (data.sales || []);
-    const ledger = Array.isArray(data) ? {}   : (data.ledger || {});
-    lastSales=sales; lastLedger=ledger;
+/* ---------- Rendu Comptes ---------- */
+function renderUsers(){
+  const tbody = $('#tbUsers');
+  if(!USERS.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">Aucun compte</td></tr>`; return;}
+  const st = $('#fltStatus').value, role = $('#fltRole').value, q = $('#fltSearch').value.trim().toLowerCase();
 
-    const totals = sales.reduce((a,s)=>{
-      const amt=Number(s.amount||0);
-      a.gross+=amt;
-      a.creator+=Number(s.creatorShare||amt*0.70);
-      a.platform+=Number(s.platformShare||amt*0.30);
-      if(!s.paid) a.unpaid+=Number(s.creatorShare||amt*0.70);
-      return a;
-    },{gross:0,creator:0,platform:0,unpaid:0});
+  const rows = USERS.filter(u=>{
+    const okS = st==='all' || (u.status||'pending')===st;
+    const okR = role==='all' || (u.role||'client')===role;
+    const okQ = !q || (String(u.username||'').toLowerCase().includes(q) || String(u.email||'').toLowerCase().includes(q));
+    return okS && okR && okQ;
+  }).map(u=>{
+    const badge = (u.status==='active') ? 'ok' : (u.status==='suspended' ? 'warn' : 'bad');
+    return `<tr>
+      <td class="mono">${(u.createdAt||'').slice(0,10)}</td>
+      <td>${u.username||'-'}</td>
+      <td class="mono">${u.email||'-'}</td>
+      <td><span class="chip">${u.role||'client'}</span></td>
+      <td><span class="chip ${badge}">${u.status||'pending'}</span></td>
+      <td class="right">
+        ${u.status!=='active' ? `<button class="btn ok small" data-act="approve" data-id="${u.id}">Valider</button>`:''}
+        ${u.status!=='suspended' ? `<button class="btn warn small" data-act="suspend" data-id="${u.id}">Suspendre</button>`:`<button class="btn small" data-act="unsuspend" data-id="${u.id}">Réactiver</button>`}
+        <button class="btn bad small" data-act="delete" data-id="${u.id}">Supprimer</button>
+      </td>
+    </tr>`;
+  }).join('');
+  tbody.innerHTML = rows || `<tr><td colspan="6" class="empty">Aucun résultat</td></tr>`;
 
-    $('#kpis').innerHTML = `
-      <span class="kpi">CA total: <b>${fmt(totals.gross)} CHF</b></span>
-      <span class="kpi">Créatrices (70%): <b>${fmt(totals.creator)} CHF</b></span>
-      <span class="kpi">Velvet (30%): <b>${fmt(totals.platform)} CHF</b></span>
-      <span class="kpi">Impayés: <b class="err">${fmt(totals.unpaid)} CHF</b></span>`;
+  // actions
+  tbody.onclick = async (e)=>{
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    const id = btn.dataset.id, act = btn.dataset.act;
+    if(act==='approve'){
+      // approuver = passer le statut à active
+      const res = await unsuspendUser(id); // si tu préfères un /approve-user dédié, change ici
+      res.ok ? (await loadUsers(), msg('Compte validé')) : msg('Erreur validation', false);
+    }else if(act==='suspend'){
+      const reason = prompt('Motif de suspension (interne) :','');
+      if(reason===null) return;
+      const res = await suspendUser(id,reason);
+      res.ok ? (await loadUsers(), msg('Compte suspendu')) : msg('Erreur suspension', false);
+    }else if(act==='unsuspend'){
+      const res = await unsuspendUser(id);
+      res.ok ? (await loadUsers(), msg('Compte réactivé')) : msg('Erreur réactivation', false);
+    }else if(act==='delete'){
+      if(!confirm('Supprimer ce profil ? Cette action est irréversible.')) return;
+      const res = await deleteUser(id);
+      res.ok ? (await loadUsers(), msg('Compte supprimé')) : msg('Erreur suppression', false);
+    }
+  };
+}
 
-    const tbLed=$('#tb-ledger'); tbLed.innerHTML='';
-    Object.keys(ledger).forEach(cid=>{
-      const L = ledger[cid]||{};
-      const total=Number(L.total||0);
-      const due=Number(L.owed||0);
-      const paidOut=Number(L.paidOut||0);
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${cid}</td>
+/* ---------- Rendu Ledger ---------- */
+function renderLedger(){
+  const tbC = $('#tbCreators'), tbS = $('#tbSales');
+  const creators = LEDGER.creators||[];
+  const sales = LEDGER.sales||LEDGER || [];
+
+  // Créateurs
+  if(!creators.length){
+    tbC.innerHTML = `<tr><td colspan="6" class="empty">Aucun agrégat disponible</td></tr>`;
+  }else{
+    tbC.innerHTML = creators.map(c=>{
+      const total = Number(c.total||0);
+      const forCreator = total*0.70;
+      const forVelvet  = total*0.30;
+      const unpaid     = Number(c.unpaid|| (forCreator - Number(c.paid||0)));
+      return `<tr>
+        <td>${c.creatorId||'-'}</td>
         <td class="right">${fmt(total)}</td>
-        <td class="right">${fmt(total*0.70)}</td>
-        <td class="right">${fmt(total*0.30)}</td>
-        <td class="right">${fmt(due)}</td>
-        <td class="right">${fmt(paidOut)}</td>
+        <td class="right">${fmt(forCreator)}</td>
+        <td class="right">${fmt(forVelvet)}</td>
+        <td class="right"><span class="chip ${unpaid>0?'warn':''} mono">${fmt(unpaid)}</span></td>
         <td class="right">
-          ${cid==='velvet'?'—':`<button class="btn" data-pay-creator="${cid}">Marquer payé (tout)</button>`}
-        </td>`;
-      tbLed.appendChild(tr);
-    });
+          <button class="btn ok small" data-act="markPaidCreator" data-creator="${c.creatorId}">Marquer payé</button>
+        </td>
+      </tr>`;
+    }).join('');
+    tbC.onclick = async (e)=>{
+      const b = e.target.closest('button[data-act="markPaidCreator"]');
+      if(!b) return;
+      const creatorId = b.dataset.creator;
+      if(!confirm(`Confirmer “marqué payé” pour ${creatorId} ?`)) return;
+      const res = await markPaid({ creatorId });
+      res.ok ? (await loadLedger(), msg('Marqué payé (créatrice)')) : msg('Erreur mark-paid', false);
+    };
+  }
 
-    tbLed.querySelectorAll('button[data-pay-creator]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        const cid = btn.getAttribute('data-pay-creator');
-        btn.disabled=true;
-        const unpaid = lastSales.filter(s=>!s.paid && s.creatorId===cid);
-        for(const s of unpaid){
-          const saleId = s.id || s.saleId; if(!saleId) continue;
-          await fetch('/.netlify/functions/mark-paid',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ saleId })});
-        }
-        btn.disabled=false; loadSales();
-      };
-    });
-
-    const tb=$('#tb-sales'); tb.innerHTML='';
-    sales.sort((a,b)=> (a.ts>b.ts?-1:1)).forEach(s=>{
-      const saleId = s.id || s.saleId || '';
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${fmtDate(s.ts)}</td>
-        <td>${s.creatorId||''}</td>
-        <td>${s.itemType||''}</td>
-        <td class="right">${fmt(s.amount||0)} ${s.currency||'CHF'}</td>
-        <td>${s.paypalTxnId||''}</td>
-        <td>${s.payerEmail||''}</td>
-        <td>${s.paid?'<span class="ok">Payé</span>':'<span class="err">Impayé</span>'}</td>
+  // Ventes
+  if(!sales.length){
+    tbS.innerHTML = `<tr><td colspan="8" class="empty">Aucune vente</td></tr>`;
+  }else{
+    tbS.innerHTML = sales.map(s=>{
+      const badge = s.paid ? 'ok' : 'warn';
+      return `<tr>
+        <td class="mono">${(s.date||'').slice(0,16).replace('T',' ')}</td>
+        <td>${s.creatorId||'-'}</td>
+        <td><span class="chip">${s.type||'-'}</span></td>
+        <td class="right">${fmt(s.amount)}</td>
+        <td class="mono">${s.txnId||'-'}</td>
+        <td class="mono">${s.buyerEmail||'-'}</td>
+        <td><span class="chip ${badge}">${s.paid?'payé':'impayé'}</span></td>
         <td class="right">
-          ${s.paid?'—':`<button class="btn secondary" data-pay-sale="${saleId}">Marquer payé</button>`}
-        </td>`;
-      tb.appendChild(tr);
-    });
+          ${s.paid ? '' : `<button class="btn ok small" data-act="markPaidSale" data-id="${s.id}">Marquer payé</button>`}
+        </td>
+      </tr>`;
+    }).join('');
+    tbS.onclick = async (e)=>{
+      const b = e.target.closest('button[data-act="markPaidSale"]');
+      if(!b) return;
+      const saleId = b.dataset.id;
+      if(!confirm('Confirmer “marqué payé” pour cette vente ?')) return;
+      const res = await markPaid({ saleId });
+      res.ok ? (await loadLedger(), msg('Vente marquée payée')) : msg('Erreur mark-paid', false);
+    };
+  }
 
-    tb.querySelectorAll('button[data-pay-sale]').forEach(btn=>{
-      btn.onclick = async ()=>{
-        const saleId=btn.getAttribute('data-pay-sale');
-        btn.disabled=true;
-        const r=await fetch('/.netlify/functions/mark-paid',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ saleId })});
-        btn.disabled=false;
-        if(!r.ok){const j=await r.json(); alert(j.error||'Erreur');return;}
-        loadSales();
-      };
-    });
-
-  }catch(e){ $('#salesMsg').textContent='Erreur : '+e.message; }
+  // Somme
+  const tot = (LEDGER.sales||[]).reduce((a,s)=>a+Number(s.amount||0),0);
+  $('#sumSales').innerHTML = `Total ventes affichées : <b>${fmt(tot)} CHF</b>`;
 }
-$('#btnReloadSales').onclick = loadSales;
 
-/* EXPORT CSV */
-function toCsv(rows){return rows.map(r=>r.map(v=>{const s=v==null?"":String(v);return /[",;\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(";")).join("\n");}
-$('#btnExportCsv').onclick=()=>{const rows=[["date","creatorId","itemType","amount","currency","txnId","payerEmail","paid"]];(lastSales||[]).forEach(s=>{rows.push([s.ts,s.creatorId,s.itemType,s.amount,s.currency||"CHF",s.paypalTxnId||"",s.payerEmail||"",s.paid?"yes":"no"]);});const blob=new Blob([toCsv(rows)],{type:"text/csv;charset=utf-8"});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ventes.csv';a.click();};
+/* ---------- Export CSV (détail des ventes affichées) ---------- */
+function exportCSV(){
+  const rows = [['date','creatorId','type','amount','txnId','buyerEmail','paid']];
+  (LEDGER.sales||[]).forEach(s=>{
+    rows.push([s.date, s.creatorId, s.type, fmt(s.amount), s.txnId||'', s.buyerEmail||'', s.paid?'1':'0']);
+  });
+  const csv = rows.map(r=>r.map(v=>{
+    const t = String(v??'');
+    return /[",;\n]/.test(t) ? `"${t.replace(/"/g,'""')}"` : t;
+  }).join(';')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `velvet_sales_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
 
-/* INIT */
-document.addEventListener('DOMContentLoaded',()=>{loadUsers();loadSales();});
+/* ---------- Loaders ---------- */
+async function loadUsers(){
+  $('#tbUsers').innerHTML = `<tr><td colspan="6" class="empty">Chargement…</td></tr>`;
+  const r = await listUsers();
+  if(!r.ok){ $('#tbUsers').innerHTML = `<tr><td colspan="6" class="empty">Erreur chargement utilisateurs</td></tr>`; return; }
+  USERS = r.data?.users || r.data || [];
+  renderUsers();
+}
+async function loadLedger(){
+  $('#tbCreators').innerHTML = `<tr><td colspan="6" class="empty">Chargement…</td></tr>`;
+  $('#tbSales').innerHTML = `<tr><td colspan="8" class="empty">Chargement…</td></tr>`;
+  const r = await listLedger();
+  if(!r.ok){ $('#tbCreators').innerHTML = `<tr><td colspan="6" class="empty">Erreur ledger</td></tr>`; $('#tbSales').innerHTML = `<tr><td colspan="8" class="empty">Erreur ledger</td></tr>`; return; }
+  // Tolère 2 formats : {creators, sales} OU simplement sales[]
+  if(Array.isArray(r.data)){
+    LEDGER = { creators:[], sales:r.data };
+  }else{
+    LEDGER = { creators:r.data.creators||[], sales:r.data.sales||[] };
+  }
+  renderLedger();
+}
+
+/* ---------- Events ---------- */
+$('#reload').onclick = () => { loadUsers(); loadLedger(); };
+$('#refreshUsers').onclick = () => loadUsers();
+$('#fltStatus').onchange = renderUsers;
+$('#fltRole').onchange = renderUsers;
+$('#fltSearch').oninput = ()=>{ clearTimeout(window.__q); window.__q=setTimeout(renderUsers,150); };
+$('#exportCsv').onclick = exportCSV;
+
+/* ---------- Init ---------- */
+loadUsers(); loadLedger();
 </script>
 </body>
 </html>
