@@ -2,51 +2,49 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Connexion — Velvet Creators VIP</title>
-  <link href="styles.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <!-- HEADER -->
   <header class="header">
-    <nav class="nav">
-      <a href="index.html">Accueil</a>
-      <a class="cta" href="signup.html">S’inscrire</a>
-    </nav>
+    <div class="container">
+      <h1 class="logo">Velvet Creators VIP</h1>
+      <nav class="nav">
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="signup.html">Inscription</a></li>
+          <li><a href="login.html" class="active">Connexion</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="hero">
-    <section class="hero-card">
-      <h1>Connexion</h1>
-      <form class="form" id="login-form" action="profile.html" method="post" novalidate>
-        <label for="username">Pseudo ou e‑mail</label>
+  <!-- MAIN -->
+  <main class="main-content">
+    <section class="form-section">
+      <h2>Connexion à votre espace</h2>
+      <p>Accédez à votre profil en toute sécurité.</p>
+
+      <form action="profile.html" method="post" class="form">
+        <label for="username">Pseudo ou e-mail</label>
         <input type="text" id="username" name="username" required />
 
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" minlength="6" required />
+        <input type="password" id="password" name="password" required />
 
         <button type="submit" class="btn gold">Se connecter</button>
       </form>
-      <p class="small" style="text-align:center;margin-top:10px;">
-        Pas encore de compte ? <a href="signup.html">Inscrivez‑vous</a>
-      </p>
     </section>
   </main>
 
+  <!-- FOOTER -->
   <footer class="footer">
-    <a href="legal.html">Mentions légales &amp; CGU</a>
+    <div class="container">
+      <p>© 2025 Velvet Creators VIP — Tous droits réservés.</p>
+      <a href="legal.html">Mentions légales &amp; CGU</a>
+    </div>
   </footer>
-
-  <script>
-    // Validation minimale côté client (pas de widget, pas d’appel externe)
-    document.getElementById('login-form').addEventListener('submit', function (e) {
-      var u = document.getElementById('username').value.trim();
-      var p = document.getElementById('password').value.trim();
-      if (!u || p.length < 6) {
-        e.preventDefault();
-        alert('Veuillez saisir un pseudo/e‑mail et un mot de passe (6 caractères minimum).');
-      }
-      // Sur site statique: on laisse l’action aller vers profile.html
-    });
-  </script>
 </body>
 </html>
