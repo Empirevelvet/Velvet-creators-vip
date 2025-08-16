@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion — Velvet Creators VIP</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Velvet — Connexion</title>
+  <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
   <header class="header">
@@ -15,18 +15,22 @@
   </header>
 
   <main class="hero">
-    <section class="hero-card" style="max-width:600px;margin:80px auto;">
-      <h1>Connexion</h1>
-      <p>Accédez à votre profil en toute sécurité.</p>
+    <section class="hero-card">
+      <h1 class="auth-title">Connexion</h1>
+      <p class="auth-sub">Accédez à votre profil en toute sécurité.</p>
 
-      <form action="profile.html" method="post" style="margin-top:20px;">
-        <label for="username">Pseudo ou e-mail</label>
-        <input type="text" id="username" name="username" required>
+      <form class="auth-form" action="#" method="post" onsubmit="return false;">
+        <label for="login" class="input-label">Pseudo ou e‑mail</label>
+        <input id="login" name="login" type="text" autocomplete="username" required />
 
-        <label for="password" style="margin-top:12px;">Mot de passe</label>
-        <input type="password" id="password" name="password" required>
+        <label for="password" class="input-label">Mot de passe</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
 
-        <button type="submit" class="btn gold" style="margin-top:16px;">Se connecter</button>
+        <button type="submit" class="btn gold auth-submit">Se connecter</button>
+
+        <p class="auth-extra">
+          Pas encore de compte ? <a href="signup.html">Créer un compte</a>
+        </p>
       </form>
     </section>
   </main>
