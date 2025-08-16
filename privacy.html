@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Politique de confidentialité — Velvet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{background:#0f0f12;color:#f2f2f3;font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0}
+    .wrap{max-width:900px;margin:40px auto;padding:0 18px}
+    h1,h2{margin:0 0 10px}
+    section{background:#16161b;border:1px solid #24242b;border-radius:14px;padding:18px;margin:0 0 18px}
+    a{color:#e8c372}
+    .muted{color:#a8a8ad}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Politique de confidentialité</h1>
+    <p class="muted">Dernière mise à jour : <span id="d"></span></p>
+
+    <section>
+      <h2>1. Responsable</h2>
+      <p>Velvet (plateforme), contact : <a href="mailto:contact@velvet.example">contact@velvet.example</a>.</p>
+    </section>
+
+    <section>
+      <h2>2. Données traitées</h2>
+      <ul>
+        <li>Compte : pseudo, email, mot de passe (haché), rôle (client/créatrice), statut (validation).</li>
+        <li>Transactions : montants, devise, ID PayPal, créatrice concernée (aucune donnée carte stockée chez nous).</li>
+        <li>Modération : signalements, motifs d’actions admin, blocages.</li>
+        <li>VIP : statut, date d’expiration.</li>
+        <li>Logs techniques (sécurité / fraude).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. Finalités & bases légales</h2>
+      <ul>
+        <li>Exécution du service (création de compte, abonnements, achats, accès VIP).</li>
+        <li>Intérêt légitime (sécurité, lutte contre la fraude, modération).</li>
+        <li>Obligations légales (comptabilité, conservation limitée).</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. Paiements</h2>
+      <p>Traitement via PayPal. Nous ne stockons pas vos numéros de carte. Les reçus et IDs de transaction sont conservés pour preuve d’achat.</p>
+    </section>
+
+    <section>
+      <h2>5. Durées</h2>
+      <ul>
+        <li>Compte : tant qu’actif (ou suppression sur demande, hors obligations légales).</li>
+        <li>Transactions : durée légale (comptabilité).</li>
+        <li>Modération : durée nécessaire à la sécurité anti‑abus.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. Vos droits</h2>
+      <p>Accès, rectification, suppression, opposition, portabilité. Contact : <a href="mailto:privacy@velvet.example">privacy@velvet.example</a>.</p>
+    </section>
+
+    <section>
+      <h2>7. Sécurité</h2>
+      <p>Hachage des mots de passe, contrôle d’accès, en-têtes de sécurité, revue des logs. Signalez toute faille : <a href="mailto:security@velvet.example">security@velvet.example</a>.</p>
+    </section>
+
+    <section>
+      <h2>8. Signalements & retraits</h2>
+      <p>Formulaire : <a href="/report.html">Signaler un contenu</a>. En cas d’urgence, écrivez immédiatement à l’adresse ci‑dessus.</p>
+    </section>
+
+    <section>
+      <h2>9. Mineurs</h2>
+      <p>Accès interdit aux moins de 18 ans. Toute tentative d’inscription mineur entraîne suppression du compte et signalement.</p>
+    </section>
+
+    <section>
+      <h2>10. Modifications</h2>
+      <p>Cette politique peut évoluer ; la date ci‑dessus fait foi.</p>
+    </section>
+  </div>
+  <script>document.getElementById('d').textContent=new Date().toLocaleDateString();</script>
+</body>
+</html>
