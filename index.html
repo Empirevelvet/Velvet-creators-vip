@@ -1,66 +1,60 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Test Paiement PayPal</title>
-
-  <!-- SDK PayPal : quand on crée la commande côté serveur, on peut mettre client-id=sb -->
-  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=CHF"></script>
-
-  <style>
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background:#0a0a0a; color:#efe7d2; }
-    .wrap { max-width: 680px; margin: 64px auto; padding: 24px; background: rgba(18,18,18,.85); border:1px solid rgba(210,181,91,.25); border-radius: 16px; }
-    h1 { margin: 0 0 16px; font-size: clamp(22px, 3vw, 34px); color: #ffe08a; }
-    p  { line-height: 1.6; margin: 0 0 16px; color:#e8e0c8; }
-    #paypal-button-container { margin-top: 16px; }
-    .note { font-size: .92rem; opacity: .8; margin-top:12px; }
-  </style>
+  <title>Velvet — Accueil</title>
+  <link href="styles.css" rel="stylesheet" />
 </head>
 <body>
-  <main class="wrap">
-    <h1>Paiement sécurisé avec PayPal</h1>
-    <p>Cliquez sur le bouton ci‑dessous pour régler en toute sécurité.</p>
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html" class="cta">Accueil</a>
+      <a class="cta" href="signup.html">S’inscrire</a>
+      <a class="cta" href="login.html">Connexion</a>
+    </nav>
+  </header>
 
-    <div id="paypal-button-container"></div>
-    <p class="note">Le paiement est traité côté serveur via Netlify Functions et crédité sur votre compte PayPal Business.</p>
+  <main class="hero">
+    <section class="hero-card">
+      <span class="badge">Adultes 18+ — Accès membre</span>
+      <h1>
+        <img alt="Velvet Creators VIP" class="hero-logo" src="logo-hero.png" />
+      </h1>
+
+      <div class="lead">
+        <p>Bienvenue dans l’univers exclusif de <strong>VELVET CREATORS VIP</strong>.</p>
+        <p>Ici, chaque femme, homme ou personne non-binaire devient maître de son art.</p>
+        <p>Que tu sois <strong>anonyme</strong>, <strong>magnétique</strong> ou <strong>déjà célèbre</strong>, ton univers t’appartient.</p>
+        <p><strong>Photos, vidéos, objets rares ou créations sensuelles, lives privés ou collectifs</strong> : <strong>TOUT</strong> peut être vendu, à tes conditions.</p>
+        <p>Tu peux choisir de te montrer… ou de rester dans l’ombre. <strong>Sois libre. Sois puissant(e). Sois désirable.</strong></p>
+        <p><strong>Rejoins la plateforme la plus sélective du moment, où ton talent devient un EMPIRE.</strong></p>
+      </div>
+
+      <div class="ctas">
+        <a class="btn" href="login.html">Se connecter</a>
+        <a class="btn gold" href="signup.html">S’inscrire</a>
+      </div>
+    </section>
   </main>
 
-  <script>
-    // Bouton PayPal branché sur tes fonctions Netlify
-    paypal.Buttons({
-      // Appelle ta fonction serveur qui crée la commande PayPal sur ton compte
-      createOrder: function () {
-        return fetch("/api/create-order", {
-          method: "POST"
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (data) {
-          // doit renvoyer l'ID de la commande créée côté serveur
-          return data.id;
-        });
-      },
+  <section class="section">
+    <p>Tout contenu est monétisable : ton art, ton mystère ou ta notoriété.</p>
+  </section>
 
-      // À l'approbation, capture la commande côté serveur
-      onApprove: function (data) {
-        return fetch("/api/capture-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderID: data.orderID })
-        })
-        .then(function (res) { return res.json(); })
-        .then(function (details) {
-          alert("Merci " + (details?.payer?.name?.given_name || "") + ", paiement réussi !");
-          // TODO : ici tu peux rediriger vers une page "merci" ou déclencher l’accès VIP
-          // location.href = "/thanks.html";
-        });
-      },
+  <footer class="footer">
+    <a href="legal.html">Mentions légales &amp; CGU</a>
+  </footer>
 
-      onError: function (err) {
-        console.error(err);
-        alert("Une erreur est survenue pendant le paiement.");
-      }
-    }).render("#paypal-button-container");
-  </script>
+  <!-- Bandeau cookies -->
+  <div class="cookie-banner" hidden id="cookie-banner">
+    <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
+    <div class="cookie-actions">
+      <button class="btn-accept" id="cookie-accept">Accepter</button>
+      <a class="btn-ghost" href="legal.html#cookies">En savoir plus</a>
+    </div>
+  </div>
+  <div aria-hidden="true" class="page-fade-bottom"></div>
+  <script src="cookies.js"></script>
 </body>
 </html>
