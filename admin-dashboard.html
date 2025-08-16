@@ -36,12 +36,12 @@
 
 <main>
 
-  <!-- INSCRIPTIONS / COMPTES -->
+  <!-- COMPTES (valider / suspendre / supprimer) -->
   <section class="card">
     <div class="row" style="justify-content:space-between;gap:12px">
       <div>
         <h2 style="margin:0 0 6px">Comptes — valider / suspendre / supprimer</h2>
-        <div class="hint">Actionne sur les comptes nouveaux ou problématiques. “Suspendre” bloque l’accès sans supprimer les données.</div>
+        <div class="hint">“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</div>
       </div>
       <div class="row">
         <label>Statut
@@ -125,7 +125,7 @@ const $ = s => document.querySelector(s);
 const fmt = n => Number(n||0).toFixed(2);
 const fmtDate = s => s ? new Date(s).toLocaleString() : '';
 
-/* ======= USERS ======= */
+/* ======= USERS (avec motif) ======= */
 async function loadUsers(){
   try{
     const st = $('#fStatus').value, rl = $('#fRole').value;
@@ -141,13 +141,14 @@ async function loadUsers(){
     if (!Array.isArray(arr) || arr.length===0){ $('#usersMsg').textContent='Aucun compte.'; return; }
 
     arr.forEach(u=>{
+      const reasonBadge = u.statusReason ? `<div class="hint">Motif: ${u.statusReason}</div>` : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${fmtDate(u.createdAt)}</td>
         <td>${u.username||'-'}</td>
         <td>${u.email}</td>
         <td>${(u.role||'client')}</td>
-        <td>${u.status}</td>
+        <td>${u.status}${reasonBadge}</td>
         <td class="right">
           ${u.status!=='approved'  ? `<button class="btn" data-act="approve"  data-id="${u.id}" data-email="${u.email}" data-role="${u.role||'client'}">Valider</button>` : ''}
           ${u.status!=='rejected'  ? `<button class="btn danger" data-act="reject"   data-id="${u.id}" data-email="${u.email}">Refuser</button>` : ''}
@@ -164,12 +165,20 @@ async function loadUsers(){
         const id    = btn.getAttribute('data-id');
         const role  = btn.getAttribute('data-role') || 'client';
 
+        // Motif (pour actions sensibles)
+        let reason = "";
+        if (act==='reject' || act==='suspend' || act==='delete') {
+          reason = prompt("Motif (visible dans l’admin) :") || "";
+        }
+        // (optionnel) motif à l’approve
+        // if (act==='approve') { reason = prompt("Motif (optionnel) :") || ""; }
+
         if (act==='delete'){
           const hard = confirm("Suppression DÉFINITIVE ? (OK = hard delete, Annuler = suppression logique)");
           btn.disabled = true;
           const res = await fetch('/.netlify/functions/delete-user',{
             method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ email, id, hard })
+            body: JSON.stringify({ email, id, hard, reason })
           });
           btn.disabled = false;
           if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
@@ -187,13 +196,14 @@ async function loadUsers(){
         btn.disabled = true;
         const res = await fetch('/.netlify/functions/set-user-status',{
           method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email, id, status, role })
+          body: JSON.stringify({ email, id, status, role, reason })
         });
         btn.disabled = false;
         if (!res.ok){ const j=await res.json(); alert(j.error||'Erreur'); return; }
         loadUsers();
       };
     });
+
   }catch(e){
     $('#usersMsg').textContent = 'Erreur: '+e.message;
   }
@@ -297,6 +307,7 @@ async function loadSales(){
 }
 $('#btnReloadSales').onclick = loadSales;
 
+/* EXPORT CSV */
 function toCsv(rows){return rows.map(r=>r.map(v=>{const s=v==null?"":String(v);return /[",;\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(";")).join("\n");}
 $('#btnExportCsv').onclick=()=>{const rows=[["date","creatorId","itemType","amount","currency","txnId","payerEmail","paid"]];(lastSales||[]).forEach(s=>{rows.push([s.ts,s.creatorId,s.itemType,s.amount,s.currency||"CHF",s.paypalTxnId||"",s.payerEmail||"",s.paid?"yes":"no"]);});const blob=new Blob([toCsv(rows)],{type:"text/csv;charset=utf-8"});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ventes.csv';a.click();};
 
