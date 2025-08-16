@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Espace VIP — Velvet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{background:#0f0f12;color:#fff;font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0}
+    .wrap{max-width:900px;margin:40px auto;padding:0 18px}
+    .card{background:#16161b;border:1px solid #24242b;border-radius:14px;padding:18px;margin-bottom:18px}
+    .btn{background:linear-gradient(180deg,#f6d57f,#d7b463);color:#111;border:1px solid #b3954f;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .muted{color:#a8a8ad}
+    .ok{color:#7bd88f}
+    .err{color:#ff6b6b}
+  </style>
+  <script src="https://www.paypal.com/sdk/js?client-id=<?php echo PAYPAL_VIP_ID ?><?/* en statique remplace par ton client id si besoin */?>&currency=CHF&intent=capture"></script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Espace VIP Velvet 👑</h1>
+    <div class="card">
+      <p class="muted">Accès VIP pendant <b>30 jours</b> : Lives publics en priorité, avant-premières, promos, et chat prioritaire.</p>
+      <div id="vipState" class="muted">Vérification de votre statut…</div>
+    </div>
+
+    <div class="card">
+      <h2>Devenir VIP — 69 CHF</h2>
+      <div id="paypal-container" style="margin-top:10px"></div>
+      <div id="payMsg" class="muted"></div>
+    </div>
+
+    <div class="card">
+      <h3>Questions fréquentes</h3>
+      <ul>
+        <li>Le VIP est valable <b>30 jours</b> à partir du paiement.</li>
+        <li>Un nouveau paiement <b>prolonge</b> la date d’expiration existante.</li>
+        <li>Tu peux annuler ton VIP à tout moment (pas de remboursement sur la période entamée).</li>
+      </ul>
+    </div>
+  </div>
+
+<script>
+// 1) Vérifier le statut VIP
+async function refreshVip(){
+  const r = await fetch('/.netlify/functions/vip-status');
+  const j = await r.json();
+  const box = document.getElementById('vipState');
+  if (!r.ok){ box.innerHTML = '<span class="err">Erreur de statut VIP.</span>'; return; }
+  if (j.active){
+    box.innerHTML = `Statut : <span class="ok">VIP actif</span> — jusqu’au <b>${new Date(j.expiresAt).toLocaleDateString()}</b>`;
+    document.getElementById('paypal-container').style.display = 'none';
+  } else {
+    box.innerHTML = 'Statut : <span class="err">Non VIP</span>';
+    document.getElementById('paypal-container').style.display = 'block';
+  }
+}
+refreshVip();
+
+// 2) Bouton PayPal
+paypal.Buttons({
+  createOrder: async () => {
+    const r = await fetch('/.netlify/functions/vip-create-order', { method:'POST' });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error||'Erreur création commande VIP');
+    return j.id; // PayPal order id
+  },
+  onApprove: async (data) => {
+    const r = await fetch('/.netlify/functions/vip-capture', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ orderID: data.orderID })
+    });
+    const j = await r.json();
+    const m = document.getElementById('payMsg');
+    if (!r.ok){ m.innerHTML = '<span class="err">Capture échouée.</span>'; return; }
+    m.innerHTML = '<span class="ok">VIP activé !</span>';
+    refreshVip();
+  }
+}).render('#paypal-container');
+</script>
+</body>
+</html>
