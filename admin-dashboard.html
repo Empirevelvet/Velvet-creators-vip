@@ -2,359 +2,326 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard — Velvet (admin)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Velvet — Dashboard admin</title>
 
-  <!-- STYLE intégré : sombre, lisible, 100% responsive -->
+  <!-- Style intégré : thème sombre, mobile-first -->
   <style>
     :root{
-      --bg:#0f1115; --panel:#171a22; --soft:#1f2433; --text:#e9edf4; --muted:#9aa4b2;
-      --brand:#7b5cff; --brand2:#12d1b7; --ok:#24d180; --warn:#ffcc00; --danger:#ff5470;
-      --line:#23293a; --chip:#1b2130; --thead:#121827;
+      --bg:#0f1115;--panel:#151923;--muted:#8b93a7;--text:#e6e9f2;
+      --brand:#7c5cff;--ok:#28c79a;--warn:#ffb020;--danger:#ff5678;
+      --line:#232836;--chip:#1b2130;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial}
     a{color:var(--brand);text-decoration:none}
-    a:hover{opacity:.9;text-decoration:underline}
-
-    header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,rgba(7,8,11,.7),rgba(7,8,11,.2));backdrop-filter:blur(8px)}
-    .wrap{max-width:1180px;margin:0 auto;padding:18px 16px}
-    .h1{font-weight:800;font-size:clamp(20px,2.5vw,28px);letter-spacing:.3px;margin:6px 0 2px}
-    .sub{color:var(--muted);font-size:13px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .actions a,.actions button{background:var(--chip);border:1px solid var(--line);color:var(--text);padding:9px 12px;border-radius:10px;font-weight:700;font-size:13px}
-    .actions a:hover,.actions button:hover{background:#20283a}
-
-    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:16px auto}
-    @media (max-width:980px){ .grid{grid-template-columns:1fr} }
-
-    .card{background:linear-gradient(180deg,#151a24,#121723);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-    .card h2{margin:0 0 10px;font-size:16px}
-    .help{color:var(--muted);font-size:12px;margin:-2px 0 12px}
-
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 16px}
-    @media (max-width:820px){ .kpis{grid-template-columns:repeat(2,1fr)} }
-    .kpi{background:#101626;border:1px solid var(--line);border-radius:12px;padding:12px}
-    .kpi .l{color:var(--muted);font-size:12px}
-    .kpi .v{font-size:22px;font-weight:800;margin-top:6px}
-
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
-    .toolbar select,.toolbar input{background:#0f141e;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 10px}
-    .btn{background:var(--brand);border:none;color:#fff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
-    .btn.ok{background:var(--ok)} .btn.warn{background:var(--warn);color:#141208} .btn.danger{background:var(--danger)}
-    .btn.small{padding:6px 10px;font-size:12px;border-radius:8px}
-
-    .tablewrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:760px}
-    thead th{position:sticky;top:0;background:var(--thead);color:#aeb7d0;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
-    tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}
-    tbody tr:hover{background:#151b2a}
-    .right{text-align:right}
-    .row-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:var(--chip);color:var(--text)}
-    .chip.ok{background:rgba(36,209,128,.12);border-color:rgba(36,209,128,.35);color:#9ff2cf}
-    .chip.warn{background:rgba(255,204,0,.12);border-color:rgba(255,204,0,.35);color:#ffe38a}
-    .chip.bad{background:rgba(255,84,112,.12);border-color:rgba(255,84,112,.35);color:#ff9eaa}
-    .chip.role{background:#101b2b;border-color:#27364f;color:#9bbcff}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px 16px}
+    header{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+    .logo{font-weight:700;font-size:18px}
+    .top-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+    .btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn.ghost{background:var(--chip);color:var(--text)}
+    .btn.small{padding:8px 10px;font-size:13px;border-radius:8px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+    h1{font-size:22px;margin:4px 0 12px}
+    h2{font-size:18px;margin:0 0 10px}
     .muted{color:var(--muted)}
+    /* cartes KPI */
+    .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 4px}
+    .kpi{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px}
+    .kpi label{display:block;color:var(--muted);font-size:12px}
+    .kpi strong{display:block;font-size:20px;margin-top:4px}
+    /* filtres */
+    .filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) 120px;gap:8px}
+    .input, select{width:100%;background:#0e131d;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px}
+    /* tables */
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid var(--line);padding:10px;vertical-align:middle}
+    .table th{color:var(--muted);text-align:left;font-weight:600;font-size:13px}
+    .chip{display:inline-block;background:var(--chip);border:1px solid var(--line);padding:4px 8px;border-radius:999px;font-size:12px}
+    .chip.ok{background:#0d1e18;border-color:#174f3f;color:#9fe7cf}
+    .chip.warn{background:#2a2211;border-color:#4b3a14;color:#ffd47a}
+    .chip.danger{background:#2a1219;border-color:#4a1520;color:#ffb3c3}
+    .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .btn.link{background:transparent;border:1px solid var(--line);color:var(--text)}
+    footer{color:var(--muted);text-align:center;padding:28px 0 12px}
 
-    .toast{position:fixed;right:16px;bottom:16px;display:none;background:#0f1726;border:1px solid var(--line);padding:12px 14px;border-radius:12px;font-weight:700;box-shadow:0 12px 28px rgba(0,0,0,.35)}
-    .hr{height:1px;background:var(--line);margin:16px 0}
-
-    /* Mobile table cards */
-    @media (max-width:640px){
-      table, thead, tbody, th, td, tr{display:block;width:100%}
-      thead{display:none}
-      tbody tr{padding:10px 12px}
-      tbody td{border:none;padding:6px 0}
+    /* responsive */
+    @media (max-width:820px){
+      .filters{grid-template-columns:1fr 1fr;grid-auto-rows:auto}
+      .kpis{grid-template-columns:1fr 1fr}
+      .hide-sm{display:none}
+      .btn.small{padding:7px 9px}
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="h1">Velvet — Dashboard (admin)</div>
-      <div class="sub">Modérer les comptes, suivre les ventes, marquer les versements.</div>
-      <div class="actions">
-        <a href="/index.html">🏠 Accueil</a>
-        <a href="/admin-items.html">➕ Créer un item</a>
-        <button id="btnReload" class="btn small ghost">Rafraîchir</button>
-        <span id="msg" class="muted"></span>
+  <div class="wrap">
+    <header>
+      <div class="logo">Velvet — <span class="muted">Dashboard (admin)</span></div>
+      <nav class="top-actions">
+        <a class="btn ghost small" href="index.html">Accueil</a>
+        <a class="btn ghost small" href="admin-items.html">Créer un item</a>
+        <button id="refreshAll" class="btn small">Rafraîchir</button>
+      </nav>
+    </header>
+
+    <!-- Comptes -->
+    <section class="panel">
+      <h1>Comptes — valider / suspendre / supprimer</h1>
+      <p class="muted">“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</p>
+
+      <div class="filters" style="margin:8px 0 10px">
+        <select id="fStatus">
+          <option value="">Statut : Tous</option>
+          <option value="pending">En attente</option>
+          <option value="approved">Validé</option>
+          <option value="suspended">Suspendu</option>
+        </select>
+        <select id="fRole">
+          <option value="">Rôle : Tous</option>
+          <option value="creator">Créatrice</option>
+          <option value="client">Client</option>
+        </select>
+        <input id="fQuery" class="input" placeholder="recherche (pseudo / email)" />
+        <div class="kpi">
+          <label>Comptes</label>
+          <strong id="kpiUsers">—</strong>
+        </div>
+        <button id="applyUsersFilters" class="btn small">Filtrer</button>
       </div>
-    </div>
-  </header>
 
-  <main class="wrap">
-    <div class="grid">
-      <!-- COMPTES -->
-      <section class="card">
-        <h2>Comptes — valider / suspendre / supprimer</h2>
-        <div class="help">“Suspendre” bloque l’accès sans supprimer les données. Tu peux réactiver ensuite.</div>
-
-        <div class="toolbar">
-          <select id="fStatus">
-            <option value="">Statut : Tous</option>
-            <option value="pending">En attente</option>
-            <option value="active">Actif</option>
-            <option value="suspended">Suspendu</option>
-          </select>
-          <select id="fRole">
-            <option value="">Rôle : Tous</option>
-            <option value="creator">Créatrices</option>
-            <option value="client">Clients</option>
-            <option value="admin">Admins</option>
-          </select>
-          <input id="fQuery" placeholder="🔎 pseudo / email" />
-          <button id="refreshUsers" class="btn small ghost">Rafraîchir</button>
-        </div>
-
-        <div class="tablewrap">
-          <table>
-            <thead>
-              <tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th></tr>
-            </thead>
-            <tbody id="tbUsers">
-              <tr><td colspan="6" class="muted">Chargement…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- KPIs + RÉCAP CRÉATRICES -->
-      <section class="card">
-        <h2>Ventes & répartition (70% / 30%)</h2>
-        <div class="help">Clique sur <b>“Marquer payé”</b> après ton virement PayPal à la créatrice.</div>
-
-        <div class="kpis">
-          <div class="kpi"><div class="l">Ventes (CHF)</div><div class="v" id="kTot">—</div></div>
-          <div class="kpi"><div class="l">Pour créatrices (70%)</div><div class="v" id="k70">—</div></div>
-          <div class="kpi"><div class="l">Pour Velvet (30%)</div><div class="v" id="k30">—</div></div>
-          <div class="kpi"><div class="l">Impayé total</div><div class="v" id="kUnpaid">—</div></div>
-        </div>
-
-        <div class="tablewrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Créatrice</th><th class="right">Ventes (CHF)</th>
-                <th class="right">Pour elle (70%)</th><th class="right">Pour Velvet (30%)</th>
-                <th class="right">Impayé</th><th class="right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="tbCreators">
-              <tr><td colspan="6" class="muted">Chargement…</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="toolbar" style="justify-content:flex-end;margin-top:10px">
-          <button id="exportCsv" class="btn small ghost">Exporter CSV</button>
-          <button id="refreshLedger" class="btn small ghost">Rafraîchir</button>
-        </div>
-      </section>
-    </div>
-
-    <!-- DÉTAIL DES VENTES -->
-    <section class="card">
-      <h2>Détail des ventes</h2>
-      <div class="tablewrap">
-        <table>
+      <div class="table-wrap">
+        <table class="table" id="usersTable">
           <thead>
             <tr>
-              <th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th>
-              <th>Txn</th><th>Email client</th><th>Statut</th>
+              <th>Date</th><th>Pseudo</th><th class="hide-sm">Email</th><th>Rôle</th><th>Statut</th><th>Action</th>
             </tr>
           </thead>
-          <tbody id="tbSales">
-            <tr><td colspan="7" class="muted">Chargement…</td></tr>
-          </tbody>
+          <tbody><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
         </table>
       </div>
     </section>
-  </main>
 
-  <div id="toast" class="toast"></div>
+    <!-- Ventes & split -->
+    <section class="panel">
+      <h1>Ventes & répartition (70% / 30%)</h1>
+      <p class="muted">Clique sur <b>“Marquer payé”</b> après ton virement PayPal à la créatrice.</p>
 
-  <!-- LOGIQUE intégrée : appels API + rendu + actions -->
+      <div class="kpis">
+        <div class="kpi"><label>Ventes (CHF)</label><strong id="kpiSales">—</strong></div>
+        <div class="kpi"><label>Pour créatrices (70%)</label><strong id="kpiForCreators">—</strong></div>
+        <div class="kpi"><label>Pour Velvet (30%)</label><strong id="kpiForVelvet">—</strong></div>
+        <div class="kpi"><label>Impayé total</label><strong id="kpiUnpaid">—</strong></div>
+      </div>
+
+      <div class="table-wrap" style="margin-top:10px">
+        <table class="table" id="creatorsSummary">
+          <thead>
+            <tr>
+              <th>Créatrice</th>
+              <th>Ventes (CHF)</th>
+              <th class="hide-sm">Pour elle (70%)</th>
+              <th>Pour Velvet (30%)</th>
+              <th>Impayé</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button id="exportCsv" class="btn ghost small">Exporter CSV</button>
+        <button id="refreshSales" class="btn ghost small">Rafraîchir</button>
+      </div>
+    </section>
+
+    <!-- Détail des ventes -->
+    <section class="panel">
+      <h2>Détail des ventes</h2>
+      <div class="table-wrap">
+        <table class="table" id="salesTable">
+          <thead>
+            <tr>
+              <th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th class="hide-sm">Txn</th><th class="hide-sm">Email client</th><th>Statut</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="8" class="muted">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="muted">© Velvet — Pilotage plateforme</footer>
+  </div>
+
+  <!-- Logic -->
   <script>
-    // ---------- Helpers ----------
-    const $ = (sel, root=document)=>root.querySelector(sel);
-    const $$ = (sel, root=document)=>[...root.querySelectorAll(sel)];
-    const fmt = n => Number(n||0).toFixed(2).replace('.', ',');
-    const toast = (t, ok=true)=>{ const el=$("#toast"); el.textContent=t; el.style.display="block"; el.style.borderColor= ok ? "#214c36" : "#5e2020"; setTimeout(()=>el.style.display="none", 2200); };
-    const setMsg = (t, ok=true)=>{ const el=$("#msg"); el.textContent=t||""; el.style.color = ok ? "#8ff0b4" : "#ff9aa0"; setTimeout(()=>el.textContent="", 3000); };
+    // Helpers
+    const $ = (id) => document.getElementById(id);
+    const api = (path, opts={}) => fetch(path, Object.assign({
+      headers:{'Content-Type':'application/json'}
+    }, opts));
 
-    async function api(url, opt){ const r = await fetch(url, { headers:{'Content-Type':'application/json'}, ...opt }); let j=null; try{ j=await r.json(); }catch{} return {ok:r.ok, status:r.status, data:j}; }
-
-    // ---------- USERS ----------
+    // ====== Comptes ======
     let USERS = [];
-
     async function loadUsers(){
-      $("#tbUsers").innerHTML = `<tr><td colspan="6" class="muted">Chargement…</td></tr>`;
+      const status = $('fStatus').value, role = $('fRole').value, q = $('fQuery').value.trim().toLowerCase();
       const r = await api('/api/list-users');
-      if(!r.ok){ $("#tbUsers").innerHTML = `<tr><td colspan="6" class="muted">Erreur chargement utilisateurs</td></tr>`; return; }
-      USERS = r.data?.users || r.data || [];
-      renderUsers();
-    }
+      const data = await r.json();
+      USERS = (data && data.users) ? data.users : [];
+      $('kpiUsers').textContent = USERS.length;
 
-    function renderUsers(){
-      const st = $("#fStatus").value, role = $("#fRole").value, q = ($("#fQuery").value||"").toLowerCase();
-      const rows = USERS.filter(u=>{
-        const okS = !st || (u.status||'pending')===st;
-        const okR = !role || (u.role||'client')===role;
-        const okQ = !q || (String(u.username||'').toLowerCase().includes(q) || String(u.email||'').toLowerCase().includes(q));
-        return okS && okR && okQ;
-      }).map(u=>{
-        const badge = (u.status==='active')?'ok':(u.status==='suspended'?'warn':'bad');
-        const d = new Date(u.createdAt || u.created || Date.now()).toLocaleString();
-        const idOrEmail = u.email || u.id;
-        return `<tr>
-          <td>${d}</td>
-          <td>${u.username||'—'}</td>
-          <td class="muted">${u.email||'—'}</td>
-          <td><span class="chip role">${u.role||'client'}</span></td>
-          <td><span class="chip ${badge}">${u.status||'pending'}</span></td>
-          <td class="right row-actions">
-            ${u.status!=='active'
-              ? `<button class="btn small ok" data-act="unsuspend" data-id="${idOrEmail}">Activer</button>`
-              : `<button class="btn small warn" data-act="suspend" data-id="${idOrEmail}">Suspendre</button>`}
-            <button class="btn small danger" data-act="delete" data-id="${idOrEmail}">Supprimer</button>
-          </td>
-        </tr>`;
-      }).join('');
-      $("#tbUsers").innerHTML = rows || `<tr><td colspan="6" class="muted">Aucun compte.</td></tr>`;
-    }
+      const tbody = $('usersTable').querySelector('tbody');
+      tbody.innerHTML = '';
+      USERS
+        .filter(u => !status || u.status===status)
+        .filter(u => !role || u.role===role)
+        .filter(u => !q || (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q))
+        .sort((a,b)=> (b.created||'').localeCompare(a.created||''))
+        .forEach(u=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${fmtDate(u.created)}</td>
+            <td>@${esc(u.username||'')}</td>
+            <td class="hide-sm">${esc(u.email||'')}</td>
+            <td><span class="chip">${u.role||'—'}</span></td>
+            <td>${statusChip(u.status)}</td>
+            <td class="row-actions">
+              ${u.status!=='approved'? `<button class="btn small link" data-act="approve" data-id="${u.id}">Valider</button>`:''}
+              ${u.status!=='suspended'? `<button class="btn small link" data-act="suspend" data-id="${u.id}">Suspendre</button>`:''}
+              <button class="btn small link" data-act="delete" data-id="${u.id}"><span style="color:var(--danger)">Supprimer</span></button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
 
-    // Actions sur comptes
-    $("#tbUsers").addEventListener('click', async (e)=>{
-      const b = e.target.closest('button[data-act]'); if(!b) return;
-      const id = b.dataset.id; const act = b.dataset.act;
-      if(act==='suspend'){
-        const reason = prompt("Motif de suspension (interne) :",""); if(reason===null) return;
-        const r = await api('/api/suspend-user',{method:'POST', body:JSON.stringify({ id, reason })});
-        r.ok ? (toast('Compte suspendu'), loadUsers()) : toast('Erreur suspension', false);
-      }else if(act==='unsuspend'){
-        const r = await api('/api/unsuspend-user',{method:'POST', body:JSON.stringify({ id })});
-        r.ok ? (toast('Compte activé'), loadUsers()) : toast('Erreur activation', false);
-      }else if(act==='delete'){
-        if(!confirm('Supprimer définitivement ce profil ?')) return;
-        const r = await api('/api/delete-user',{method:'POST', body:JSON.stringify({ id })});
-        r.ok ? (toast('Profil supprimé'), loadUsers()) : toast('Erreur suppression', false);
-      }
-    });
-
-    $("#refreshUsers").onclick = loadUsers;
-    $("#fStatus").onchange = renderUsers;
-    $("#fRole").onchange = renderUsers;
-    $("#fQuery").oninput = ()=>{ clearTimeout(window.__q); window.__q=setTimeout(renderUsers,160); };
-
-    // ---------- LEDGER ----------
-    let LEDGER = { totals:{}, creators:{}, sales:[] };
-
-    async function loadLedger(){
-      $("#tbCreators").innerHTML = `<tr><td colspan="6" class="muted">Chargement…</td></tr>`;
-      $("#tbSales").innerHTML = `<tr><td colspan="7" class="muted">Chargement…</td></tr>`;
-      const r = await api('/api/list-ledger');
-      if(!r.ok){ $("#tbCreators").innerHTML = `<tr><td colspan="6" class="muted">Erreur ledger</td></tr>`; $("#tbSales").innerHTML = `<tr><td colspan="7" class="muted">Erreur ledger</td></tr>`; return; }
-
-      // Accepte 2 formats: { totals, creators, sales } OU array ventes
-      if (Array.isArray(r.data)) {
-        const sales = r.data;
-        const total = sales.reduce((a,s)=>a+Number(s.amount||0),0);
-        LEDGER = {
-          totals:{ total, toCreators: total*0.70, toVelvet: total*0.30, unpaid: 0 },
-          creators:{},
-          sales
+      // actions comptes
+      tbody.querySelectorAll('button').forEach(b=>{
+        b.onclick = async ()=>{
+          const id=b.dataset.id, act=b.dataset.act;
+          if(act==='delete' && !confirm("Supprimer ce profil ? Cette action est définitive.")) return;
+          if(act==='suspend'){
+            const reason = prompt("Motif de suspension (visible admin) :","Non conforme");
+            await api('/api/admin-users',{method:'POST',body:JSON.stringify({action:'suspend',id,reason})});
+          }else if(act==='approve'){
+            await api('/api/admin-users',{method:'POST',body:JSON.stringify({action:'approve',id})});
+          }else if(act==='delete'){
+            await api('/api/admin-users',{method:'POST',body:JSON.stringify({action:'delete',id})});
+          }
+          loadUsers();
         };
-      } else {
-        LEDGER = {
-          totals: r.data.totals || {},
-          creators: r.data.creators || {},
-          sales: r.data.sales || []
-        };
-      }
-      renderLedger();
-    }
-
-    function renderLedger(){
-      const t = LEDGER.totals || {};
-      $("#kTot").textContent = fmt(t.total||0) + " CHF";
-      $("#k70").textContent  = fmt(t.toCreators||0) + " CHF";
-      $("#k30").textContent  = fmt(t.toVelvet||0) + " CHF";
-      $("#kUnpaid").textContent = fmt(t.unpaid||0) + " CHF";
-
-      // Créatrices
-      const cs = Object.values(LEDGER.creators||{});
-      $("#tbCreators").innerHTML = cs.length ? cs.map(c=>{
-        const unpaid = Number(c.unpaid ?? ((c.toCreator||0) - (c.alreadyPaid||0)));
-        return `<tr>
-          <td>${c.name||c.id||'—'}</td>
-          <td class="right">${fmt(c.total||0)}</td>
-          <td class="right">${fmt(c.toCreator||0)}</td>
-          <td class="right">${fmt(c.toVelvet||0)}</td>
-          <td class="right">${unpaid>0?`<span class="chip warn">${fmt(unpaid)}</span>`:`<span class="chip ok">0,00</span>`}</td>
-          <td class="right">
-            ${unpaid>0?`<button class="btn small ok" data-mark="${c.id}">Marquer payé</button>`:'—'}
-          </td>
-        </tr>`;
-      }).join('') : `<tr><td colspan="6" class="muted">Pas encore de ventes.</td></tr>`;
-
-      // Ventes
-      const rows = (LEDGER.sales||[]).map(s=>{
-        const d = new Date(s.date||Date.now()).toLocaleString();
-        const badge = (s.status==='paid')?'ok':'warn';
-        return `<tr>
-          <td>${d}</td>
-          <td>${s.creatorName||s.creatorId||'—'}</td>
-          <td><span class="chip">${s.type||'ppv'}</span></td>
-          <td class="right">${fmt(s.amount||0)}</td>
-          <td class="muted">${s.txn||'—'}</td>
-          <td class="muted">${s.buyerEmail||'—'}</td>
-          <td><span class="chip ${badge}">${s.status||'pending'}</span></td>
-        </tr>`;
-      }).join('');
-      $("#tbSales").innerHTML = rows || `<tr><td colspan="7" class="muted">Aucune vente.</td></tr>`;
-    }
-
-    // Marquer payé (par créatrice)
-    $("#tbCreators").addEventListener('click', async (e)=>{
-      const b = e.target.closest('button[data-mark]'); if(!b) return;
-      const creatorId = b.dataset.mark;
-      if(!confirm('Confirmer : marquer PAYÉ pour cette créatrice ?')) return;
-      const r = await api('/api/mark-paid', { method:'POST', body:JSON.stringify({ creatorId }) });
-      r.ok ? (toast('Marqué payé'), loadLedger()) : toast('Erreur “marqué payé”', false);
-    });
-
-    // Export CSV (ventes)
-    $("#exportCsv").onclick = ()=>{
-      const rows = [['date','creator','type','amount','txn','buyerEmail','status']];
-      (LEDGER.sales||[]).forEach(s=>{
-        rows.push([
-          new Date(s.date||Date.now()).toISOString(),
-          (s.creatorName||s.creatorId||'').replaceAll(';',' '),
-          s.type||'ppv',
-          String(Number(s.amount||0).toFixed(2)).replace('.',','),
-          (s.txn||'').replaceAll(';',' '),
-          (s.buyerEmail||'').replaceAll(';',' '),
-          s.status||'pending'
-        ]);
       });
-      const csv = rows.map(r=>r.join(';')).join('\n');
+    }
+
+    // ====== Ventes & ledger ======
+    let LEDGER = [];
+    async function loadSales(){
+      const r = await api('/api/list-ledger');
+      const data = await r.json();
+      LEDGER = (data && data.sales) ? data.sales : [];
+
+      // KPIs
+      const total   = sum(LEDGER.map(s=> s.amount||0));
+      const for70   = +(total * 0.70).toFixed(2);
+      const for30   = +(total * 0.30).toFixed(2);
+      const unpaid  = sum(LEDGER.filter(s=>!s.paid).map(s=> (s.amount||0)*0.70 ));
+
+      $('kpiSales').textContent = fmtCHF(total);
+      $('kpiForCreators').textContent = fmtCHF(for70);
+      $('kpiForVelvet').textContent = fmtCHF(for30);
+      $('kpiUnpaid').textContent = fmtCHF(unpaid);
+
+      // par créatrice
+      const byCreator = {};
+      LEDGER.forEach(s=>{
+        const id = s.creatorId || 'inconnu';
+        if(!byCreator[id]) byCreator[id]={creatorId:id,total:0,unpaid:0};
+        byCreator[id].total += (s.amount||0);
+        if(!s.paid) byCreator[id].unpaid += ((s.amount||0)*0.70);
+      });
+
+      const tbody = $('creatorsSummary').querySelector('tbody');
+      tbody.innerHTML='';
+      Object.values(byCreator).sort((a,b)=>b.total-a.total).forEach(row=>{
+        const t70 = +(row.total*0.70).toFixed(2);
+        const t30 = +(row.total*0.30).toFixed(2);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${esc(row.creatorId)}</td>
+          <td>${fmtCHF(row.total)}</td>
+          <td class="hide-sm">${fmtCHF(t70)}</td>
+          <td>${fmtCHF(t30)}</td>
+          <td><span class="chip ${row.unpaid>0?'warn':'ok'}">${fmtCHF(row.unpaid)}</span></td>
+          <td><button class="btn small link" data-creator="${row.creatorId}">Marquer payé</button></td>`;
+        tbody.appendChild(tr);
+      });
+
+      // bouton "Marquer payé" par créatrice
+      tbody.querySelectorAll('button[data-creator]').forEach(b=>{
+        b.onclick = async ()=>{
+          if(!confirm("Confirmer que les virements à cette créatrice ont été effectués ?")) return;
+          await api('/api/mark-paid',{method:'POST',body:JSON.stringify({creatorId:b.dataset.creator})});
+          loadSales();
+        };
+      });
+
+      // détail ventes
+      const tb = $('salesTable').querySelector('tbody');
+      tb.innerHTML='';
+      LEDGER.sort((a,b)=> (b.date||'').localeCompare(a.date||'')).forEach(s=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td>${fmtDate(s.date)}</td>
+          <td>${esc(s.creatorId||'—')}</td>
+          <td>${esc(s.type||'—')}</td>
+          <td>${fmtCHF(s.amount||0)}</td>
+          <td class="hide-sm">${esc(s.txn||'—')}</td>
+          <td class="hide-sm">${esc(s.clientEmail||'—')}</td>
+          <td>${s.paid?'<span class="chip ok">payé</span>':'<span class="chip warn">impayé</span>'}</td>
+          <td class="row-actions">
+            ${!s.paid? `<button class="btn small link" data-one="${s.id||''}">Marquer payé</button>`:''}
+          </td>`;
+        tb.appendChild(tr);
+      });
+      tb.querySelectorAll('button[data-one]').forEach(b=>{
+        b.onclick = async ()=>{
+          await api('/api/mark-paid',{method:'POST',body:JSON.stringify({saleId:b.dataset.one})});
+          loadSales();
+        };
+      });
+    }
+
+    // ====== Export CSV (détail) ======
+    $('exportCsv').onclick = ()=>{
+      const head = ['date','creatorId','type','amount','txn','clientEmail','paid'];
+      const rows = LEDGER.map(s=> [s.date||'',s.creatorId||'',s.type||'',String(s.amount||0),s.txn||'',s.clientEmail||'',s.paid?'yes':'no']);
+      const csv = [head, ...rows].map(r=> r.map(x=> `"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `velvet_ventes_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `velvet-sales-${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 500);
     };
 
-    // Actions globales
-    $("#refreshLedger").onclick = loadLedger;
-    $("#btnReload").onclick = ()=>{ loadUsers(); loadLedger(); };
+    // ====== Utils ======
+    function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function fmtCHF(v){ return `${Number(v||0).toFixed(2)} CHF`; }
+    function sum(arr){ return +arr.reduce((a,b)=>a+Number(b||0),0).toFixed(2); }
+    function fmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString(); }catch{ return iso; } }
+    function statusChip(s){
+      if(s==='approved') return '<span class="chip ok">validé</span>';
+      if(s==='suspended') return '<span class="chip warn">suspendu</span>';
+      if(s==='deleted') return '<span class="chip danger">supprimé</span>';
+      return '<span class="chip">en attente</span>';
+    }
 
-    // Boot
-    loadUsers(); loadLedger();
+    // événements
+    $('applyUsersFilters').onclick = loadUsers;
+    $('refreshAll').onclick = ()=>{ loadUsers(); loadSales(); };
+    $('refreshSales').onclick = loadSales;
+
+    // init
+    loadUsers(); loadSales();
   </script>
 </body>
 </html>
