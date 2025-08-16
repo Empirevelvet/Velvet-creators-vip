@@ -82,3 +82,45 @@
 <script src="assets/js/cookies.js"></script>
 </body>
 </html>
+<script>
+(() => {
+  const form = document.getElementById('signup-form'); // id de ton <form>
+  if (!form) return;
+
+  const emailEl = document.getElementById('email');
+  const userEl  = document.getElementById('username');
+  const passEl  = document.getElementById('password');
+  const msgEl   = document.getElementById('signup-msg') || (() => {
+    const d = document.createElement('div'); d.id = 'signup-msg'; form.appendChild(d); return d;
+  })();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msgEl.textContent = 'Création du compte...';
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email: emailEl.value,
+          username: userEl.value,
+          password: passEl.value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        msgEl.textContent = data.error || 'Erreur lors de l’inscription';
+        msgEl.style.color = '#ff6b6b';
+        return;
+      }
+      msgEl.textContent = 'Compte créé avec succès !';
+      msgEl.style.color = '#7CFC00';
+      // redirection si tu veux :
+      // location.href = 'thanks.html';
+    } catch (err) {
+      msgEl.textContent = 'Erreur réseau. Réessaie.';
+      msgEl.style.color = '#ff6b6b';
+    }
+  });
+})();
+</script>
