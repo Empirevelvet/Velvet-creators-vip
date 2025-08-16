@@ -1,12 +1,17 @@
 {
   "name": "velvet-creators-vip",
   "version": "1.0.0",
-  "description": "Fonctions Netlify pour gérer les paiements PayPal",
+  "private": true,
+  "description": "Fonctions Netlify pour paiements PayPal et tickets live",
   "main": "index.js",
   "scripts": {
-    "build": "echo 'No build step required'"
+    "build": "echo \"No build step required\""
   },
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "@netlify/blobs": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
