@@ -1,47 +1,185 @@
-<script>
-const CREATOR_ID = window.CREATOR_ID || 'creatrice-demo';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Velvet — Chat & PPV</title>
+  <link href="styles.css" rel="stylesheet" />
+  <style>
+    /* Compléments légers de style pour la page chat */
+    .chat-wrap{max-width:980px;margin:8vh auto 12vh;padding:22px;background:rgba(18,18,18,.92);border-radius:18px;box-shadow:0 18px 54px rgba(0,0,0,.5)}
+    .chat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .chat-head h1{margin:0;font-size:clamp(22px,3vw,36px)}
+    .send-box{display:grid;grid-template-columns:1fr 130px 140px;gap:10px;margin:12px 0 18px}
+    .send-box input[type="file"]{padding:10px;background:#111;border:1px solid rgba(255,255,255,.12);border-radius:10px}
+    .send-box input[type="number"]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#111;color:#e6e6e6}
+    .send-box button{border-radius:12px}
+    .note{opacity:.7;font-size:.95rem;margin-top:-6px}
+    ul#messages{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .msg{background:#0f0f0f;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;position:relative}
+    .thumb{display:block;aspect-ratio:4/5;object-fit:cover;width:100%}
+    .blur{filter:blur(12px);transform:scale(1.02)}
+    .card-body{padding:12px}
+    .price{font-weight:700}
+    .unlock{width:100%;margin-top:8px}
+    .payer{margin-top:8px}
+    .video{width:100%;height:auto;background:#000}
+    .badge-lock{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:999px;font-size:.85rem}
+    @media (max-width:560px){.send-box{grid-template-columns:1fr 1fr;grid-auto-rows:minmax(44px,auto)} .send-box button{grid-column:1/-1}}
+  </style>
+</head>
+<body>
 
-document.getElementById('sendPPV').onclick = async () => {
-  const file  = document.getElementById('file').files[0];
-  const price = parseFloat(document.getElementById('ppvPrice').value || '0');
+  <header class="header">
+    <nav class="nav">
+      <a class="cta" href="index.html">Accueil</a>
+      <a class="cta" href="signup.html">S’inscrire</a>
+      <a class="cta" href="login.html">Connexion</a>
+    </nav>
+  </header>
 
-  if (!file) return alert('Sélectionnez un fichier');
-  if (!(price > 0)) return alert('Le prix doit être supérieur à 0');
-
-  const previewUrl = URL.createObjectURL(file); // provisoire pour test
-
-  const res = await fetch('/api/upsert-item', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      creatorId: CREATOR_ID,
-      title: file.name,
-      type: file.type.startsWith('video') ? 'video' : 'image',
-      previewUrl,
-      price
-    })
-  });
-  const data = await res.json();
-  if (!res.ok || !data.success) return alert('Erreur: ' + (data.error || 'serveur'));
-
-  addLockedMessage({ itemId: data.itemId, previewUrl, price });
-  document.getElementById('file').value = '';
-  document.getElementById('ppvPrice').value = '';
-};
-
-function addLockedMessage({ itemId, previewUrl, price }) {
-  const li = document.createElement('li');
-  li.className = 'msg locked';
-  li.innerHTML = `
-    <div class="thumb" style="filter: blur(10px);">
-      <img src="${previewUrl}" alt="aperçu verrouillé" style="max-width:220px;border-radius:12px;">
+  <main class="chat-wrap">
+    <div class="chat-head">
+      <h1>Chat privé & ventes à la demande</h1>
+      <span class="badge-lock">Contenus verrouillés • PPV</span>
     </div>
-    <div class="actions">
-      <a class="btn gold" href="paiement.html?item=${encodeURIComponent(itemId)}">
-        Débloquer pour ${price.toFixed(2)} CHF
-      </a>
+
+    <!-- Zone "créatrice" : choisir un fichier + fixer un prix libre -->
+    <div class="send-box">
+      <input id="file" type="file" accept="image/*,video/*" />
+      <input id="ppvPrice" type="number" min="0" step="0.10" placeholder="Prix (ex: 19.90)" />
+      <button id="sendPPV" class="btn gold">Envoyer (PPV)</button>
     </div>
-  `;
-  document.getElementById('thread').appendChild(li);
-}
-</script>
+    <p class="note">La créatrice choisit librement son prix pour chaque photo/vidéo envoyée. Le média est affiché verrouillé dans le chat jusqu’au paiement.</p>
+
+    <!-- Messages / cartes médias -->
+    <ul id="messages"></ul>
+  </main>
+
+  <!-- SDK PayPal (ton client-id + CHF) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AfQktUT9wtwRSXbudljfhWf-jbwzaQhWF8oA88XREeFTwHjXkTsrOdVZRzih7s6pXao6RKNsYvrYt9rD&currency=CHF"></script>
+
+  <script>
+    /**
+     * Démo front‑end : les médias sont gardés en mémoire et prévisualisés via URL.createObjectURL.
+     * En production, il faudra un stockage (ex: Netlify Large Media / S3) + un vrai système de messagerie.
+     */
+
+    // Id "virtuel" de la créatrice pour tracer qui a posté (à brancher avec l'auth plus tard)
+    const CREATOR_ID = window.CREATOR_ID || 'creatrice-demo';
+
+    // État local des messages PPV
+    const state = {
+      items: [] // { id, type:'image'|'video', previewUrl, price, unlocked:false }
+    };
+
+    // Envoi par la créatrice
+    document.getElementById('sendPPV').onclick = async () => {
+      const fileInput = document.getElementById('file');
+      const priceInput = document.getElementById('ppvPrice');
+      const file = fileInput.files[0];
+      const price = parseFloat(priceInput.value || '0');
+
+      if (!file) return alert('Sélectionne un fichier.');
+      if (!(price > 0)) return alert('Le prix doit être supérieur à 0.');
+
+      // Aperçu local (démo)
+      const previewUrl = URL.createObjectURL(file);
+
+      // On "ajoute au chat"
+      const item = {
+        id: 'itm_' + Math.random().toString(36).slice(2),
+        type: file.type.startsWith('video') ? 'video' : 'image',
+        previewUrl,
+        price,
+        unlocked: false
+      };
+      state.items.unshift(item);
+      render();
+
+      // reset champs
+      fileInput.value = '';
+      priceInput.value = '';
+    };
+
+    // Rendu des cartes
+    function render() {
+      const list = document.getElementById('messages');
+      list.innerHTML = '';
+      state.items.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'msg';
+
+        // média (flouté si locked)
+        let mediaHTML = '';
+        if (item.type === 'image') {
+          mediaHTML = `<img class="thumb ${item.unlocked ? '' : 'blur'}" src="${item.previewUrl}" alt="aperçu">`;
+        } else {
+          mediaHTML = item.unlocked
+            ? `<video class="video" src="${item.previewUrl}" controls playsinline></video>`
+            : `<img class="thumb blur" src="${item.previewUrl}" alt="aperçu vidéo verrouillé">`;
+        }
+
+        const bodyHTML = `
+          <div class="card-body">
+            <div>Prix: <span class="price">${item.price.toFixed(2)} CHF</span></div>
+            ${ item.unlocked
+                ? `<div style="margin-top:6px;opacity:.8">Débloqué ✔️ — merci pour votre achat.</div>`
+                : `<button class="btn gold unlock" data-id="${item.id}">Débloquer pour ${item.price.toFixed(2)} CHF</button>
+                   <div class="payer" id="pp-${item.id}"></div>` }
+          </div>
+        `;
+
+        li.innerHTML = `${mediaHTML}${ item.unlocked ? '' : '<span class="badge-lock">Verrouillé</span>' }${bodyHTML}`;
+        list.appendChild(li);
+      });
+
+      // Brancher les boutons "Débloquer"
+      document.querySelectorAll('.unlock').forEach(btn => {
+        btn.onclick = () => openPayPalFor(btn.dataset.id);
+      });
+    }
+
+    // Ouvre PayPal Buttons pour l'item donné
+    function openPayPalFor(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const container = document.getElementById('pp-' + itemId);
+      container.innerHTML = ''; // reset si déjà rendu
+
+      paypal.Buttons({
+        createOrder: function () {
+          return fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: item.price })
+          })
+          .then(res => res.json())
+          .then(data => data.id);
+        },
+        onApprove: function (data) {
+          return fetch('/api/capture-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID })
+          })
+          .then(res => res.json())
+          .then(() => {
+            // Succès : on déverrouille le média dans l'UI
+            item.unlocked = true;
+            render();
+            // 💾 Ici, en vrai, on enregistrerait la transaction + rattacherait au compte client/créatrice
+          })
+          .catch(err => {
+            alert('Paiement non abouti : ' + err.message);
+          });
+        }
+      }).render(container);
+    }
+
+    // Premier rendu (liste vide)
+    render();
+  </script>
+</body>
+</html>
