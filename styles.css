@@ -1,3 +1,14 @@
+input, textarea, select {
+  background-color: #111;   /* fond sombre */
+  color: #fff;              /* texte blanc */
+  border: 1px solid #444;   /* bordure discrète */
+  border-radius: 6px;
+  padding: 8px;
+  width: 100%;
+}
+input::placeholder, textarea::placeholder {
+  color: #aaa;   /* couleur des placeholders */
+}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
