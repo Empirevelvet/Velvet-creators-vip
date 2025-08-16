@@ -45,3 +45,12 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
+// ... dans netlify/functions/create-order.js
+body: JSON.stringify({
+  intent: "CAPTURE",
+  purchase_units: [{
+    amount: { currency_code: "CHF", value: body.amount },
+    // IMPORTANT : associer la vente
+    custom_id: `${body.creatorId || "velvet"}|${body.itemId || ""}|${body.type || "ppv"}`
+  }]
+})
