@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paiement sécurisé • Velvet</title>
+
+  <!-- Feuille de style principale de ton site -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    /* Habillage léger de la boîte de paiement pour rester dans ton thème luxe */
+    .paybox{
+      max-width: 640px;
+      margin: 8vh auto;
+      padding: 28px 22px;
+      border-radius: 18px;
+      background: rgba(18,18,18,.92);
+      box-shadow: 0 18px 54px rgba(0,0,0,.5);
+      backdrop-filter: blur(6px);
+    }
+    .paybox h1{
+      margin: 0 0 14px;
+      font-size: clamp(22px, 2.4vw, 34px);
+    }
+    .note{ 
+      margin-top: 12px;
+      font-size: .9rem;
+      opacity: .8;
+      text-align: center;
+    }
+    #paypal-button-container{ margin-top:16px; }
+    /* petite barre de nav cohérente avec tes pages */
+    .header{ position: sticky; top:0; z-index: 10; background: rgba(0,0,0,.35); }
+    .nav{ display:flex; gap:12px; align-items:center; justify-content:flex-start; padding:12px 18px; }
+    .cta{ display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid rgba(210,181,91,.3); color:#e0d3a0; text-decoration:none; }
+    .cta:hover{ background: linear-gradient(180deg, #d8a04b, #8d6b55); color:#14160b; border-color: transparent; }
+  </style>
+</head>
+<body>
+
+  <!-- Mini navigation -->
+  <header class="header">
+    <nav class="nav">
+      <a class="cta" href="index.html">Accueil</a>
+      <a class="cta" href="signup.html">S’inscrire</a>
+      <a class="cta" href="login.html">Connexion</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="paybox">
+      <h1>Paiement sécurisé avec PayPal</h1>
+      <p>Cliquez sur le bouton ci‑dessous pour régler en toute sécurité.</p>
+
+      <!-- Conteneur du bouton PayPal -->
+      <div id="paypal-button-container"></div>
+
+      <p class="note">Le paiement est traité côté serveur via Netlify Functions et crédité sur votre compte PayPal Business.</p>
+    </section>
+  </main>
+
+  <!-- SDK PayPal (Client ID LIVE déjà intégré + devise CHF) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AfQktUT9wtwRSXbudljfhWf-jbwzaQhWF8oA88XREeFTwHjXkTsrOdVZRzih7s6pXao6RKNsYvrYt9rD&currency=CHF&components=buttons"></script>
+
+  <script>
+    // Bouton PayPal => utilise tes fonctions serverless Netlify
+    paypal.Buttons({
+      style: {
+        shape: 'rect',
+        color: 'gold',
+        layout: 'vertical',
+        label: 'paypal'
+      },
+
+      // 1) Création de l'order côté serveur
+      createOrder: async () => {
+        const res = await fetch('/api/create-order', { method: 'POST' });
+        if (!res.ok) throw new Error('create-order failed');
+        const data = await res.json();
+        return data.id; // retourne l'ID d’ordre PayPal
+      },
+
+      // 2) Capture au retour d’approbation
+      onApprove: async (data) => {
+        const res = await fetch('/api/capture-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderID: data.orderID })
+        });
+        if (!res.ok) throw new Error('capture-order failed');
+        const out = await res.json();
+
+        // Redirige vers ta page de remerciement existante
+        window.location.href = 'thanks.html';
+      },
+
+      onError: (err) => {
+        console.error(err);
+        alert("Une erreur est survenue pendant le paiement. Réessaie dans un instant.");
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>
