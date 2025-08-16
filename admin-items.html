@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Créer un item</title>
+  <link href="styles.css" rel="stylesheet" />
+  <style>
+    /* petit style local pour rendre le formulaire propre */
+    .admin-box{max-width:780px;margin:8vh auto;padding:24px 22px;background:rgba(18,18,18,.92);border-radius:18px;box-shadow:0 18px 54px rgba(0,0,0,.5)}
+    .admin-box h1{margin:0 0 14px;font-size:clamp(22px,2.4vw,34px)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid .full{grid-column:1 / -1}
+    label{display:block;color:#e6e6e6;margin:4px 0 6px}
+    input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(12,12,12,.85);color:#f4f4f4}
+    .hint{font-size:.95rem;opacity:.75;margin-top:2px}
+    .actions{display:flex;gap:10px;align-items:center;margin-top:16px}
+    .btn{display:inline-block;padding:12px 18px;border-radius:10px;font-weight:700;text-decoration:none;border:1px solid rgba(233,200,122,.35);background:linear-gradient(180deg,#f4d88f,#d8b565);color:#141414;box-shadow:0 8px 22px rgba(0,0,0,.25)}
+    .btn.ghost{background:transparent;color:#f4d88f;border-color:rgba(233,200,122,.35)}
+    .result{margin-top:18px;padding:14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+    code, .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    .ok{color:#9be879}
+    .err{color:#ff6b6b}
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <nav class="nav">
+    <a class="cta" href="index.html">Accueil</a>
+    <a class="cta" href="signup.html">S’inscrire</a>
+    <a class="cta" href="login.html">Connexion</a>
+  </nav>
+</header>
+
+<main>
+  <section class="admin-box">
+    <h1>Créer un item (photo / vidéo / PPV / live)</h1>
+
+    <div class="grid">
+      <div class="full">
+        <label for="creatorId">ID créatrice</label>
+        <input id="creatorId" placeholder="ex: user_1234 (ou laisse vide pour ‘creatrice-demo’)" />
+        <div class="hint">Utilisé pour associer la vente à la créatrice (suivi des revenus).</div>
+      </div>
+
+      <div>
+        <label for="title">Titre</label>
+        <input id="title" placeholder="ex: Live privé du samedi soir" />
+      </div>
+
+      <div>
+        <label for="type">Type</label>
+        <select id="type">
+          <option value="image">Image (PPV)</option>
+          <option value="video">Vidéo (PPV)</option>
+          <option value="live">Live (ticket)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="price">Prix (CHF)</label>
+        <input id="price" type="number" min="0" step="0.05" placeholder="ex: 29.00" />
+      </div>
+
+      <div id="roomWrap" style="display:none">
+        <label for="room">Nom de la salle (live)</label>
+        <input id="room" placeholder="ex: velvet-samedi-22h" />
+        <div class="hint">Ce nom identifie la salle live (utilisé par <span class="mono">live.html?room=...</span>).</div>
+      </div>
+
+      <div class="full">
+        <label for="notes">Notes privées (optionnel)</label>
+        <textarea id="notes" rows="3" placeholder="Infos internes (non visibles client)"></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="createBtn">Créer l’item</button>
+      <button class="btn ghost" id="resetBtn">Réinitialiser</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none"></div>
+  </section>
+</main>
+
+<script>
+  // Valeurs par défaut utiles
+  const input = (id) => document.getElementById(id);
+  const resultBox = document.getElementById('resultBox');
+  const typeEl = input('type');
+  const roomWrap = document.getElementById('roomWrap');
+
+  // Affiche / masque le champ "room" selon le type
+  const toggleRoom = () => {
+    roomWrap.style.display = (typeEl.value === 'live') ? '' : 'none';
+  };
+  typeEl.addEventListener('change', toggleRoom);
+  toggleRoom();
+
+  // Construit l’URL absolue du site (utile pour composer les liens)
+  const origin = window.location.origin || '';
+
+  document.getElementById('createBtn').onclick = async () => {
+    const creatorId = input('creatorId').value.trim() || 'creatrice-demo';
+    const title     = input('title').value.trim();
+    const type      = typeEl.value;
+    const price     = parseFloat(input('price').value || '0');
+    const room      = input('room').value.trim();
+    const notes     = input('notes').value.trim();
+
+    if (!title)  return show('err', 'Le titre est requis.');
+    if (isNaN(price) || price <= 0) return show('err', 'Le prix doit être supérieur à 0.');
+    if (type === 'live' && !room)   return show('err', 'Pour un live, indique un nom de salle.');
+
+    try {
+      const res = await fetch('/api/upsert-item', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ creatorId, title, type, price, room, notes })
+      });
+      const data = await res.json();
+      if (!res.ok || !data || !data.itemId) {
+        throw new Error(data && data.error ? data.error : 'Réponse invalide du serveur');
+      }
+
+      // Lien paiement / affichage selon type
+      const payLink = `${origin}/paiement.html?item=${encodeURIComponent(data.itemId)}`;
+      const liveLink = (type === 'live' && room) ? `${origin}/live.html?room=${encodeURIComponent(room)}` : null;
+
+      show('ok', `
+        ✅ <strong>Item créé avec succès</strong><br/>
+        <span class="mono">ID</span> : <code>${data.itemId}</code><br/>
+        <span class="mono">Titre</span> : <code>${escapeHtml(title)}</code><br/>
+        <span class="mono">Type</span> : <code>${type}</code><br/>
+        <span class="mono">Prix</span> : <code>${price.toFixed(2)} CHF</code><br/>
+        ${liveLink ? `<div style="margin-top:8px">Lien salle live : <a href="${liveLink}" target="_blank">${liveLink}</a></div>` : ``}
+        <div style="margin-top:8px">Lien paiement à envoyer au client : <a href="${payLink}" target="_blank">${payLink}</a></div>
+      `);
+    } catch (err) {
+      show('err', '❌ Erreur : ' + err.message);
+    }
+  };
+
+  document.getElementById('resetBtn').onclick = () => {
+    ['creatorId','title','price','room','notes'].forEach(id => input(id).value = '');
+    typeEl.value = 'image';
+    toggleRoom();
+    resultBox.style.display = 'none';
+    resultBox.innerHTML = '';
+  };
+
+  function show(kind, html){
+    resultBox.style.display = '';
+    resultBox.innerHTML = `<div class="${kind}">${html}</div>`;
+  }
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+</script>
+</body>
+</html>
