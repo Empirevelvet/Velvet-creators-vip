@@ -1,60 +1,42 @@
 // netlify/functions/delete-user.js
-// Soft delete par défaut (status=deleted + reason). Hard delete si body.hard === true.
-
-import { getStore } from "@netlify/blobs";
+import { getStore } from '@netlify/blobs';
+const ok = (s, b) => ({ statusCode: s, headers:{'Content-Type':'application/json'}, body:JSON.stringify(b) });
 
 export const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode:405, body: JSON.stringify({ error:"Méthode non autorisée" }) };
-  }
+  if (event.httpMethod !== 'POST') return ok(405, { error: 'Méthode non autorisée' });
   try {
-    const body = JSON.parse(event.body || "{}");
-    const emailInput = (body.email || "").trim().toLowerCase();
-    const idInput    = (body.id || "").trim();
-    const hard       = !!body.hard;
-    const reason     = (body.reason || "").trim();
+    const { id, email } = JSON.parse(event.body || '{}');
+    if (!id && !email) return ok(400, { error: 'id ou email requis' });
 
-    const users = getStore("users");
-    const byUsername = getStore("by_username");
+    const users = getStore('users');
+    const byUsername = getStore('by_username');
 
-    // retrouver l'email si on a seulement l'id
-    let keyEmail = emailInput;
-    let userDoc  = null;
+    let key = (email || '').trim().toLowerCase();
+    let userDoc = null;
 
-    if (!keyEmail) {
-      const keys = await users.list();
-      for (const b of keys.blobs || []) {
-        const raw = await users.get(b.key); if (!raw) continue;
-        try { const u = JSON.parse(raw); if (u.id === idInput){ keyEmail = u.email; userDoc = u; break; } } catch {}
-      }
-      if (!keyEmail) return { statusCode:404, body: JSON.stringify({ error:"Utilisateur introuvable" }) };
-    }
-
-    if (!userDoc) {
-      const raw = await users.get(keyEmail);
-      if (!raw) return { statusCode:404, body: JSON.stringify({ error:"Utilisateur introuvable" }) };
-      userDoc = JSON.parse(raw);
-    }
-
-    // Retirer index pseudo
-    if (userDoc.usernameLower) { try { await byUsername.delete(userDoc.usernameLower); } catch {} }
-
-    if (hard) {
-      await users.delete(keyEmail);
+    if (key) {
+      const raw = await users.get(key);
+      if (raw) userDoc = JSON.parse(raw);
     } else {
-      userDoc.status = "deleted";
-      userDoc.moderation = Array.isArray(userDoc.moderation) ? userDoc.moderation : [];
-      userDoc.moderation.push({
-        at: new Date().toISOString(),
-        action: "deleted",
-        reason: reason || null
-      });
-      userDoc.statusReason = reason || null;
-      await users.set(keyEmail, JSON.stringify(userDoc));
+      const { blobs } = await users.list();
+      for (const b of blobs || []) {
+        const raw = await users.get(b.key);
+        if (!raw) continue;
+        const u = JSON.parse(raw);
+        if (u.id === id) { key = b.key; userDoc = u; break; }
+      }
     }
+    if (!key || !userDoc) return ok(404, { error: 'Utilisateur introuvable' });
 
-    return { statusCode:200, body: JSON.stringify({ success:true, hard }) };
+    // supprimer index pseudo
+    const uname = (userDoc.usernameLower || '').trim();
+    if (uname) await byUsername.delete(uname);
+
+    // supprimer la fiche utilisateur
+    await users.delete(key);
+
+    return ok(200, { success: true });
   } catch (e) {
-    return { statusCode:500, body: JSON.stringify({ error:"Erreur serveur" }) };
+    return ok(500, { error: e.message });
   }
 };
