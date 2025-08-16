@@ -4,139 +4,128 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Velvet — Inscription</title>
-  <!-- On garde ton CSS global -->
-  <link rel="stylesheet" href="styles.css"/>
-
-  <!-- Petit correctif visuel uniquement pour cacher le honeypot (ne change pas ton design) -->
+  <link href="styles.css" rel="stylesheet"/>
   <style>
-    .honeypot{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden;}
+    /* Masquer totalement le champ anti-robots */
+    [name="bot-field"] {
+      display: none !important;
+      visibility: hidden !important;
+      position: absolute !important;
+      left: -9999px !important;
+    }
   </style>
 </head>
 <body>
-  <header class="header">
-    <nav class="nav">
-      <a href="index.html">Accueil</a>
-      <a class="cta" href="login.html">Se connecter</a>
-    </nav>
-  </header>
+<header class="header">
+  <nav class="nav">
+    <a href="index.html">Accueil</a>
+    <a class="cta" href="login.html">Se connecter</a>
+  </nav>
+</header>
 
-  <div class="panel">
-    <h1>Inscription</h1>
-    <p class="lead" style="text-align:center;margin:0 0 8px">
-      Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité &amp; conformité).
-    </p>
+<div class="panel">
+  <h1>Inscription</h1>
+  <p class="lead" style="text-align:center; margin:0 0 8px">
+    Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité &amp; conformité).
+  </p>
 
-    <!-- Netlify Forms : on garde EXACTEMENT ton fonctionnement -->
-    <form
-      name="signup"
-      method="POST"
-      action="merci_adhesion.html"
-      enctype="multipart/form-data"
-      data-netlify="true"
-      data-netlify-honeypot="bot-field"
-      class="form-grid"
-    >
-      <input type="hidden" name="form-name" value="signup"/>
+  <form name="signup" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" enctype="multipart/form-data" class="form-grid" action="merci_adhesion.html">
+    <input type="hidden" name="form-name" value="signup"/>
+    <input type="text" name="bot-field"/>
 
-      <!-- Honeypot caché (le fameux carré blanc ➜ disparu) -->
-      <div class="honeypot" aria-hidden="true">
-        <label>Ne pas remplir : <input type="text" name="bot-field" tabindex="-1" autocomplete="off"/></label>
-      </div>
-
-      <div>
-        <label for="handle">Pseudo (obligatoire)</label>
-        <input class="input" id="handle" name="handle" placeholder="@pseudo" required type="text"/>
-        <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
-      </div>
-
-      <div>
-        <label for="fullname">Nom complet</label>
-        <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
-      </div>
-
-      <div>
-        <label for="email">Email</label>
-        <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
-      </div>
-
-      <div>
-        <label for="phone">Numéro de téléphone</label>
-        <input class="input" id="phone" name="phone" placeholder="+41 79 123 45 67"
-               pattern="^\+?[0-9\s\-]{6,20}$" required type="tel"/>
-      </div>
-
-      <div class="full">
-        <label for="address">Adresse complète</label>
-        <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
-      </div>
-
-      <div>
-        <label for="country">Pays</label>
-        <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text"/>
-      </div>
-
-      <div>
-        <label for="dob">Date de naissance</label>
-        <input class="input" id="dob" name="dob" required type="date"/>
-      </div>
-
-      <div>
-        <label>Je suis</label>
-        <div class="row-inline" id="role">
-          <label><input type="radio" name="role" value="creatrice" required/> Créatrice</label>
-          <label><input type="radio" name="role" value="client" required/> Client</label>
-        </div>
-      </div>
-
-      <div>
-        <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
-        <input class="input" id="avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png"/>
-      </div>
-
-      <div class="full">
-        <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
-        <input class="input" id="id_front" name="id_front" type="file" accept=".jpg,.jpeg,.png,.pdf" required/>
-      </div>
-
-      <div class="full">
-        <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
-        <input class="input" id="id_back" name="id_back" type="file" accept=".jpg,.jpeg,.png,.pdf" required/>
-      </div>
-
-      <div class="full">
-        <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
-        <input class="input" id="selfie" name="selfie" type="file" accept=".jpg,.jpeg,.png" required/>
-      </div>
-
-      <div class="full row-inline">
-        <input id="consent" name="consent" type="checkbox" required/>
-        <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité &amp; sécurité).</label>
-      </div>
-
-      <div class="full form-actions">
-        <button class="btn gold" type="submit">Envoyer ma demande</button>
-        <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
-      </div>
-    </form>
-
-    <p class="help" style="text-align:center;margin-top:14px">
-      Dans votre espace privé, vous renseignerez vos coordonnées de paiement (IBAN ou PayPal).
-    </p>
-  </div>
-
-  <footer class="footer">
-    <a href="legal.html">Mentions légales &amp; CGU</a>
-  </footer>
-
-  <!-- Bannière cookies : on garde ton JS -->
-  <div class="cookie-banner" id="cookie-banner" hidden>
-    <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
-    <div class="cookie-actions">
-      <button id="cookie-accept" class="btn-accept">Accepter</button>
-      <a class="btn-ghost" href="legal.html#cookies">En savoir plus</a>
+    <div>
+      <label for="handle">Pseudo (obligatoire)</label>
+      <input class="input" id="handle" name="handle" placeholder="@pseudo" required type="text"/>
+      <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
     </div>
+
+    <div>
+      <label for="fullname">Nom complet</label>
+      <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
+    </div>
+
+    <div>
+      <label for="phone">Numéro de téléphone</label>
+      <input class="input" id="phone" name="phone" placeholder="+41 79 123 45 67" pattern="^\+?[0-9\s\-]{6,20}$" required type="tel"/>
+    </div>
+
+    <div class="full">
+      <label for="address">Adresse complète</label>
+      <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
+    </div>
+
+    <div>
+      <label for="role">Je suis</label>
+      <div class="row-inline" id="role">
+        <label><input type="radio" name="role" value="creatrice" required> Créatrice</label>
+        <label><input type="radio" name="role" value="client" required> Client</label>
+      </div>
+    </div>
+
+    <div>
+      <label for="country">Pays</label>
+      <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text"/>
+    </div>
+
+    <div>
+      <label for="dob">Date de naissance</label>
+      <input class="input" id="dob" name="dob" required type="date"/>
+    </div>
+
+    <div>
+      <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
+      <input class="input" id="avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png"/>
+    </div>
+
+    <div class="full">
+      <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
+      <input class="input" id="id_front" name="id_front" type="file" required accept=".jpg,.jpeg,.png,.pdf"/>
+    </div>
+
+    <div class="full">
+      <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
+      <input class="input" id="id_back" name="id_back" type="file" required accept=".jpg,.jpeg,.png,.pdf"/>
+    </div>
+
+    <div class="full">
+      <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
+      <input class="input" id="selfie" name="selfie" type="file" required accept=".jpg,.jpeg,.png"/>
+    </div>
+
+    <div class="full row-inline">
+      <input id="consent" name="consent" type="checkbox" required/>
+      <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité &amp; sécurité).</label>
+    </div>
+
+    <div class="full form-actions">
+      <button class="btn gold" type="submit">Envoyer ma demande</button>
+      <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
+    </div>
+  </form>
+
+  <p class="help" style="text-align:center; margin-top:14px">
+    Dans votre espace privé, vous renseignerez vos coordonnées de paiement (IBAN ou PayPal).<br/>
+  </p>
+</div>
+
+<footer class="footer">
+  <a href="legal.html">Mentions légales &amp; CGU</a>
+</footer>
+
+<div id="cookie-banner" class="cookie-banner" hidden>
+  <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
+  <div class="cookie-actions">
+    <button id="cookie-accept" class="btn-accept">Accepter</button>
+    <a href="legal.html#cookies" class="btn-ghost">En savoir plus</a>
   </div>
-  <div class="page-fade-bottom" aria-hidden="true"></div>
-  <script src="assets/js/cookies.js"></script>
+</div>
+
+<div class="page-fade-bottom" aria-hidden="true"></div>
+<script src="assets/js/cookies.js"></script>
 </body>
 </html>
