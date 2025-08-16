@@ -1,58 +1,141 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paiement sécurisé</title>
-  <link href="styles.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Paiement sécurisé • Velvet</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .wrap{max-width:720px;margin:8vh auto 12vh;padding:26px 22px;background:rgba(18,18,18,.92);border-radius:18px;box-shadow:0 18px 54px rgba(0,0,0,.5)}
+    .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .price{font-weight:800;font-size:1.15rem}
+    .meta{opacity:.8;margin:2px 0 12px}
+    #paypal-button-container{margin-top:14px}
+    .err{color:#ffb3b3}
+  </style>
+  <!-- SDK PayPal : pas besoin de client-id ici, on passe par tes Functions -->
+  <script src="https://www.paypal.com/sdk/js?currency=CHF"></script>
 </head>
 <body>
-  <header class="header">
-    <nav class="nav">
-      <a class="cta" href="index.html">Accueil</a>
-      <a class="cta" href="signup.html">S'inscrire</a>
-      <a class="cta" href="login.html">Connexion</a>
-    </nav>
-  </header>
+<header class="header">
+  <nav class="nav">
+    <a class="cta" href="index.html">Accueil</a>
+    <a class="cta" href="chat.html">Chat</a>
+    <a class="cta" href="login.html">Connexion</a>
+  </nav>
+</header>
 
-  <main>
-    <section class="paybox">
-      <h1>Paiement sécurisé avec PayPal</h1>
-      <p>Cliquez sur le bouton ci-dessous pour régler en toute sécurité.</p>
-      <div id="paypal-button-container"></div>
-      <p class="note">Le paiement est traité côté serveur via Netlify Functions et crédité sur votre compte PayPal Business.</p>
-    </section>
-  </main>
+<main class="wrap">
+  <div class="h">
+    <h1>Paiement sécurisé</h1>
+    <div class="price"><span id="amount">—</span> CHF</div>
+  </div>
+  <div class="meta">
+    <div id="itemTitle">Chargement…</div>
+    <div id="itemType"></div>
+  </div>
 
-  <!-- SDK PayPal -->
-  <script src="https://www.paypal.com/sdk/js?currency=CHF"></script>
-  <script>
+  <div id="paypal-button-container"></div>
+  <p id="msg" class="meta"></p>
+  <p id="err" class="meta err"></p>
+</main>
+
+<script>
+  // Helpers
+  const $ = (id)=>document.getElementById(id);
+  const api = (path)=>fetch(path, { headers:{'Content-Type':'application/json'} });
+
+  const params = new URLSearchParams(location.search);
+  const itemId = params.get('item');
+
+  if(!itemId){ $('err').textContent = 'Lien invalide : aucun item fourni.'; throw new Error('itemId manquant'); }
+
+  let ITEM = null;
+
+  // 1) Charger l'item (prix/titre/type/roomName) depuis le serveur
+  async function loadItem() {
+    try {
+      const r = await api('/api/get-item?id='+encodeURIComponent(itemId));
+      const data = await r.json();
+      if(!r.ok) throw new Error(data.error || 'Item introuvable');
+
+      ITEM = data;
+      $('amount').textContent = Number(ITEM.price).toFixed(2);
+      $('itemTitle').textContent = ITEM.title || 'Contenu payant';
+      $('itemType').textContent = (ITEM.type === 'live')
+        ? 'Accès LIVE — ticket d’entrée'
+        : (ITEM.type ? ('Type : '+ITEM.type) : '');
+
+      renderPayPal();
+    } catch(e) {
+      $('err').textContent = 'Erreur lors du chargement : ' + e.message;
+    }
+  }
+
+  // 2) Rendre le bouton PayPal relié à tes Functions
+  function renderPayPal() {
+    if(!ITEM) return;
+    $('msg').textContent = 'Veuillez finaliser votre paiement via PayPal.';
+
     paypal.Buttons({
-      createOrder: function() {
-        return fetch("/api/create-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ amount: "49.00" }) // 💰 tu peux changer le prix ici
+      // Crée l'ordre côté serveur (prix côté serveur = sécurisé)
+      createOrder: () => {
+        return fetch('/api/create-order', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ itemId: ITEM.itemId })
         })
         .then(res => res.json())
-        .then(order => order.id);
+        .then(j => {
+          if(!j.id) throw new Error(j.error || 'create-order a échoué');
+          return j.id;
+        })
+        .catch(err => {
+          $('err').textContent = 'Erreur création commande : ' + err.message;
+          throw err;
+        });
       },
-      onApprove: function(data) {
-        return fetch("/api/capture-order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+
+      // Capture après validation PayPal
+      onApprove: (data) => {
+        $('msg').textContent = 'Validation du paiement…';
+        return fetch('/api/capture-order', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ orderID: data.orderID })
         })
-        .then(res => res.json())
-        .then(details => {
-          alert("Merci " + details.payer.name.given_name + ", paiement réussi !");
-        });
+        .then(res => res.json().then(j=>({ok:res.ok, j})))
+        .then(async ({ok, j}) => {
+          if(!ok) throw new Error(j.error || 'capture-order a échoué');
+
+          // 3) Si LIVE → émettre un ticket et rediriger vers le live
+          if(ITEM.type === 'live' && ITEM.roomName){
+            const tr = await fetch('/api/issue-ticket', {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ itemId: ITEM.itemId })
+            });
+            const tk = await tr.json();
+            if(!tr.ok || !tk.success) throw new Error(tk.error || 'Emission du ticket échouée');
+
+            location.href = 'live.html?room=' + encodeURIComponent(tk.roomName)
+                          + '&token=' + encodeURIComponent(tk.token);
+            return;
+          }
+
+          // 4) Sinon (PPV classique) → retour au chat en marquant l’item débloqué
+          location.href = 'chat.html?unlocked=' + encodeURIComponent(ITEM.itemId);
+        })
+        .catch(err => { $('err').textContent = 'Erreur paiement : ' + err.message; });
+      },
+
+      onError: (err) => {
+        $('err').textContent = 'Erreur PayPal : ' + (err?.message || err);
       }
-    }).render("#paypal-button-container");
-  </script>
+    }).render('#paypal-button-container');
+  }
+
+  loadItem();
+</script>
 </body>
 </html>
