@@ -5,8 +5,8 @@ export const handler = async (event) => {
   try {
     const users = getStore("users");
     const q = event.queryStringParameters || {};
-    const wantStatus = (q.status || "").toLowerCase();  // "", "pending","approved","rejected","suspended","deleted"
-    const wantRole   = (q.role || "").toLowerCase();    // "", "creator","client"
+    const wantStatus = (q.status || "").toLowerCase();
+    const wantRole   = (q.role || "").toLowerCase();
 
     const keys = await users.list();
     const out = [];
@@ -23,9 +23,14 @@ export const handler = async (event) => {
       if (wantRole   && u.role   !== wantRole)   continue;
 
       out.push({
-        id: u.id, email: u.email, username: u.username,
-        role: u.role, status: u.status,
-        createdAt: u.createdAt, approvedAt: u.approvedAt || null,
+        id: u.id,
+        email: u.email,
+        username: u.username,
+        role: u.role,
+        status: u.status,
+        statusReason: u.statusReason || null,
+        createdAt: u.createdAt,
+        approvedAt: u.approvedAt || null,
         paypal: u.paypal || null
       });
     }
