@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Signaler un contenu — Velvet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{background:#0f0f12;color:#f2f2f3;font:15px/1.6 system-ui;margin:0}
+    .wrap{max-width:800px;margin:40px auto;padding:0 18px}
+    .card{background:#16161b;border:1px solid #24242b;border-radius:14px;padding:18px}
+    input,textarea,select{width:100%;background:#11131a;color:#fff;border:1px solid #24242b;border-radius:10px;padding:10px;margin:8px 0}
+    button{background:linear-gradient(180deg,#f6d57f,#d7b463);color:#111;border:1px solid #b3954f;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .muted{color:#a8a8ad}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Signaler un contenu</h1>
+    <div class="card">
+      <form id="f">
+        <label>Votre email (pour suivi)</label>
+        <input type="email" name="reporterEmail" required placeholder="vous@example.com"/>
+
+        <label>ID du contenu ou URL</label>
+        <input type="text" name="target" required placeholder="ex: post_abc123 ou URL complète"/>
+
+        <label>Motif</label>
+        <select name="reason" required>
+          <option value="">— Sélectionner —</option>
+          <option>Harcèlement</option>
+          <option>Contenu interdit</option>
+          <option>Fraude / Usurpation</option>
+          <option>Mineur suspecté</option>
+          <option>Autre</option>
+        </select>
+
+        <label>Détails</label>
+        <textarea name="details" rows="6" placeholder="Expliquez le problème (dates, pseudos, captures si applicable)…"></textarea>
+
+        <button type="submit">Envoyer le signalement</button>
+        <div id="msg" class="muted"></div>
+      </form>
+    </div>
+  </div>
+<script>
+document.getElementById('f').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target).entries());
+  document.getElementById('msg').textContent = 'Envoi…';
+  const r = await fetch('/.netlify/functions/report-content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const j = await r.json();
+  document.getElementById('msg').textContent = r.ok ? 'Merci, report enregistré.' : ('Erreur: '+(j.error||''));
+  if (r.ok) e.target.reset();
+});
+</script>
+</body>
+</html>
