@@ -1,56 +1,63 @@
-const fetch = require('node-fetch');
-const { getStore } = require('@netlify/blobs');
+// netlify/functions/create-order.js
+const API = (env) => env === 'live'
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com';
 
-exports.handler = async (event) => {
+async function getAccessToken() {
+  const base = API(process.env.PAYPAL_ENV || 'sandbox');
+  const auth = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+  ).toString('base64');
+
+  const r = await fetch(`${base}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials'
+  });
+  if (!r.ok) throw new Error(`PayPal token ${r.status}`);
+  const j = await r.json();
+  return j.access_token;
+}
+
+export const handler = async (event) => {
+  if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method not allowed' };
+
   try {
-    const { itemId } = JSON.parse(event.body || '{}');
-    if (!itemId) return { statusCode: 400, body: JSON.stringify({ error: 'itemId manquant' }) };
+    const { amount, currency='CHF', description='Achat Velvet', creatorId='velvet', itemId='generic', type='ppv' } =
+      JSON.parse(event.body || '{}');
 
-    // Lire l'item (source de vérité pour le prix)
-    const store = getStore('items');
-    const raw = await store.get(`item:${itemId}`);
-    if (!raw) return { statusCode: 404, body: JSON.stringify({ error: 'Item introuvable' }) };
-    const item = JSON.parse(raw);
+    if (!amount) return { statusCode: 400, body: 'Missing amount' };
 
-    const price = Number(item.price || 0);
-    if (!(price > 0)) return { statusCode: 400, body: JSON.stringify({ error: 'Prix invalide' }) };
+    const access = await getAccessToken();
+    const base = API(process.env.PAYPAL_ENV || 'sandbox');
 
-    // OAuth PayPal LIVE (tes variables Netlify)
-    const auth = Buffer.from(`${process.env.PAYPAL_VIP_ID}:${process.env.PAYPAL_VIP_SECRET}`).toString('base64');
-    const tokRes = await fetch('https://api-m.paypal.com/v1/oauth2/token', {
-      method:'POST',
-      headers:{Authorization:`Basic ${auth}`,'Content-Type':'application/x-www-form-urlencoded'},
-      body:'grant_type=client_credentials'
-    });
-    const { access_token } = await tokRes.json();
+    const body = {
+      intent: 'CAPTURE',
+      purchase_units: [{
+        amount: { currency_code: currency, value: String(Number(amount).toFixed(2)) },
+        description,
+        custom_id: `${creatorId}|${itemId}|${type}`
+      }],
+      application_context: {
+        brand_name: 'Velvet',
+        user_action: 'PAY_NOW',
+        shipping_preference: 'NO_SHIPPING',
+        return_url: `${process.env.URL || ''}/paiement.html?status=approved`,
+        cancel_url: `${process.env.URL || ''}/paiement.html?status=cancelled`
+      }
+    };
 
-    const orderRes = await fetch('https://api-m.paypal.com/v2/checkout/orders', {
-      method:'POST',
-      headers:{Authorization:`Bearer ${access_token}`,'Content-Type':'application/json'},
-      body: JSON.stringify({
-        intent:'CAPTURE',
-        purchase_units:[{
-          amount:{ currency_code:'CHF', value: price.toFixed(2) },
-          description: `${item.title || 'Contenu'} (${item.type||'ppv'})`,
-          custom_id: `${item.creatorId||'unknown'}|${item.itemId}|${item.type||'ppv'}`,
-          invoice_id: `VX-${item.type||'ppv'}-${item.creatorId||'x'}-${Date.now()}`
-        }]
-      })
+    const r = await fetch(`${base}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     });
 
-    const order = await orderRes.json();
-    if (!orderRes.ok) return { statusCode: orderRes.status, body: JSON.stringify(order) };
-    return { statusCode: 200, body: JSON.stringify({ id: order.id }) };
+    const data = await r.json();
+    if (!r.ok) return { statusCode: r.status, body: JSON.stringify(data) };
+
+    return { statusCode: 200, body: JSON.stringify({ success: true, id: data.id, links: data.links || [] }) };
   } catch (e) {
     return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
-// ... dans netlify/functions/create-order.js
-body: JSON.stringify({
-  intent: "CAPTURE",
-  purchase_units: [{
-    amount: { currency_code: "CHF", value: body.amount },
-    // IMPORTANT : associer la vente
-    custom_id: `${body.creatorId || "velvet"}|${body.itemId || ""}|${body.type || "ppv"}`
-  }]
-})
