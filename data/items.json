@@ -1,0 +1,12 @@
+[
+  {
+    "id": "i1",
+    "creator": "@sofia",
+    "type": "photo",
+    "title": "Photo privée",
+    "price": 19.9,
+    "sku": "PH-001",
+    "visibility": "hidden",
+    "desc": ""
+  }
+]
