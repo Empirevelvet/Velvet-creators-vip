@@ -1,7 +1,0 @@
-Ajoute ce bloc dans ton `netlify.toml` (n'efface rien d'autre) :
-
-[[scheduled.functions]]
-name = "prune-users"
-cron = "0 3 * * *"
-
-→ Cela lancera la purge automatique chaque jour à 03:00.
