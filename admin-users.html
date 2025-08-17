@@ -63,6 +63,10 @@ async function loadUsers(){
   const j = await r.json();
   let list = j.users||[];
 
+  // Query param ?q= pour pré-filtrer depuis le Dashboard
+  const urlQ = new URLSearchParams(location.search).get('q') || '';
+  if (urlQ) $('#q').value = urlQ;
+
   const q = ($('#q').value||'').toLowerCase();
   const role = $('#f_role').value; const status = $('#f_status').value;
   if(q) list = list.filter(u => (u.username||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q));
