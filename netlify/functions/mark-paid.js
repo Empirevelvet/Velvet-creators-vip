@@ -1,34 +1,33 @@
 // netlify/functions/mark-paid.js
-// Marque une vente comme payée (vu dans le dashboard)
-
-import { getStore } from "@netlify/blobs";
+import { getStore } from '@netlify/blobs';
 
 export const handler = async (event) => {
+  if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method not allowed' };
+
   try {
-    if (event.httpMethod !== "POST") {
-      return { statusCode: 405, body: JSON.stringify({ error: "Méthode non autorisée" }) };
+    const { creatorId, txn } = JSON.parse(event.body || '{}');
+    if (!creatorId && !txn) return { statusCode: 400, body: 'Missing creatorId or txn' };
+
+    const store = getStore('ledger');
+    const ids = await store.list();
+    let count = 0;
+
+    for (const id of ids.keys) {
+      const raw = await store.get(id);
+      if (!raw) continue;
+      const row = JSON.parse(raw);
+
+      const match = txn ? (row.txn === txn) : (row.creatorId === creatorId && !row.paid);
+      if (match) {
+        row.paid = true;
+        row.paidAt = new Date().toISOString();
+        await store.set(id, JSON.stringify(row));
+        count++;
+      }
     }
 
-    const { saleId } = JSON.parse(event.body || "{}");
-    if (!saleId) {
-      return { statusCode: 400, body: JSON.stringify({ error: "saleId requis" }) };
-    }
-
-    const salesStore = getStore("sales");
-    const existing = await salesStore.get(saleId);
-    if (!existing) {
-      return { statusCode: 404, body: JSON.stringify({ error: "Vente introuvable" }) };
-    }
-
-    const sale = JSON.parse(existing);
-    sale.paid = true;
-    sale.paidAt = new Date().toISOString();
-
-    await salesStore.set(saleId, JSON.stringify(sale));
-
-    return { statusCode: 200, body: JSON.stringify({ success: true, sale }) };
-  } catch (err) {
-    console.error("mark-paid error:", err);
-    return { statusCode: 500, body: JSON.stringify({ error: "Erreur serveur" }) };
+    return { statusCode: 200, body: JSON.stringify({ success: true, updated: count }) };
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
