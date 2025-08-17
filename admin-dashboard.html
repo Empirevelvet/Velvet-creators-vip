@@ -143,5 +143,189 @@
     function reloadAll(){ loadStats(); }
     reloadAll();
   </script>
+  <script>
+// ===== Helpers =====
+const $  = (s, c=document) => c.querySelector(s);
+const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
+const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
+const fmt = n => Number(n||0).toFixed(2);
+
+// ===== Tabs (sidebar -> sections) =====
+function activateFromHash() {
+  const hash = location.hash || '#overview';
+  // activer lien
+  $$('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')===hash));
+  // afficher section ciblée (si présente)
+  $$('[data-tab]').forEach(sec => { if(sec.id) sec.hidden = ('#'+sec.id !== hash); });
+  // scroll au début
+  const el = document.querySelector(hash);
+  if (el) el.scrollIntoView({block:'start', behavior:'instant' in window ? 'instant' : 'auto'});
+}
+window.addEventListener('hashchange', activateFromHash);
+document.addEventListener('DOMContentLoaded', activateFromHash);
+
+// ===== Rendus =====
+function renderLastSales(rows=[]) {
+  const tb = $('#t-last tbody'); if(!tb) return;
+  tb.innerHTML = '';
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="6">Aucune vente.</td></tr>'; return; }
+  rows.slice(0,8).forEach(v=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${(v.date||'').replace('T',' ').slice(0,16)}</td>
+      <td>${v.creator||'—'}</td>
+      <td>${v.type||'—'}</td>
+      <td>${fmt(v.amount)} CHF</td>
+      <td>${v.clientEmail||'—'}</td>
+      <td>${v.paid ? 'Payé' : `<button class="btn" data-pay="${v.id||''}">Marquer payé</button>`}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function renderCreatorsRecap(map={}) {
+  const tb = $('#t-creators tbody'); if(!tb) return;
+  tb.innerHTML = '';
+  const entries = Object.entries(map);
+  if (!entries.length) { tb.innerHTML = '<tr><td colspan="6">Aucune donnée.</td></tr>'; return; }
+  entries.forEach(([name,val])=>{
+    const total = Number(val.total||0), c70 = total*0.7, v30 = total*0.3, due = Number(val.due||0);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td>${fmt(total)}</td>
+      <td>${fmt(c70)}</td>
+      <td>${fmt(v30)}</td>
+      <td>${fmt(due)}</td>
+      <td>${due>0 ? `<button class="btn" data-bulk="${name}">Marquer tout payé</button>` : '—'}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function renderLedger(rows=[]) {
+  const tb = $('#t-ledger tbody'); if(!tb) return;
+  tb.innerHTML = '';
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="8">Aucune ligne.</td></tr>'; return; }
+  rows.forEach(v=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${(v.date||'').replace('T',' ').slice(0,16)}</td>
+      <td>${v.creator||'—'}</td>
+      <td>${v.type||'—'}</td>
+      <td>${fmt(v.amount)}</td>
+      <td>${v.txn||'—'}</td>
+      <td>${v.clientEmail||'—'}</td>
+      <td>${v.paid ? 'Payé' : 'Impayé'}</td>
+      <td>${v.paid ? '—' : `<button class="btn" data-pay="${v.id||''}">Payé</button>`}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+// ===== Chargement global =====
+async function loadDashboard() {
+  try{
+    const r = await api('/api/list-ledger'); // format attendu: { last:[], ledger:[], creators:{}, totals:{today,due}, online,pending }
+    const j = await r.json();
+
+    // Tuiles (si présentes)
+    const onlineEl  = $('#k-online');
+    const pendingEl = $('#k-pending');
+    const todayEl   = $('#k-today');
+    const dueEl     = $('#k-due');
+    if (onlineEl)  onlineEl.textContent  = j.online ?? 0;
+    if (pendingEl) pendingEl.textContent = j.pending ?? 0;
+    if (todayEl)   todayEl.textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF';
+    if (dueEl)     dueEl.textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF';
+
+    renderLastSales(j.last || []);
+    renderCreatorsRecap(j.creators || {});
+    renderLedger(j.ledger || []);
+  }catch(err){
+    console.error('Erreur /api/list-ledger', err);
+    // laisser les tableaux afficher "Chargement…" si erreur
+  }
+}
+
+// ===== Actions =====
+async function markPaid(id) {
+  try{
+    const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id }) });
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(j.error||'mark-paid ko');
+    await loadDashboard();
+  }catch(e){
+    alert('Erreur marquage payé');
+    console.error(e);
+  }
+}
+
+async function markAllForCreator(name) {
+  try{
+    if (!confirm('Marquer TOUT impayé comme versé pour cette créatrice ?')) return;
+    const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id: 'creator:'+name }) });
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(j.error||'mark-paid bulk ko');
+    await loadDashboard();
+  }catch(e){
+    alert('Erreur marquage global');
+    console.error(e);
+  }
+}
+
+async function purgeInactive90d() {
+  try{
+    if (!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
+    const r = await api('/api/purge-inactive', { method:'POST' });
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(j.error||'purge ko');
+    alert('Comptes supprimés : ' + (j.count||0));
+    await loadDashboard();
+  }catch(e){
+    alert('Erreur purge');
+    console.error(e);
+  }
+}
+
+// Export CSV via l’API (si supporté)
+function exportCsv(){
+  // côté fonction, supporte ?format=csv
+  window.location.href = '/api/list-ledger?format=csv';
+}
+
+// ===== Événements =====
+document.addEventListener('click', (e)=>{
+  const bPay  = e.target.closest('button[data-pay]');
+  const bBulk = e.target.closest('button[data-bulk]');
+  if (bPay)  { const id=bPay.dataset.pay; if(id) markPaid(id); }
+  if (bBulk) { const name=bBulk.dataset.bulk; if(name) markAllForCreator(name); }
+});
+
+const btnReload = $('#btnReload');
+if (btnReload) btnReload.addEventListener('click', loadDashboard);
+
+const btnPurge = $('#btnPurge');
+if (btnPurge) btnPurge.addEventListener('click', purgeInactive90d);
+
+const btnCsv = $('#btnCsv');
+if (btnCsv) btnCsv.addEventListener('click', exportCsv);
+
+const btnFilter = $('#btnFilter');
+if (btnFilter) btnFilter.addEventListener('click', ()=>{
+  const q = ($('#q')?.value||'').trim();
+  location.href = '/admin-users.html' + (q ? ('?q='+encodeURIComponent(q)) : '');
+});
+
+// Horloge en haut
+const clockEl = $('#clock');
+if (clockEl) setInterval(()=>{ clockEl.textContent = new Date().toLocaleTimeString(); }, 1000);
+
+// Auto-refresh chaque 30s
+setInterval(loadDashboard, 30_000);
+
+// Premier chargement
+loadDashboard();
+</script>
 </body>
 </html>
