@@ -7,6 +7,16 @@
     "price": 19.9,
     "sku": "PH-001",
     "visibility": "hidden",
-    "desc": ""
+    "desc": "Envoi via chat après paiement."
+  },
+  {
+    "id": "i2",
+    "creator": "@sofia",
+    "type": "ticket",
+    "title": "Live public de 20h",
+    "price": 9.9,
+    "sku": "TK-0800",
+    "visibility": "public",
+    "desc": "Accès au live collectif (ticket)."
   }
 ]
