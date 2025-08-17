@@ -1,41 +1,30 @@
 // netlify/functions/list-ledger.js
-// Récupère toutes les ventes et calcule les totaux
-
-import { getStore } from "@netlify/blobs";
+import { getStore } from '@netlify/blobs';
 
 export const handler = async () => {
   try {
-    const salesStore = getStore("sales");
-
-    // Récupération brute des ventes
-    const allKeys = await salesStore.list();
-    const sales = [];
-    for (const key of allKeys.blobs) {
-      const raw = await salesStore.get(key.key);
-      if (raw) sales.push(JSON.parse(raw));
+    const store = getStore('ledger');
+    const ids = await store.list();
+    const rows = [];
+    for (const id of ids.keys) {
+      const raw = await store.get(id);
+      if (!raw) continue;
+      rows.push(JSON.parse(raw));
     }
 
-    // Calcul des totaux par créatrice
-    const ledger = {};
-    for (const sale of sales) {
-      const { creatorId = "velvet", amount = 0, paid = false } = sale;
-      if (!ledger[creatorId]) {
-        ledger[creatorId] = { total: 0, owed: 0, paidOut: 0 };
-      }
-      ledger[creatorId].total += amount;
-      if (paid) {
-        ledger[creatorId].paidOut += amount * 0.7; // 70% pour la créatrice
-      } else {
-        ledger[creatorId].owed += amount * 0.7;
-      }
+    const creators = {};
+    for (const r of rows) {
+      const cid = r.creatorId || 'velvet';
+      creators[cid] = creators[cid] || { total:0, dueToCreator:0, dueToVelvet:0, unpaid:0 };
+      const amt = Number(r.amount||0);
+      creators[cid].total += amt;
+      creators[cid].dueToCreator += amt * 0.70;
+      creators[cid].dueToVelvet  += amt * 0.30;
+      if (!r.paid) creators[cid].unpaid += amt * 0.70;
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ sales, ledger })
-    };
-  } catch (err) {
-    console.error("list-ledger error:", err);
-    return { statusCode: 500, body: JSON.stringify({ error: "Erreur serveur" }) };
+    return { statusCode: 200, body: JSON.stringify({ rows, creators }) };
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
