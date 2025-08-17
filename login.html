@@ -1,59 +1,102 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Velvet — Connexion</title>
-  <link href="styles.css" rel="stylesheet" />
-
-  <!-- Fallback minime au cas où ton styles.css n'aurait pas encore ces classes -->
-  <style>
-    .auth-card { max-width: 440px; margin: 10vh auto 0; padding: 28px 24px; }
-    .auth-form label { display:block; font-weight:600; margin:14px 0 6px; }
-    .auth-form input { width:100%; height:44px; border-radius:10px; padding:0 12px; }
-    .auth-submit { margin-top:10px; width:100%; height:46px; display:block; font-weight:700; border-radius:12px; }
-    .form-hint { margin-top:12px; text-align:center; opacity:.9; }
-  </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Connexion — Velvet Creators VIP</title>
+  <!-- Utilise ton CSS global existant -->
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-
   <header class="header">
     <nav class="nav">
-      <a class="cta" href="index.html">Accueil</a>
-      <a class="cta gold" href="signup.html">S’inscrire</a>
+      <a href="index.html">Accueil</a>
+      <a class="cta" href="signup.html">S’inscrire</a>
     </nav>
   </header>
 
-  <main class="hero">
-    <section class="hero-card auth-card" role="main" aria-labelledby="title">
-      <h1 id="title">Connexion</h1>
-      <p class="lead" style="max-width:420px;margin:6px auto 18px;text-align:center;">
-        Accédez à votre profil en toute sécurité.
-      </p>
+  <main class="panel" style="max-width:720px;margin:8vh auto 12vh;">
+    <h1>Connexion</h1>
+    <p class="lead" style="text-align:center;margin:0 0 8px">
+      Entre ton email et ton mot de passe pour accéder à ton espace.
+    </p>
 
-      <!-- Formulaire de connexion simple (pseudo/email + mot de passe) -->
-      <!-- L'action ci-dessous est un placeholder : tu pourras la pointer vers ta fonction Netlify quand tu l’activeras -->
-      <form id="login-form" class="auth-form" method="post" action="/.netlify/functions/login">
-        <label for="login">Pseudo ou e‑mail</label>
-        <input type="text" id="login" name="login" inputmode="email" autocomplete="username" required />
+    <form id="loginForm" class="form-grid" autocomplete="on" novalidate>
+      <div>
+        <label for="email">Email</label>
+        <input class="input" id="email" name="email" type="email" placeholder="vous@example.com" required/>
+      </div>
 
+      <div>
         <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" autocomplete="current-password" required />
+        <input class="input" id="password" name="password" type="password" placeholder="••••••" required/>
+      </div>
 
-        <button type="submit" class="btn gold auth-submit">Se connecter</button>
+      <div class="full form-actions">
+        <button class="btn gold" type="submit">Se connecter</button>
+        <a class="btn" href="signup.html">Créer un compte</a>
+      </div>
 
-        <p class="form-hint">
-          Pas encore de compte ? <a href="signup.html">Créer un compte</a>
-        </p>
-      </form>
-    </section>
+      <div id="login-msg" class="help" style="text-align:center;margin-top:10px;"></div>
+    </form>
   </main>
 
-  <footer class="footer" style="text-align:center;margin:32px 0 18px;">
-    <a href="legal.html">Mentions légales &amp; CGU</a>
+  <footer class="footer">
+    <a href="legal.html">Mentions légales & CGU</a>
   </footer>
 
-  <!-- (Optionnel) ton script cookies existant si tu l’utilises sur cette page -->
-  <script src="assets/js/cookies.js"></script>
+  <script>
+  // Petite aide
+  const $ = (s, c=document)=>c.querySelector(s);
+
+  const saveSession = (user) => {
+    try {
+      localStorage.setItem('velvet_user', JSON.stringify(user));
+      // cookie basique pour guard côté client (vip-guard.js)
+      document.cookie = "velvet_session=1; path=/; max-age=" + (60*60*24*7);
+    } catch(e){/* ignore */}
+  };
+
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('#login-msg');
+    msg.textContent = 'Vérification…';
+
+    const payload = {
+      email: $('#email').value,
+      password: $('#password').value
+    };
+
+    try {
+      const res = await fetch('/.netlify/functions/signin', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        msg.textContent = '❌ ' + (data.error || 'Identifiants invalides');
+        msg.style.color = '#ff6b6b';
+        return;
+      }
+
+      // Ok : on enregistre la session côté navigateur
+      saveSession(data.user);
+      msg.textContent = '✅ Connecté ! Redirection…';
+      msg.style.color = '#7CFC00';
+
+      // Redirection selon rôle
+      if ((data.user.role||'').toLowerCase() === 'admin') {
+        location.href = 'admin-dashboard.html';
+      } else {
+        location.href = 'index.html';
+      }
+    } catch (err) {
+      msg.textContent = '⚠️ Erreur réseau.';
+      msg.style.color = '#ff6b6b';
+    }
+  });
+  </script>
 </body>
 </html>
