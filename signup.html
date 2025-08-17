@@ -1,134 +1,172 @@
-<form id="signupForm" class="form-grid" autocomplete="off" enctype="multipart/form-data" novalidate>
-  <!-- Identifiants -->
-  <div>
-    <label for="username">Pseudo (obligatoire)</label>
-    <input class="input" id="username" name="username" placeholder="@pseudo" required type="text" />
-    <div class="help">Affiché publiquement sur votre profil.</div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Velvet — Inscription</title>
+  <!-- On garde TON CSS global -->
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html">Accueil</a>
+      <a class="cta" href="login.html">Se connecter</a>
+    </nav>
+  </header>
+
+  <div class="panel" style="max-width:920px;margin:8vh auto 10vh;">
+    <h1>Inscription</h1>
+    <p class="lead" style="text-align:center;margin:0 0 14px;">
+      Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
+    </p>
+
+    <!-- FORMULAIRE — mêmes classes que ton site -->
+    <form id="signupForm" class="form-grid" autocomplete="off" enctype="multipart/form-data" novalidate>
+      <!-- Identifiants (une seule fois, en haut) -->
+      <div>
+        <label for="username">Pseudo (obligatoire)</label>
+        <input class="input" id="username" name="username" placeholder="@pseudo" required type="text"/>
+        <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
+      </div>
+
+      <div>
+        <label for="password">Mot de passe</label>
+        <input class="input" id="password" name="password" placeholder="Min. 6 caractères" minlength="6" required type="password"/>
+        <div class="help">Il sera utilisé à l’activation de votre compte.</div>
+      </div>
+
+      <!-- Coordonnées & rôle -->
+      <div>
+        <label for="fullname">Nom complet</label>
+        <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
+      </div>
+
+      <div>
+        <label for="phone">Numéro de téléphone</label>
+        <input class="input" id="phone" name="phone" pattern="^\+?[0-9\s\-]{6,20}$" placeholder="+41 79 123 45 67" required type="tel"/>
+      </div>
+
+      <div class="full">
+        <label for="address">Adresse complète</label>
+        <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
+      </div>
+
+      <div>
+        <label for="country">Pays</label>
+        <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text"/>
+      </div>
+
+      <div>
+        <label for="dob">Date de naissance</label>
+        <input class="input" id="dob" name="dob" required type="date"/>
+      </div>
+
+      <div class="full">
+        <label>Je suis</label>
+        <div class="row-inline" id="role">
+          <label><input type="radio" name="role" value="Créatrice" required/> Créatrice</label>
+          <label><input type="radio" name="role" value="Client" required/> Client</label>
+        </div>
+      </div>
+
+      <!-- Médias & vérification d’âge -->
+      <div>
+        <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
+        <input accept=".jpg,.jpeg,.png" class="input" id="avatar" name="avatar" type="file"/>
+      </div>
+
+      <div class="full">
+        <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
+        <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_front" name="id_front" required type="file"/>
+      </div>
+
+      <div class="full">
+        <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
+        <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_back" name="id_back" required type="file"/>
+      </div>
+
+      <div class="full">
+        <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
+        <input accept=".jpg,.jpeg,.png" class="input" id="selfie" name="selfie" required type="file"/>
+      </div>
+
+      <div class="full row-inline">
+        <input id="consent" name="consent" required type="checkbox"/>
+        <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité & sécurité).</label>
+      </div>
+
+      <!-- Actions -->
+      <div class="full form-actions">
+        <button class="btn gold" type="submit">Envoyer ma demande</button>
+        <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
+      </div>
+      <div id="signup-msg" class="help" style="text-align:center;margin-top:10px;"></div>
+    </form>
+
+    <p class="help" style="text-align:center;margin-top:14px">
+      <strong>Important (créatrices) :</strong> les paiements des revenus se font <u>uniquement via PayPal</u>. Veillez à disposer d’un compte PayPal valide afin de pouvoir être réglée chaque semaine.
+    </p>
   </div>
 
-  <div>
-    <label for="email">Email</label>
-    <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email" />
-  </div>
+  <footer class="footer">
+    <a href="legal.html">Mentions légales &amp; CGU</a>
+  </footer>
 
-  <div>
-    <label for="password">Mot de passe</label>
-    <input class="input" id="password" name="password" placeholder="Min. 6 caractères" minlength="6" required type="password" />
-    <div class="help">Il sera utilisé à l’activation de votre compte.</div>
-  </div>
+  <!-- JS : envoi MULTIPART vers ta Function signup-upload (aucun widget externe) -->
+  <script>
+  (() => {
+    const $ = s => document.querySelector(s);
+    const form = $('#signupForm');
+    const msg  = $('#signup-msg');
 
-  <!-- Coordonnées & rôle -->
-  <div>
-    <label for="fullname">Nom complet</label>
-    <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text" />
-  </div>
+    if (!form) return;
 
-  <div>
-    <label for="phone">Numéro de téléphone</label>
-    <input class="input" id="phone" name="phone" pattern="^\+?[0-9\s\-]{6,20}$" placeholder="+41 79 123 45 67" required type="tel" />
-  </div>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Envoi en cours…';
 
-  <div class="full">
-    <label for="address">Adresse complète</label>
-    <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
-  </div>
-
-  <div>
-    <label for="country">Pays</label>
-    <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text" />
-  </div>
-
-  <div>
-    <label for="dob">Date de naissance</label>
-    <input class="input" id="dob" name="dob" required type="date" />
-  </div>
-
-  <div class="full">
-    <label>Je suis</label>
-    <div class="row-inline" id="role">
-      <label><input type="radio" name="role" value="Créatrice" required /> Créatrice</label>
-      <label><input type="radio" name="role" value="Client" required /> Client</label>
-    </div>
-  </div>
-
-  <!-- Médias & vérif âge -->
-  <div>
-    <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
-    <input accept=".jpg,.jpeg,.png" class="input" id="avatar" name="avatar" type="file" />
-  </div>
-
-  <div class="full">
-    <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
-    <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_front" name="id_front" required type="file" />
-  </div>
-
-  <div class="full">
-    <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
-    <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_back" name="id_back" required type="file" />
-  </div>
-
-  <div class="full">
-    <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
-    <input accept=".jpg,.jpeg,.png" class="input" id="selfie" name="selfie" required type="file" />
-  </div>
-
-  <div class="full row-inline">
-    <input id="consent" name="consent" required type="checkbox" />
-    <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité & sécurité).</label>
-  </div>
-
-  <!-- Actions -->
-  <div class="full form-actions">
-    <button class="btn gold" type="submit">Envoyer ma demande</button>
-    <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
-  </div>
-</form>
-
-<p class="help" style="text-align:center; margin-top:14px">
-  <strong>Important (créatrices) :</strong> les paiements des revenus se font <u>uniquement via PayPal</u>. Veillez à disposer d’un compte PayPal valide afin de pouvoir être réglée chaque semaine.
-</p>
-
-<script>
-// Envoi MULTIPART vers la Function signup-upload (avec fichiers)
-(() => {
-  const $ = s => document.querySelector(s);
-  const form = $('#signupForm');
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Validation rapide
-    const requiredIds = ['username','email','password','fullname','phone','address','country','dob'];
-    for (const id of requiredIds) {
-      const el = document.getElementById(id);
-      if (!el || !el.value.trim()) { alert('Merci de compléter tous les champs obligatoires.'); return; }
-    }
-    if (!document.querySelector('input[name="role"]:checked')) { alert('Merci de choisir votre rôle.'); return; }
-    if (!document.getElementById('id_front').files[0] ||
-        !document.getElementById('id_back').files[0] ||
-        !document.getElementById('selfie').files[0]) {
-      alert("Merci d'ajouter vos pièces d'identité et le selfie.");
-      return;
-    }
-
-    const fd = new FormData(form); // inclut tous les champs + fichiers
-
-    try {
-      const res = await fetch('/.netlify/functions/signup-upload', {
-        method: 'POST',
-        body: fd
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        alert('❌ ' + (data.error || 'Erreur serveur'));
+      // Validation douce
+      const must = ['username','email','password','fullname','phone','address','country','dob'];
+      for (const id of must) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) { msg.textContent = 'Merci de compléter tous les champs.'; msg.style.color='#ff6b6b'; return; }
+      }
+      if (!document.querySelector('input[name="role"]:checked')) { msg.textContent='Merci de choisir votre rôle.'; msg.style.color='#ff6b6b'; return; }
+      if (!document.getElementById('id_front').files[0] ||
+          !document.getElementById('id_back').files[0] ||
+          !document.getElementById('selfie').files[0]) {
+        msg.textContent = "Merci d'ajouter vos pièces d'identité et le selfie.";
+        msg.style.color = '#ff6b6b';
         return;
       }
-      alert('✅ Demande envoyée. Nous validerons votre profil (majorité & conformité).');
-      // location.href = 'merci_adhesion.html';
-    } catch (err) {
-      alert('⚠️ Erreur réseau. Réessayez dans un instant.');
-    }
-  });
-})();
-</script>
+
+      try {
+        const fd = new FormData(form);
+        const res = await fetch('/.netlify/functions/signup-upload', { method:'POST', body: fd });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          msg.textContent = '❌ ' + (data.error || 'Erreur serveur');
+          msg.style.color = '#ff6b6b';
+          return;
+        }
+
+        msg.textContent = '✅ Demande envoyée. Validation sous peu.';
+        msg.style.color = '#7CFC00';
+        // Redirection possible :
+        // location.href = 'merci_adhesion.html';
+      } catch (err) {
+        msg.textContent = '⚠️ Erreur réseau. Réessayez.';
+        msg.style.color = '#ff6b6b';
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
