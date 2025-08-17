@@ -1,183 +1,134 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Velvet — Inscription</title>
-  <link href="styles.css" rel="stylesheet"/>
-  <style>
-    /* Masquer totalement le champ anti-robots (honeypot) */
-    [name="bot-field"]{
-      display:none !important; visibility:hidden !important;
-      position:absolute !important; left:-9999px !important; height:0 !important;
-    }
-    /* Si jamais un premier enfant vide apparaissait dans la grille, on le supprime visuellement */
-    .form-grid > :first-child:empty { display:none !important; }
-  </style>
-</head>
-<body>
-<header class="header">
-  <nav class="nav">
-    <a href="index.html">Accueil</a>
-    <a class="cta" href="login.html">Se connecter</a>
-  </nav>
-</header>
+<form id="signupForm" class="form-grid" autocomplete="off" enctype="multipart/form-data" novalidate>
+  <!-- Identifiants -->
+  <div>
+    <label for="username">Pseudo (obligatoire)</label>
+    <input class="input" id="username" name="username" placeholder="@pseudo" required type="text" />
+    <div class="help">Affiché publiquement sur votre profil.</div>
+  </div>
 
-<div class="panel">
-  <h1>Inscription</h1>
-  <p class="lead" style="text-align:center; margin:0 0 8px">
-    Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité &amp; conformité).
-  </p>
+  <div>
+    <label for="email">Email</label>
+    <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email" />
+  </div>
 
-  <!-- IMPORTANT : la grille est maintenant dans un <div> interne,
-       le <form> ne porte plus la classe .form-grid -->
-  <form
-    name="signup"
-    method="POST"
-    action="merci_adhesion.html"
-    enctype="multipart/form-data"
-    data-netlify="true"
-    data-netlify-honeypot="bot-field"
-  >
-    <input type="hidden" name="form-name" value="signup"/>
-    <!-- Honeypot totalement invisible (et hors de la grille) -->
-    <input type="text" name="bot-field" tabindex="-1" autocomplete="off"/>
+  <div>
+    <label for="password">Mot de passe</label>
+    <input class="input" id="password" name="password" placeholder="Min. 6 caractères" minlength="6" required type="password" />
+    <div class="help">Il sera utilisé à l’activation de votre compte.</div>
+  </div>
 
-    <!-- Tous les champs visibles sont dans la grille -->
-    <div class="form-grid">
-      <div>
-        <label for="handle">Pseudo (obligatoire)</label>
-        <input class="input" id="handle" name="handle" placeholder="@pseudo" required type="text"/>
-        <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
-      </div>
+  <!-- Coordonnées & rôle -->
+  <div>
+    <label for="fullname">Nom complet</label>
+    <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text" />
+  </div>
 
-      <div>
-        <label for="fullname">Nom complet</label>
-        <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
-      </div>
+  <div>
+    <label for="phone">Numéro de téléphone</label>
+    <input class="input" id="phone" name="phone" pattern="^\+?[0-9\s\-]{6,20}$" placeholder="+41 79 123 45 67" required type="tel" />
+  </div>
 
-      <div>
-        <label for="email">Email</label>
-        <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
-      </div>
+  <div class="full">
+    <label for="address">Adresse complète</label>
+    <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
+  </div>
 
-      <div>
-        <label for="phone">Numéro de téléphone</label>
-        <input class="input" id="phone" name="phone" placeholder="+41 79 123 45 67"
-               pattern="^\+?[0-9\s\-]{6,20}$" required type="tel"/>
-      </div>
+  <div>
+    <label for="country">Pays</label>
+    <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text" />
+  </div>
 
-      <div class="full">
-        <label for="address">Adresse complète</label>
-        <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
-      </div>
+  <div>
+    <label for="dob">Date de naissance</label>
+    <input class="input" id="dob" name="dob" required type="date" />
+  </div>
 
-      <div>
-        <label for="country">Pays</label>
-        <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text"/>
-      </div>
+  <div class="full">
+    <label>Je suis</label>
+    <div class="row-inline" id="role">
+      <label><input type="radio" name="role" value="Créatrice" required /> Créatrice</label>
+      <label><input type="radio" name="role" value="Client" required /> Client</label>
+    </div>
+  </div>
 
-      <div>
-        <label for="dob">Date de naissance</label>
-        <input class="input" id="dob" name="dob" required type="date"/>
-      </div>
+  <!-- Médias & vérif âge -->
+  <div>
+    <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
+    <input accept=".jpg,.jpeg,.png" class="input" id="avatar" name="avatar" type="file" />
+  </div>
 
-      <div>
-        <label>Je suis</label>
-        <div class="row-inline" id="role">
-          <label><input type="radio" name="role" value="creatrice" required/> Créatrice</label>
-          <label><input type="radio" name="role" value="client" required/> Client</label>
-        </div>
-      </div>
+  <div class="full">
+    <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
+    <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_front" name="id_front" required type="file" />
+  </div>
 
-      <div>
-        <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
-        <input class="input" id="avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png"/>
-      </div>
+  <div class="full">
+    <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
+    <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_back" name="id_back" required type="file" />
+  </div>
 
-      <div class="full">
-        <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
-        <input class="input" id="id_front" name="id_front" type="file" required accept=".jpg,.jpeg,.png,.pdf"/>
-      </div>
+  <div class="full">
+    <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
+    <input accept=".jpg,.jpeg,.png" class="input" id="selfie" name="selfie" required type="file" />
+  </div>
 
-      <div class="full">
-        <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
-        <input class="input" id="id_back" name="id_back" type="file" required accept=".jpg,.jpeg,.png,.pdf"/>
-      </div>
+  <div class="full row-inline">
+    <input id="consent" name="consent" required type="checkbox" />
+    <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité & sécurité).</label>
+  </div>
 
-      <div class="full">
-        <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
-        <form id="signup-form" autocomplete="off">
-  <label>Pseudo</label>
-  <input id="username" type="text" required placeholder="@pseudo">
-
-  <label>Email</label>
-  <input id="email" type="email" required placeholder="vous@example.com">
-
-  <label>Mot de passe</label>
-  <input id="password" type="password" required minlength="6">
-
-  <button type="submit">Créer mon compte</button>
-  <div id="signup-msg" class="help"></div>
+  <!-- Actions -->
+  <div class="full form-actions">
+    <button class="btn gold" type="submit">Envoyer ma demande</button>
+    <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
+  </div>
 </form>
 
+<p class="help" style="text-align:center; margin-top:14px">
+  <strong>Important (créatrices) :</strong> les paiements des revenus se font <u>uniquement via PayPal</u>. Veillez à disposer d’un compte PayPal valide afin de pouvoir être réglée chaque semaine.
+</p>
+
 <script>
+// Envoi MULTIPART vers la Function signup-upload (avec fichiers)
 (() => {
-  const form = document.getElementById('signup-form');
-  const emailEl = document.getElementById('email');
-  const userEl  = document.getElementById('username');
-  const passEl  = document.getElementById('password');
-  const msgEl   = document.getElementById('signup-msg');
+  const $ = s => document.querySelector(s);
+  const form = $('#signupForm');
+  if (!form) return;
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    msgEl.textContent = 'Création du compte...';
+
+    // Validation rapide
+    const requiredIds = ['username','email','password','fullname','phone','address','country','dob'];
+    for (const id of requiredIds) {
+      const el = document.getElementById(id);
+      if (!el || !el.value.trim()) { alert('Merci de compléter tous les champs obligatoires.'); return; }
+    }
+    if (!document.querySelector('input[name="role"]:checked')) { alert('Merci de choisir votre rôle.'); return; }
+    if (!document.getElementById('id_front').files[0] ||
+        !document.getElementById('id_back').files[0] ||
+        !document.getElementById('selfie').files[0]) {
+      alert("Merci d'ajouter vos pièces d'identité et le selfie.");
+      return;
+    }
+
+    const fd = new FormData(form); // inclut tous les champs + fichiers
+
     try {
-      const res = await fetch('/api/signup', {
+      const res = await fetch('/.netlify/functions/signup-upload', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          email: emailEl.value,
-          username: userEl.value,
-          password: passEl.value
-        })
+        body: fd
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        msgEl.textContent = data.error || 'Erreur inscription';
-        msgEl.style.color = '#ff6b6b';
+        alert('❌ ' + (data.error || 'Erreur serveur'));
         return;
       }
-      msgEl.textContent = 'Compte créé ✅';
-      msgEl.style.color = '#7CFC00';
-      // Redirige si tu veux :
-      // location.href = 'thanks.html';
+      alert('✅ Demande envoyée. Nous validerons votre profil (majorité & conformité).');
+      // location.href = 'merci_adhesion.html';
     } catch (err) {
-      msgEl.textContent = 'Erreur réseau';
-      msgEl.style.color = '#ff6b6b';
+      alert('⚠️ Erreur réseau. Réessayez dans un instant.');
     }
   });
 })();
 </script>
-
-  <p class="help" style="text-align:center; margin-top:14px">
-    Dans votre espace privé, vous renseignerez vos coordonnées de paiement (IBAN ou PayPal).<br/>
-  </p>
-</div>
-
-<footer class="footer">
-  <a href="legal.html">Mentions légales &amp; CGU</a>
-</footer>
-
-<div id="cookie-banner" class="cookie-banner" hidden>
-  <p>Ce site utilise des cookies techniques pour améliorer votre expérience. En poursuivant, vous acceptez notre utilisation des cookies.</p>
-  <div class="cookie-actions">
-    <button id="cookie-accept" class="btn-accept">Accepter</button>
-    <a href="legal.html#cookies" class="btn-ghost">En savoir plus</a>
-  </div>
-</div>
-
-<div class="page-fade-bottom" aria-hidden="true"></div>
-<script src="assets/js/cookies.js"></script>
-</body>
-</html>
