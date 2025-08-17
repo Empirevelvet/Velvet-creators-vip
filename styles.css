@@ -75,3 +75,54 @@ body.has-cookie-banner{padding-bottom:84px}
 /* Hero logo image */
 .hero-logo{width:min(520px, 78vw); height:auto; display:block; margin:10px auto 12px; filter: drop-shadow(0 4px 16px rgba(0,0,0,.6));}
 @media (max-width:480px){ .hero-logo{width:min(78vw, 340px)} }
+/* ===== Cookie banner (noir & or, non bloquant mobile) ===== */
+.cookie-banner{
+  position: fixed;
+  left: 12px; right: 12px; bottom: 12px;
+  z-index: 1000;
+  max-width: 680px; margin: 0 auto;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(20,20,20,.92);
+  border: 1px solid rgba(212,175,55,.35);       /* or */
+  backdrop-filter: blur(8px);
+  color: #eee;
+  box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  line-height: 1.45;
+}
+
+/* Respect de l’encoche iOS */
+@supports(padding: env(safe-area-inset-bottom)){
+  .cookie-banner{
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Quand le bandeau est visible, on pousse le contenu vers le haut
+   pour éviter qu’il soit caché derrière (important sur mobile). */
+body.cookie-open{
+  padding-bottom: 120px;
+}
+@supports(padding: env(safe-area-inset-bottom)){
+  body.cookie-open{
+    padding-bottom: calc(120px + env(safe-area-inset-bottom));
+  }
+}
+
+.cookie-actions{
+  display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.cookie-actions .btn-accept{
+  border: 0; padding: 8px 14px; border-radius: 10px; font-weight: 600;
+  background: #d4af37; color: #121212; cursor: pointer;
+}
+.cookie-actions .btn-ghost{
+  display: inline-block; padding: 8px 12px; border-radius: 10px; 
+  border: 1px solid rgba(212,175,55,.45); color: #e6e6e6; text-decoration: none;
+}
+
+/* Petits écrans */
+@media (max-width: 420px){
+  .cookie-banner{ left: 8px; right: 8px; padding: 10px 12px; }
+  body.cookie-open{ padding-bottom: 110px; }
+}
