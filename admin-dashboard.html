@@ -7,20 +7,23 @@
   <link rel="stylesheet" href="/admin.css" />
 </head>
 <body>
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
     <nav class="nav">
-      <a class="active" href="/admin-dashboard.html">Aperçu</a>
-      <a href="/admin-users.html">Comptes</a>
-      <a href="#sales">Ventes</a>
-      <a href="#convs">Conversations</a>
-      <a href="#lives">Lives</a>
-      <a href="/admin-items.html">Créer un item</a>
+      <a class="active" href="/admin-dashboard.html">📊 Aperçu</a>
+      <a href="/admin-users.html">👤 Comptes</a>
+      <a href="#sales">💳 Ventes</a>
+      <a href="#convs">💬 Conversations</a>
+      <a href="#lives">🎥 Lives</a>
+      <a href="/admin-items.html">➕ Créer un item</a>
     </nav>
     <div class="foot">© Velvet Creators VIP</div>
   </aside>
 
+  <!-- MAIN -->
   <main class="main">
+    <!-- TOP BAR -->
     <div class="topbar">
       <div class="search">
         <input id="q" class="input" type="text" placeholder="Rechercher (pseudo, email)" />
@@ -33,96 +36,274 @@
       </div>
     </div>
 
+    <!-- KPIs -->
     <div class="grid">
-      <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
-      <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
-      <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="value" id="k-today">0.00 CHF</div><small>tickets & PPV</small></div>
-      <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
+      <div class="card">
+        <h3>Utilisateurs en ligne</h3>
+        <div class="value" id="k-online">0</div>
+        <small>dans les 5 dernières minutes</small>
+      </div>
+      <div class="card">
+        <h3>Inscriptions en attente</h3>
+        <div class="value" id="k-pending">0</div>
+        <small>à valider</small>
+      </div>
+      <div class="card">
+        <h3>Ventes (aujourd’hui)</h3>
+        <div class="value" id="k-today">0.00 CHF</div>
+        <small>tickets &amp; PPV</small>
+      </div>
+      <div class="card">
+        <h3>Impayé total</h3>
+        <div class="value bad" id="k-due">0.00 CHF</div>
+        <small>à verser aux créatrices</small>
+      </div>
     </div>
 
+    <!-- DERNIÈRES VENTES -->
     <section class="section">
       <h2>Dernières ventes</h2>
       <table id="t-last">
-        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr>
+        </thead>
         <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
     </section>
 
+    <!-- RECAP CRÉATRICES -->
     <section class="section">
       <h2>Récap ventes par créatrice</h2>
       <table id="t-creators">
-        <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr>
+        </thead>
         <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
       <button class="btn" id="btnCsv" style="margin-top:10px">Exporter CSV</button>
     </section>
 
-    <section class="section" id="sales">
+    <!-- VENTES (DÉTAIL) -->
+    <section class="section" id="sales" data-tab>
       <h2>Détail des ventes</h2>
       <table id="t-ledger">
-        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr>
+        </thead>
         <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
       </table>
     </section>
 
-    <footer class="small">Besoin d’un filtre/onglet en plus ? Tu me dis et je l’ajoute.</footer>
+    <!-- CONVERSATIONS -->
+    <section class="section" id="convs" data-tab>
+      <h2>Conversations (aperçu)</h2>
+      <table id="t-conv">
+        <thead><tr><th>Date</th><th>Participants</th><th>Dernier message</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
+      </table>
+    </section>
+
+    <!-- LIVES -->
+    <section class="section" id="lives" data-tab>
+      <h2>Lives</h2>
+      <table id="t-lives">
+        <thead><tr><th>Room</th><th>Créatrice</th><th>Statut</th><th>Viewers</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="5">Chargement…</td></tr></tbody>
+      </table>
+    </section>
+
+    <footer class="small">Besoin d’un filtre/onglet en plus ? Dis‑moi et je l’ajoute.</footer>
   </main>
 
-  <!-- SCRIPT FINAL UNIQUEMENT -->
+  <!-- SCRIPT UNIQUE -->
   <script>
-  // ===== Helpers =====
-  const $  = (s, c=document) => c.querySelector(s);
-  const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
-  const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
-  const fmt = n => Number(n||0).toFixed(2);
+    // ===== Utils =====
+    const $  = (s, c=document) => c.querySelector(s);
+    const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
+    const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
+    const fmt = n => Number(n||0).toFixed(2);
 
-  // ===== Tabs (sidebar -> sections) =====
-  function activateFromHash() {
-    const hash = location.hash || '#overview';
-    $$('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')===hash));
-    $$('[data-tab]').forEach(sec => { if(sec.id) sec.hidden = ('#'+sec.id !== hash); });
-    const el = document.querySelector(hash);
-    if (el) el.scrollIntoView({block:'start', behavior:'auto'});
-  }
-  window.addEventListener('hashchange', activateFromHash);
-  document.addEventListener('DOMContentLoaded', activateFromHash);
+    // ===== Horloge + auto refresh =====
+    setInterval(()=>{ const el=$('#clock'); if(el) el.textContent=new Date().toLocaleTimeString(); }, 1000);
+    setInterval(()=>reloadAll(), 30_000);
 
-  // ===== Rendus =====
-  function renderLastSales(rows=[]) { /* idem code envoyé avant */ }
-  function renderCreatorsRecap(map={}) { /* idem code envoyé avant */ }
-  function renderLedger(rows=[]) { /* idem code envoyé avant */ }
+    // ===== Navigation interne (hash) =====
+    document.addEventListener('click', (e)=>{
+      const a = e.target.closest('.nav a[href^="#"]');
+      if (!a) return;
+      e.preventDefault();
+      location.hash = a.getAttribute('href');
+      activateFromHash();
+    });
+    function activateFromHash(){
+      const hash = location.hash || '';
+      $$('.nav a').forEach(a => {
+        const isActive = a.getAttribute('href')===hash || (!hash && a.getAttribute('href')==='/admin-dashboard.html');
+        a.classList.toggle('active', isActive);
+      });
+      // show/hide sections with data-tab
+      $$('[data-tab]').forEach(sec => {
+        sec.hidden = (hash && ('#'+sec.id)!==hash);
+      });
+      if(hash){
+        const el = $(hash); if(el) el.scrollIntoView({block:'start'});
+      }
+    }
+    window.addEventListener('hashchange', activateFromHash);
+    document.addEventListener('DOMContentLoaded', activateFromHash);
 
-  // ===== Chargement global =====
-  async function loadDashboard() { /* idem code envoyé avant */ }
+    // ===== Rendus =====
+    function renderLast(rows=[]){
+      const tb = $('#t-last tbody'); tb.innerHTML='';
+      if (!rows.length){ tb.innerHTML = '<tr><td colspan="6">Aucune vente.</td></tr>'; return; }
+      rows.slice(0,8).forEach(v=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${(v.date||'').replace('T',' ').slice(0,16)}</td>
+          <td>${v.creator||'—'}</td>
+          <td>${v.type||'—'}</td>
+          <td>${fmt(v.amount)} CHF</td>
+          <td>${v.clientEmail||'—'}</td>
+          <td>${v.paid ? 'Payé' : `<button class="btn" data-pay="${v.id||''}">Marquer payé</button>`}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function renderCreators(map={}){
+      const tb = $('#t-creators tbody'); tb.innerHTML='';
+      const entries = Object.entries(map);
+      if (!entries.length){ tb.innerHTML = '<tr><td colspan="6">Aucune donnée.</td></tr>'; return; }
+      entries.forEach(([name,val])=>{
+        const total = Number(val.total||0), c70=total*0.7, v30=total*0.3, due=Number(val.due||0);
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${name}</td><td>${fmt(total)}</td><td>${fmt(c70)}</td><td>${fmt(v30)}</td>
+          <td>${fmt(due)}</td>
+          <td>${due>0 ? `<button class="btn" data-bulk="${name}">Marquer tout payé</button>` : '—'}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function renderLedger(rows=[]){
+      const tb = $('#t-ledger tbody'); tb.innerHTML='';
+      if (!rows.length){ tb.innerHTML = '<tr><td colspan="8">Aucune ligne.</td></tr>'; return; }
+      rows.forEach(v=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${(v.date||'').replace('T',' ').slice(0,16)}</td>
+          <td>${v.creator||'—'}</td>
+          <td>${v.type||'—'}</td>
+          <td>${fmt(v.amount)}</td>
+          <td>${v.txn||'—'}</td>
+          <td>${v.clientEmail||'—'}</td>
+          <td>${v.paid ? 'Payé' : 'Impayé'}</td>
+          <td>${v.paid ? '—' : `<button class="btn" data-pay="${v.id||''}">Payé</button>`}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function renderConvs(rows=[]){
+      const tb = $('#t-conv tbody'); tb.innerHTML='';
+      if (!rows.length){ tb.innerHTML = '<tr><td colspan="4">Aucune donnée.</td></tr>'; return; }
+      rows.forEach(c=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${(c.date||'').replace('T',' ').slice(0,16)}</td>
+          <td>${(c.participants||[]).join(', ')||'—'}</td>
+          <td>${c.lastMessage||'—'}</td>
+          <td><a class="btn" href="/admin-users.html?q=${encodeURIComponent(c.participants?.[0]||'')}">Ouvrir</a></td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function renderLives(rows=[]){
+      const tb = $('#t-lives tbody'); tb.innerHTML='';
+      if (!rows.length){ tb.innerHTML = '<tr><td colspan="5">Aucun live.</td></tr>'; return; }
+      rows.forEach(l=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${l.room||'—'}</td><td>${l.creator||'—'}</td>
+          <td>${l.status||'—'}</td><td>${l.viewers ?? '—'}</td>
+          <td>${l.adminUrl ? `<a class="btn" target="_blank" href="${l.adminUrl}">Ouvrir</a>` : '—'}</td>`;
+        tb.appendChild(tr);
+      });
+    }
 
-  // ===== Actions =====
-  async function markPaid(id) { /* idem code envoyé avant */ }
-  async function markAllForCreator(name) { /* idem code envoyé avant */ }
-  async function purgeInactive90d() { /* idem code envoyé avant */ }
-  function exportCsv(){ window.location.href = '/api/list-ledger?format=csv'; }
+    // ===== Chargements =====
+    async function loadLedger(){
+      try{
+        const r = await api('/api/list-ledger');
+        const j = await r.json();
+        $('#k-online').textContent  = j.online ?? 0;
+        $('#k-pending').textContent = j.pending ?? 0;
+        $('#k-today').textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF';
+        $('#k-due').textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF';
+        renderLast(j.last||[]);
+        renderCreators(j.creators||{});
+        renderLedger(j.ledger||[]);
+      }catch(e){ console.warn('list-ledger', e); }
+    }
+    async function loadConversations(){
+      try{
+        const r = await api('/api/list-conversations');
+        if (!r.ok) throw 0;
+        const j = await r.json();
+        renderConvs(j.items||[]);
+      }catch(e){
+        const tb = $('#t-conv tbody'); if(tb) tb.innerHTML='<tr><td colspan="4">Indisponible.</td></tr>';
+      }
+    }
+    async function loadLives(){
+      try{
+        const r = await api('/api/list-lives');
+        if (!r.ok) throw 0;
+        const j = await r.json();
+        renderLives(j.items||[]);
+      }catch(e){
+        const tb = $('#t-lives tbody'); if(tb) tb.innerHTML='<tr><td colspan="5">Indisponible.</td></tr>';
+      }
+    }
 
-  // ===== Événements =====
-  document.addEventListener('click', (e)=>{
-    const bPay  = e.target.closest('button[data-pay]');
-    const bBulk = e.target.closest('button[data-bulk]');
-    if (bPay)  markPaid(bPay.dataset.pay);
-    if (bBulk) markAllForCreator(bBulk.dataset.bulk);
-  });
-  $('#btnReload')?.addEventListener('click', loadDashboard);
-  $('#btnPurge')?.addEventListener('click', purgeInactive90d);
-  $('#btnCsv')?.addEventListener('click', exportCsv);
-  $('#btnFilter')?.addEventListener('click', ()=>{
-    const q = ($('#q')?.value||'').trim();
-    location.href = '/admin-users.html' + (q ? ('?q='+encodeURIComponent(q)) : '');
-  });
+    // ===== Actions =====
+    async function markPaid(id){
+      try{
+        const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id }) });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
+        loadLedger();
+      }catch(e){ alert('Erreur marquage payé'); }
+    }
+    async function markAllForCreator(name){
+      if (!confirm('Marquer TOUT impayé comme versé pour cette créatrice ?')) return;
+      try{
+        const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id: 'creator:'+name }) });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
+        loadLedger();
+      }catch(e){ alert('Erreur marquage global'); }
+    }
+    async function purgeInactive90d(){
+      if (!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
+      try{
+        const r = await api('/api/purge-inactive', { method:'POST' });
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
+        alert('Comptes supprimés : ' + (j.count||0));
+      }catch(e){ alert('Erreur purge'); }
+    }
+    function exportCsv(){ window.location.href = '/api/list-ledger?format=csv'; }
 
-  // Horloge + refresh
-  const clockEl = $('#clock');
-  if (clockEl) setInterval(()=>{ clockEl.textContent = new Date().toLocaleTimeString(); }, 1000);
-  setInterval(loadDashboard, 30_000);
+    // ===== Events =====
+    document.addEventListener('click', (e)=>{
+      const bPay  = e.target.closest('button[data-pay]');
+      const bBulk = e.target.closest('button[data-bulk]');
+      if (bPay)  markPaid(bPay.dataset.pay);
+      if (bBulk) markAllForCreator(bBulk.dataset.bulk);
+    });
+    $('#btnReload').onclick = ()=>{ loadLedger(); loadConversations(); loadLives(); };
+    $('#btnPurge').onclick  = purgeInactive90d;
+    $('#btnCsv').onclick    = exportCsv;
+    $('#btnFilter').onclick = ()=>{ const q=($('#q')?.value||'').trim(); location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); };
 
-  // Premier chargement
-  loadDashboard();
+    // ===== Init =====
+    function reloadAll(){ loadLedger(); loadConversations(); loadLives(); }
+    reloadAll();
   </script>
 </body>
 </html>
