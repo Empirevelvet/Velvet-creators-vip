@@ -1,444 +1,166 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Velvet — Admin Dashboard</title>
-
-  <!-- ===== THEME (noir & or) + portée locale ===== -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles.css">
   <style>
-    :root{
-      --bg:#0b0b0c;
-      --panel:#121214;
-      --panel-2:#17171a;
-      --line:#24242a;
-      --ink:#e6e6e9;
-      --muted:#a6a6ad;
-      --gold:#d4af37;
-      --gold-2:#c39a2e;
-      --danger:#ff6b6b;
-      --ok:#44d499;
-      --chip:#232329;
-      --radius:14px;
-      --shadow:0 10px 28px rgba(0,0,0,.55);
-      --shadow-soft:0 6px 20px rgba(0,0,0,.35);
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    /* ==== Styles spécifiques au dashboard ==== */
+    body{ display:flex; min-height:100vh; background:#0b0b0c; color:#e6e6e9; }
+    .sidebar{
+      width:220px; background:#121214; padding:20px 12px;
+      display:flex; flex-direction:column; gap:20px;
+      border-right:1px solid #2a2a2f;
     }
-
-    /* On isole le style pour ne rien casser ailleurs */
-    .admin-ui, .admin-ui * { box-sizing:border-box }
-    html, body { height:100% }
-    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 var(--font); }
-
-    .admin-ui { max-width:1200px; margin:0 auto; padding:18px; }
-    .admin-ui header.top {
-      position:sticky; top:0; z-index:10;
-      background:rgba(18,18,20,.92); backdrop-filter:saturate(120%) blur(6px);
-      border-bottom:1px solid var(--line);
-      margin: -18px -18px 18px; padding:12px 18px;
+    .sidebar h2{ font-size:18px; margin:0 0 20px; color:#d4af37; }
+    .sidebar a{
+      display:block; padding:10px 14px; border-radius:8px;
+      color:#e6e6e9; text-decoration:none; font-size:15px;
     }
-    .brand { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px }
-    .brand .dot{ width:10px; height:10px; border-radius:50%; background:var(--ok); box-shadow:0 0 0 3px #0a2a22 inset }
-    .links a { color:var(--ink); text-decoration:none; opacity:.8; margin-right:14px }
-    .links a:hover{ opacity:1 }
-    .chip { display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border-radius:999px; font-size:12px;
-      background:var(--chip); border:1px solid var(--line) }
-    .btn { display:inline-flex; align-items:center; gap:8px;
-      padding:10px 14px; border-radius:10px; background:#1a1a1f; color:var(--ink);
-      border:1px solid var(--line); text-decoration:none; cursor:pointer }
-    .btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-soft) }
-    .btn.gold { background:linear-gradient(180deg,var(--gold),var(--gold-2)); color:#0b0b0c; border:0 }
-    .btn.ghost { background:transparent; border:1px solid var(--line) }
-    .btn.danger { background:rgba(255,107,107,.1); color:#ffbbbb; border:1px solid rgba(255,107,107,.35) }
+    .sidebar a:hover{ background:#1a1a1f; color:#d4af37; }
 
-    .grid {
-      display:grid; grid-template-columns:repeat(12,1fr); gap:18px;
+    .main{ flex:1; padding:20px; overflow-x:hidden; }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px;
     }
-    @media (max-width:960px){ .grid { grid-template-columns: 1fr } }
-
-    .card {
-      background:linear-gradient(180deg,var(--panel),var(--panel-2));
-      border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
-      padding:18px;
+    .search{ display:flex; gap:8px; }
+    .search input{
+      background:#0f0f12; border:1px solid #2a2a2f; border-radius:6px;
+      color:#e6e6e9; padding:8px 10px;
     }
-    .card h3 { margin:0 0 10px; font-size:16px; letter-spacing:.2px }
-    .meta { color:var(--muted); font-size:12px }
+    .btn-small{
+      padding:8px 14px; border-radius:6px;
+      border:1px solid #3b2e10;
+      background:linear-gradient(#3b2e10,#2a210b);
+      color:#d4af37; cursor:pointer;
+    }
+    .grid-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:20px; }
+    .card{ background:#121214; border:1px solid #2a2a2f; border-radius:12px; padding:14px; box-shadow:0 4px 10px rgba(0,0,0,.5); }
+    .card h3{ font-size:15px; margin:0 0 6px; color:#9aa0a8; }
+    .card .value{ font-size:20px; font-weight:700; color:#d4af37; }
+    .card .danger{ color:#ff6b6b; }
+    .card .ok{ color:#3dd399; }
 
-    /* Stats tuiles */
-    .tiles{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px }
-    @media (max-width:960px){ .tiles{ grid-template-columns:repeat(2,1fr) } }
-    .tile{ background:#101014; border:1px solid var(--line); border-radius:12px; padding:16px }
-    .tile .k{ font-size:26px; font-weight:800 }
-    .tile .l{ color:var(--muted); font-size:12px; margin-top:6px }
-
-    /* Filtres & tableaux */
-    .filters{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0 16px }
-    .input, select{ background:#0f0f14; color:var(--ink); border:1px solid var(--line);
-      border-radius:10px; padding:10px 12px; outline:none }
-    .input:focus, select:focus{ border-color:#2b2b35; box-shadow:0 0 0 3px rgba(212,175,55,.15) }
-
-    table{ width:100%; border-collapse:collapse; background:#0f0f14; border-radius:12px; overflow:hidden; }
-    thead th{ text-align:left; padding:12px; background:#131318; font-size:12px; color:#b8b8bd; border-bottom:1px solid var(--line) }
-    tbody td{ padding:12px; border-bottom:1px solid #15151b; vertical-align:top }
-    tbody tr:hover{ background:#101018 }
-    .badge{ display:inline-block; padding:4px 8px; font-size:12px; border-radius:999px; background:#15151b; border:1px solid var(--line) }
-    .badge.ok{ background:rgba(68,212,153,.12); color:#a6f3d3; border-color:rgba(68,212,153,.25) }
-    .badge.warn{ background:rgba(212,175,55,.12); color:#ffe6a6; border-color:rgba(212,175,55,.25) }
-    .badge.danger{ background:rgba(255,107,107,.12); color:#ffc9c9; border-color:rgba(255,107,107,.25) }
-
-    .section-title{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:4px 0 12px }
-    .section-title h2{ margin:0; font-size:18px; letter-spacing:.3px }
-    .note{ color:var(--muted); font-size:12px }
-
-    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-
-    /* mini helper */
-    .right{ text-align:right }
-    .mono{ font-family:var(--mono) }
-    .mt8{ margin-top:8px } .mt16{ margin-top:16px } .mt24{ margin-top:24px } .mb0{ margin-bottom:0 }
-    .hide-mobile{ display:block } @media (max-width:640px){ .hide-mobile{ display:none } }
+    table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:14px; }
+    th,td{ padding:10px; border-bottom:1px solid #2a2a2f; text-align:left; }
+    th{ background:#1b1b1f; color:#dcdce2; }
+    tr:hover{ background:#0f0f12; }
+    .section{ margin-top:24px; }
+    .section h2{ font-size:18px; margin:0 0 12px; color:#d4af37; }
   </style>
 </head>
 <body>
-<div class="admin-ui">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>VELVET ADMIN</h2>
+    <a href="#">Aperçu</a>
+    <a href="#">Comptes</a>
+    <a href="#">Ventes</a>
+    <a href="#">Conversations</a>
+    <a href="#">Lives</a>
+    <a href="#">Créer un item</a>
+    <p style="margin-top:auto; font-size:12px; color:#777">© Velvet Creators VIP</p>
+  </aside>
 
-  <!-- ===== HEADER ===== -->
-  <header class="top card">
-    <div class="toolbar" style="justify-content:space-between;">
-      <div class="brand">
-        <span class="dot" id="dotLive"></span>
-        <div>
-          <div style="font-weight:800;letter-spacing:.4px">VELVET — Admin</div>
-          <div class="meta">Pilotage de la plateforme • <span id="lastRefresh">—</span></div>
-        </div>
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <input type="text" placeholder="Rechercher (pseudo, email)">
+        <button class="btn-small">Filtrer</button>
       </div>
-      <div class="links">
-        <a href="index.html">Accueil</a>
-        <a href="admin-items.html">Créer un item</a>
-        <a href="#" class="btn ghost" id="btnReload">Rafraîchir</a>
+      <div>
+        <span style="margin-right:12px;">21:40:29</span>
+        <button class="btn-small">Purger inactifs (90 j)</button>
+        <button class="btn-small">Rafraîchir</button>
       </div>
     </div>
-  </header>
 
-  <!-- ===== APERÇU RAPIDE ===== -->
-  <section class="grid">
-    <div class="card" style="grid-column:span 12;">
-      <div class="section-title">
-        <h2>Aperçu en direct</h2>
-        <div class="chip">Auto‑refresh 30s</div>
+    <!-- Stats cards -->
+    <div class="grid-cards">
+      <div class="card">
+        <h3>Utilisateurs en ligne</h3>
+        <div class="value">0</div>
+        <small>dans les 5 dernières minutes</small>
       </div>
-      <div class="tiles">
-        <div class="tile">
-          <div class="l">Utilisateurs en ligne</div>
-          <div class="k" id="kOnline">0</div>
-        </div>
-        <div class="tile">
-          <div class="l">Inscriptions en attente</div>
-          <div class="k" id="kPending">0</div>
-        </div>
-        <div class="tile">
-          <div class="l">Ventes (aujourd’hui)</div>
-          <div class="k"><span id="kSalesToday">0.00</span> <span class="l">CHF</span></div>
-        </div>
-        <div class="tile">
-          <div class="l">Impayé total</div>
-          <div class="k"><span id="kUnpaid">0.00</span> <span class="l">CHF</span></div>
-        </div>
+      <div class="card">
+        <h3>Inscriptions en attente</h3>
+        <div class="value">0</div>
+        <small>à valider</small>
+      </div>
+      <div class="card">
+        <h3>Ventes (aujourd’hui)</h3>
+        <div class="value">0.00 CHF</div>
+        <small>tickets & PPV</small>
+      </div>
+      <div class="card">
+        <h3>Impayé total</h3>
+        <div class="value danger">0.00 CHF</div>
+        <small>à verser aux créatrices</small>
       </div>
     </div>
-  </section>
 
-  <!-- ===== DERNIÈRES VENTES ===== -->
-  <section class="grid mt16">
-    <div class="card" style="grid-column:span 12;">
-      <div class="section-title">
-        <h2>Dernières ventes</h2>
-        <div class="toolbar">
-          <button class="btn ghost" id="btnExportCsv">Exporter CSV</button>
-        </div>
-      </div>
-      <div class="note">Clique “Marquer payé” après ton virement PayPal à la créatrice.</div>
-      <div class="mt8">
-        <table id="tblSales">
-          <thead>
-            <tr>
-              <th>Date</th><th>Créatrice</th><th class="hide-mobile">Type</th>
-              <th class="right">Montant</th><th class="hide-mobile">Txn</th>
-              <th class="hide-mobile">Email client</th><th>Statut</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody><tr><td colspan="8" class="meta">Chargement…</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== COMPTES ===== -->
-  <section class="grid mt16">
-    <div class="card" style="grid-column:span 12;">
-      <div class="section-title">
-        <h2>Comptes</h2>
-        <div class="toolbar">
-          <span class="note">Valider, suspendre ou supprimer. Filtrer par statut, rôle ou recherche.</span>
-        </div>
-      </div>
-      <div class="filters">
-        <select id="fStatus">
-          <option value="">Statut : Tous</option>
-          <option value="pending">En attente</option>
-          <option value="active">Actif</option>
-          <option value="suspended">Suspendu</option>
-        </select>
-        <select id="fRole">
-          <option value="">Rôle : Tous</option>
-          <option value="creatrice">Créatrice</option>
-          <option value="client">Client</option>
-        </select>
-        <input class="input" id="fQuery" placeholder="pseudo / email…" />
-        <button class="btn" id="btnFilter">Filtrer</button>
-      </div>
-
-      <table id="tblUsers">
+    <!-- Dernières ventes -->
+    <div class="section">
+      <h2>Dernières ventes</h2>
+      <table>
         <thead>
-          <tr>
-            <th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Actions</th>
-          </tr>
+          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr>
         </thead>
-        <tbody><tr><td colspan="6" class="meta">Chargement…</td></tr></tbody>
+        <tbody>
+          <tr><td colspan="6">Chargement...</td></tr>
+        </tbody>
       </table>
     </div>
-  </section>
 
-  <!-- ===== RÉCAP PAR CRÉATRICE ===== -->
-  <section class="grid mt16">
-    <div class="card" style="grid-column:span 12;">
-      <div class="section-title">
-        <h2>Récap ventes par créatrice (70% / 30%)</h2>
-      </div>
-      <table id="tblCreators">
+    <!-- Récap ventes par créatrice -->
+    <div class="section">
+      <h2>Récap ventes par créatrice</h2>
+      <table>
         <thead>
-          <tr>
-            <th>Créatrice</th>
-            <th class="right">Ventes (CHF)</th>
-            <th class="right">Pour elle (70%)</th>
-            <th class="right">Pour Velvet (30%)</th>
-            <th class="right">Impayé</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr>
         </thead>
-        <tbody><tr><td colspan="6" class="meta">Chargement…</td></tr></tbody>
+        <tbody>
+          <tr><td colspan="6">Chargement...</td></tr>
+        </tbody>
+      </table>
+      <button class="btn-small" style="margin-top:10px;">Exporter CSV</button>
+    </div>
+
+    <!-- Comptes -->
+    <div class="section">
+      <h2>Comptes — valider / suspendre / supprimer</h2>
+      <p><small>"Suspendre" bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</small></p>
+      <div class="search" style="margin-bottom:10px;">
+        <select><option>Statut : Tous</option></select>
+        <select><option>Rôle : Tous</option></select>
+        <input type="text" placeholder="pseudo / email">
+        <button class="btn-small">Filtrer</button>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6">Erreur chargement utilisateurs</td></tr>
+        </tbody>
       </table>
     </div>
-  </section>
 
-  <!-- ===== Conversations (placeholder) ===== -->
-  <section class="grid mt16">
-    <div class="card" style="grid-column:span 12;">
-      <div class="section-title">
-        <h2>Conversations (aperçu & modération)</h2>
-        <span class="note">Bientôt : fil des derniers messages + modération en direct.</span>
-      </div>
-      <div id="convEmpty" class="meta">—</div>
+    <!-- Détail des ventes -->
+    <div class="section">
+      <h2>Détail des ventes</h2>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8">Chargement...</td></tr>
+        </tbody>
+      </table>
     </div>
-  </section>
-
-  <footer class="grid mt24">
-    <div class="card" style="grid-column:span 12; display:flex; justify-content:space-between; align-items:center;">
-      <div class="note">Velvet Admin • mode live <span id="liveTick" class="mono">…</span></div>
-      <div class="toolbar">
-        <a class="btn gold" href="admin-items.html">+ Créer un item</a>
-        <button class="btn ghost" id="btnReload2">Rafraîchir</button>
-      </div>
-    </div>
-  </footer>
-
-</div>
-
-<!-- ===== LOGIQUE ===== -->
-<script>
-const $ = (sel, ctx=document) => ctx.querySelector(sel);
-const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-const api = (p, opt={}) => fetch(p, { headers:{'Content-Type':'application/json'}, ...opt });
-
-let SALES=[], USERS=[], CREASUM=[], REFRESH_T=null;
-
-function fmtCHF(n){ return Number(n||0).toFixed(2); }
-function setStatus(txt){
-  $("#lastRefresh").textContent = txt + " • " + new Date().toLocaleTimeString();
-}
-
-async function loadAll(){
-  try{
-    const [u, l] = await Promise.all([
-      api('/api/list-users'),         // {users:[{createdAt,username,email,role,status,id}]}
-      api('/api/list-ledger')         // {sales:[{date,creator,amount,type,txn,clientEmail,status,creatorId}], creators:[{creator,total,forCreator,forVelvet,unpaid,creatorId}]}
-    ]);
-    const U = await u.json(); const L = await l.json();
-    USERS   = U.users || [];
-    SALES   = L.sales || [];
-    CREASUM = L.creators || [];
-
-    // tuiles
-    $("#kOnline").textContent   = U.online || 0;
-    $("#kPending").textContent  = (USERS.filter(x=>x.status==='pending').length);
-    $("#kSalesToday").textContent = fmtCHF(L.today || 0);
-    $("#kUnpaid").textContent   = fmtCHF(L.unpaid || 0);
-
-    renderUsers();
-    renderSales();
-    renderCreators();
-
-    setStatus("Données à jour");
-  }catch(err){
-    console.error(err);
-    setStatus("Erreur de chargement");
-  }
-}
-
-/* ===== USERS ===== */
-function renderUsers(){
-  const tbody = $("#tblUsers tbody"); tbody.innerHTML='';
-  const status = $("#fStatus").value, role=$("#fRole").value, q=($("#fQuery").value||'').toLowerCase();
-
-  USERS
-    .filter(u => !status || u.status===status)
-    .filter(u => !role || u.role===role)
-    .filter(u => !q || (u.username?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)))
-    .sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''))
-    .forEach(u=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML = `
-        <td class="mono">${(u.createdAt||'').slice(0,10)}</td>
-        <td>${u.username||'—'}</td>
-        <td class="hide-mobile">${u.email||'—'}</td>
-        <td><span class="badge">${u.role||'—'}</span></td>
-        <td>
-          <span class="badge ${u.status==='active'?'ok':u.status==='pending'?'warn':u.status==='suspended'?'danger':''}">
-            ${u.status||'—'}
-          </span>
-        </td>
-        <td>
-          <div class="toolbar">
-            <button class="btn" data-a="approve" data-id="${u.id}">Valider</button>
-            <button class="btn ghost" data-a="suspend" data-id="${u.id}">Suspendre</button>
-            <button class="btn danger" data-a="delete" data-id="${u.id}">Supprimer</button>
-          </div>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-
-  if(!tbody.children.length){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td colspan="6" class="meta">Aucun résultat…</td>`;
-    tbody.appendChild(tr);
-  }
-}
-
-$("#btnFilter").onclick = renderUsers;
-$("#tblUsers").addEventListener('click', async (e)=>{
-  const b = e.target.closest('button[data-a]'); if(!b) return;
-  const id=b.dataset.id, a=b.dataset.a;
-  if(a==='delete' && !confirm("Supprimer ce compte ?")) return;
-
-  const r = await api('/api/moderate', { method:'POST', body:JSON.stringify({ action:a, userId:id }) });
-  if(!r.ok){ alert('Erreur action'); return;}
-  await loadAll();
-});
-
-/* ===== SALES ===== */
-function renderSales(){
-  const tbody = $("#tblSales tbody"); tbody.innerHTML='';
-  SALES
-    .slice() .sort((a,b)=> (b.date||'').localeCompare(a.date||''))
-    .forEach(s=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td class="mono">${(s.date||'').replace('T',' ').slice(0,16)}</td>
-        <td>${s.creator||'—'}</td>
-        <td class="hide-mobile">${s.type||'—'}</td>
-        <td class="right mono">${fmtCHF(s.amount||0)}</td>
-        <td class="hide-mobile mono">${s.txn||'—'}</td>
-        <td class="hide-mobile">${s.clientEmail||'—'}</td>
-        <td>${s.paid ? '<span class="badge ok">payé</span>' : '<span class="badge warn">impayé</span>'}</td>
-        <td>
-          ${s.paid ? '—' : `<button class="btn" data-mark="${s.id}">Marquer payé</button>`}
-        </td>`;
-      tbody.appendChild(tr);
-    });
-
-  if(!tbody.children.length){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td colspan="8" class="meta">Aucune vente pour l’instant…</td>`;
-    tbody.appendChild(tr);
-  }
-}
-
-$("#tblSales").addEventListener('click', async (e)=>{
-  const b = e.target.closest('button[data-mark]'); if(!b) return;
-  const id = b.dataset.mark;
-  if(!confirm("Confirmer : marquer cette vente comme versée à la créatrice ?")) return;
-  const r = await api('/api/mark-paid', { method:'POST', body:JSON.stringify({ saleId:id }) });
-  if(!r.ok){ alert('Erreur /api/mark-paid'); return; }
-  await loadAll();
-});
-
-function exportCSV(rows, filename='velvet_sales.csv'){
-  const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
-  const head = ['date','creator','type','amount','txn','clientEmail','paid'];
-  const lines = [head.map(esc).join(',')]
-    .concat(rows.map(r=> head.map(k=>esc(r[k])).join(',')));
-  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = filename; a.click();
-  URL.revokeObjectURL(a.href);
-}
-$("#btnExportCsv").onclick = ()=> exportCSV(SALES);
-
-/* ===== RECAP CRÉATRICES ===== */
-function renderCreators(){
-  const tbody = $("#tblCreators tbody"); tbody.innerHTML='';
-  CREASUM.forEach(c=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${c.creator||'—'}</td>
-      <td class="right mono">${fmtCHF(c.total||0)}</td>
-      <td class="right mono">${fmtCHF(c.forCreator||0)}</td>
-      <td class="right mono">${fmtCHF(c.forVelvet||0)}</td>
-      <td class="right mono">${fmtCHF(c.unpaid||0)}</td>
-      <td>${(c.unpaid>0)? `<button class="btn" data-mark-all="${c.creatorId}">Tout payer</button>`:'—'}</td>`;
-    tbody.appendChild(tr);
-  });
-  if(!tbody.children.length){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td colspan="6" class="meta">Aucune donnée…</td>`;
-    tbody.appendChild(tr);
-  }
-}
-$("#tblCreators").addEventListener('click', async (e)=>{
-  const b = e.target.closest('button[data-mark-all]'); if(!b) return;
-  const id=b.dataset.markAll;
-  if(!confirm("Marquer toutes les ventes impayées de cette créatrice comme payées ?")) return;
-  const r = await api('/api/mark-paid', { method:'POST', body:JSON.stringify({ creatorId:id }) });
-  if(!r.ok){ alert('Erreur /api/mark-paid'); return; }
-  await loadAll();
-});
-
-/* ===== LIVE TICK + AUTO REFRESH ===== */
-function startLive(){
-  let t=0; clearInterval(REFRESH_T);
-  REFRESH_T = setInterval(()=>{ $("#liveTick").textContent = 't+'+(++t)+'s'; if(t%30===0) loadAll(); }, 1000);
-}
-$("#btnReload").onclick = loadAll;
-$("#btnReload2").onclick = loadAll;
-
-/* ===== INIT ===== */
-(async function init(){
-  $("#dotLive").style.background = 'radial-gradient(circle at 35% 35%, #6ff0c0, #02b67a 60%)';
-  await loadAll();
-  startLive();
-})();
-</script>
+  </main>
 </body>
 </html>
