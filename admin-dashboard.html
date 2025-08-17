@@ -1,484 +1,414 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Velvet — Admin Dashboard</title>
-
-<!-- ====== THEME (noir & or) ====== -->
-<style>
-:root{
-  --bg:#0b0b0c; --panel:#121214; --line:#2a2a2f; --ink:#e6e0e9;
-  --gold:#d4af37; --muted:#a6a6ad; --radius:14px;
-  --shadow: 10px 28px 28px rgba(0,0,0,.55);
-  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--font);
-}
-.header{position:sticky;top:0;z-index:10;background:#0f0f11;border-bottom:1px solid var(--line)}
-.wrap{max-width:1200px;margin:0 auto;padding:20px}
-h1,h2,h3{margin:0 0 12px}
-a{color:var(--gold);text-decoration:none}
-a.btn,button.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  background:linear-gradient(135deg,#2b2720,#12100b);
-  color:var(--gold);border:1px solid #3b3325;border-radius:10px;
-  padding:9px 14px;box-shadow:var(--shadow);cursor:pointer;
-}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-@media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:640px){.grid{grid-template-columns:1fr}}
-.card{
-  background:radial-gradient(120% 120% at 90% 10%,rgba(212,175,55,.10) 0%,rgba(18,18,20,1) 55%);
-  border:1px solid #2c2b26;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);
-}
-.card h3{font-weight:700;color:var(--gold);letter-spacing:.3px;margin-bottom:8px}
-.kpi{font-size:26px;font-weight:800;color:#f4e6b3}
-.table{
-  width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:10px
-}
-.table th,.table td{padding:10px 12px}
-.table thead th{font-size:12px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--line)}
-.table tbody tr{background:linear-gradient(180deg,#141416,#121214)}
-.table tbody tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
-.table tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
-.input,.select{
-  width:100%;background:#101012;border:1px solid var(--line);color:var(--ink);
-  border-radius:10px;padding:10px 12px;outline:none
-}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid #3b3325;color:#f1e3a6;background:linear-gradient(135deg,#2b2720,#12100b)}
-.panel{background:#101012;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
-hr{border:0;height:1px;background:var(--line);margin:16px 0}
-footer{padding:16px;color:var(--muted);text-align:center}
-</style>
-:root{
-  --bg:#0b0b0c;
-  --panel:#121214;
-  --panel-2:#17171a;
-  --line:#2a2a2f;
-  --ink:#e6e6e9;
-  --mute:#a6a6ad;
-  --gold:#d4af37;
-  --gold-2:#c39a2e;
-  --danger:#ff4d4d;
-  --ok:#40c463;
-  --cta:#1f6feb;
-  --chip:#232329;
-  --radius:14px;
-  --shadow:0 10px 28px rgba(0,0,0,.55);
-  --shadow-soft:0 6px 20px rgba(0,0,0,.35);
-  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);
-}
-
-/* Layout */
-.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-@media (max-width:980px){ .app{grid-template-columns:1fr} .sidebar{position:sticky;top:0;z-index:20} }
-
-.sidebar{
-  background:linear-gradient(180deg,#0e0e10, #121216 60%, #0e0e10);
-  border-right:1px solid var(--line);
-  padding:18px 14px; box-shadow:var(--shadow-soft);
-}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.brand .logo{width:28px;height:28px;border-radius:8px;background:radial-gradient(circle at 40% 35%,var(--gold),#7b5b14);box-shadow:0 0 0 2px #1a1a1a, inset 0 0 12px rgba(0,0,0,.4)}
-.brand h1{font-size:17px;letter-spacing:.4px;margin:0}
-.brand small{color:var(--mute)}
-.nav{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.nav a{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);
-  background:transparent;border:1px solid transparent;
-}
-.nav a .ico{width:22px;text-align:center;opacity:.9}
-.nav a.active, .nav a:hover{background:var(--chip);border-color:var(--line)}
-.sep{margin:12px 6px;border-bottom:1px dashed var(--line)}
-
-.main{background:var(--bg)}
-.header{
-  position:sticky;top:0;z-index:10;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:14px 18px;border-bottom:1px solid var(--line);background:#0b0b0ce6;backdrop-filter:saturate(120%) blur(8px)
-}
-.header .path{color:var(--mute);font-size:13px}
-.header .path b{color:var(--ink)}
-.header .actions{display:flex;gap:10px;align-items:center}
-.btn{
-  padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
-  color:var(--ink);text-decoration:none;cursor:pointer;box-shadow:var(--shadow-soft)
-}
-.btn:hover{filter:brightness(1.05)}
-.btn.gold{background:linear-gradient(180deg,var(--gold),var(--gold-2));color:#161616;border-color:#6f5a19}
-.btn.ghost{background:transparent}
-.btn.danger{background:#2a1416;border-color:#5a2a2e;color:#ffb0b6}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#1b1b1f;border:1px solid var(--line);font-size:12px;color:var(--mute)}
-
-.wrap{padding:18px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-@media (max-width:1100px){ .grid{grid-template-columns:repeat(6,1fr)} }
-@media (max-width:700px){ .grid{grid-template-columns:repeat(2,1fr)} }
-
-.card{
-  grid-column:span 3; background:var(--panel); border:1px solid var(--line); border-radius:16px;
-  padding:16px; box-shadow:var(--shadow)
-}
-.card.wide{grid-column:span 12}
-.card.h6{grid-column:span 6}
-.kpi{display:flex;align-items:center;justify-content:space-between}
-.kpi .k{font:600 13px var(--font);color:var(--mute)}
-.kpi .v{font-size:22px}
-.kpi .v.gold{color:var(--gold)}
-
-.table{
-  width:100%;border-collapse:separate;border-spacing:0;background:var(--panel-2);
-  border:1px solid var(--line);border-radius:14px;overflow:hidden
-}
-.table th, .table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
-.table th{background:#111116;color:#bdbdc4;font-weight:600}
-.table tr:hover td{background:#141418}
-.table .actions{display:flex;gap:6px}
-.filterbar{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.input, select{
-  background:#111114;border:1px solid var(--line);border-radius:10px;color:var(--ink);
-  padding:9px 10px;outline:none;min-width:120px
-}
-.input::placeholder{color:#8e8e96}
-.status{padding:2px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px}
-.status.ok{background:#0e2616;color:#79e0a1;border-color:#12472a}
-.status.pending{background:#262011;color:#f0d08a;border-color:#5a4a19}
-.status.sus{background:#261b1b;color:#f3a1a8;border-color:#5a2a2e}
-
-/* Footer */
-.footer{padding:18px;color:var(--mute);text-align:center;border-top:1px solid var(--line);margin-top:8px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Velvet — Admin Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --panel:#121214;
+      --panel-2:#17171a;
+      --line:#2a2a2f;
+      --ink:#e6e6e9;
+      --muted:#9aa0a6;
+      --gold:#d4af37;
+      --gold-2:#c39a2e;
+      --ok:#34d399;
+      --danger:#ff6b6b;
+      --chip:#232329;
+      --shadow: 0 10px 28px rgba(0,0,0,.45);
+      --radius:14px;
+    }
+    *,*:before,*:after{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; background:linear-gradient(180deg,#0a0a0a 0%, #0c0c0e 100%);
+      color:var(--ink); font:15px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial, sans-serif;
+    }
+    a{ color:var(--gold) ; text-decoration:none }
+    a:hover{ opacity:.9 }
+    .layout{ display:grid; grid-template-columns: 260px 1fr; min-height:100vh }
+    .sidebar{
+      background:var(--panel);
+      border-right:1px solid var(--line);
+      padding:18px 14px; position:sticky; top:0; height:100vh; overflow:auto;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; margin-bottom:18px }
+    .brand .logo{
+      width:30px;height:30px;border-radius:8px;
+      background: radial-gradient(120% 120% at 20% 20%, var(--gold) , #7e5e10);
+      box-shadow: 0 4px 18px rgba(212,175,55,.3);
+    }
+    .brand h1{ font-size:15px; margin:0; letter-spacing:.12em; text-transform:uppercase; color:var(--ink) }
+    .nav{ display:flex; flex-direction:column; gap:6px; margin-top:8px }
+    .nav a{
+      display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px;
+      color:var(--ink); background:transparent; border:1px solid transparent;
+    }
+    .nav a.active, .nav a:hover{
+      background:var(--panel-2); border-color:var(--line);
+    }
+    .chip{ background:var(--chip); border:1px solid var(--line); color:var(--muted);
+      padding:4px 8px; border-radius:999px; font-size:12px }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center; padding:16px 22px;
+      border-bottom:1px solid var(--line); background:rgba(0,0,0,.2); position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(8px);
+    }
+    .btn{
+      background:linear-gradient(180deg,var(--gold),var(--gold-2));
+      border:0; color:#111; font-weight:700; border-radius:10px; padding:10px 14px; cursor:pointer
+    }
+    .btn.ghost{ background:transparent; color:var(--gold); border:1px solid var(--gold) }
+    .btn.small{ padding:6px 10px; font-size:12px }
+    .content{ padding:22px; display:grid; gap:18px }
+    .cards{ display:grid; grid-template-columns: repeat(4,minmax(220px,1fr)); gap:16px }
+    @media (max-width:1100px){ .layout{ grid-template-columns: 84px 1fr } .nav a span{ display:none } .cards{ grid-template-columns: repeat(2,minmax(220px,1fr)); } }
+    @media (max-width:700px){ .cards{ grid-template-columns: 1fr } }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+      border:1px solid var(--line); border-radius: var(--radius); padding:16px; box-shadow:var(--shadow)
+    }
+    .card h3{ margin:0 0 8px; font-size:14px; color:var(--muted); font-weight:600 }
+    .card .big{ font-size:28px; font-weight:800; letter-spacing:.02em }
+    .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:16px }
+    .grid-1{ display:grid; grid-template-columns: 1fr; gap:16px }
+    .panel{ background:var(--panel); border:1px solid var(--line); border-radius: var(--radius); padding:16px; box-shadow:var(--shadow) }
+    table{ width:100%; border-collapse:collapse; font-size:14px }
+    th, td{ padding:10px 12px; border-bottom:1px solid var(--line) }
+    th{ text-align:left; color:var(--muted); font-weight:700; letter-spacing:.02em }
+    tr:hover td{ background:rgba(255,255,255,.02) }
+    .status{ padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--line); background:var(--chip) }
+    .ok{ color:var(--ok) } .bad{ color:var(--danger) }
+    .muted{ color:var(--muted) }
+    .right{ text-align:right }
+    .search{ display:flex; gap:8px }
+    input, select{
+      background:#0f0f11; border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:10px 12px; outline:none;
+    }
+    .footer{ color:var(--muted); font-size:12px; padding:10px 0 0 }
+    .pulse{ position:relative }
+    .pulse:after{ content:''; position:absolute; right:-6px; top:-6px; width:10px; height:10px; border-radius:50%; background:var(--ok);
+      box-shadow:0 0 0 0 rgba(52,211,153,.7); animation:pulse 2s infinite }
+    @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(52,211,153,.7) } 70%{ box-shadow:0 0 0 12px rgba(52,211,153,0) } 100%{ box-shadow:0 0 0 0 rgba(52,211,153,0) } }
+  </style>
 </head>
-
 <body>
-<div class="app">
-  <!-- ====== SIDEBAR ====== -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo"></div>
-      <div>
-        <h1>VELVET <small>admin</small></h1>
-        <small>Creators VIP</small>
-      </div>
-    </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo"></div><h1>VELVET admin</h1></div>
+      <nav class="nav">
+        <a href="#overview" class="active">🏠 <span>Aperçu</span></a>
+        <a href="#accounts">👤 <span>Comptes</span></a>
+        <a href="#sales">💳 <span>Ventes</span></a>
+        <a href="#conversations">💬 <span>Conversations</span></a>
+        <a href="#lives">🎥 <span>Lives</span></a>
+        <a href="admin-items.html" class="ghost">🧰 <span>Créer un item</span></a>
+      </nav>
+      <div class="footer">© Velvet Creators VIP</div>
+    </aside>
 
-    <nav class="nav">
-      <a href="#" class="active" data-tab="overview"><span class="ico">🏠</span> Aperçu</a>
-      <a href="#" data-tab="accounts"><span class="ico">👥</span> Comptes</a>
-      <a href="#" data-tab="sales"><span class="ico">💳</span> Ventes</a>
-      <a href="#" data-tab="chat"><span class="ico">💬</span> Conversations</a>
-      <a href="#" data-tab="live"><span class="ico">📡</span> Lives</a>
-      <div class="sep"></div>
-      <a href="admin-items.html"><span class="ico">🧰</span> Créer un item</a>
-      <a href="index.html"><span class="ico">🏷️</span> Accueil site</a>
-    </nav>
-  </aside>
-
-  <!-- ====== MAIN ====== -->
-  <section class="main">
-    <header class="header">
-      <div class="path">Velvet • <b>Dashboard</b> <span class="badge" id="lastStatus">…</span></div>
-      <div class="actions">
-        <button class="btn gold" id="reloadAll">Rafraîchir</button>
-        <a class="btn ghost" href="login.html">Déconnexion</a>
-      </div>
-    </header>
-
-    <div class="wrap">
-      <!-- ====== APERÇU ====== -->
-      <div class="grid" id="tab-overview">
-        <div class="card">
-          <div class="kpi"><div class="k">Utilisateurs en ligne</div><div class="v" id="k-online">0</div></div>
-          <small class="mute">Sur les 5 dernières minutes</small>
+    <main>
+      <div class="topbar">
+        <div class="search">
+          <input id="q" placeholder="Rechercher (pseudo, email…)" />
+          <button class="btn small" id="btnSearch">Filtrer</button>
+          <span class="chip" id="lastRefresh">—</span>
         </div>
-        <div class="card">
-          <div class="kpi"><div class="k">Inscriptions en attente</div><div class="v" id="k-pending">0</div></div>
-          <small class="mute">à valider</small>
-        </div>
-        <div class="card">
-          <div class="kpi"><div class="k">Ventes (aujourd’hui)</div><div class="v gold" id="k-today">0.00 CHF</div></div>
-          <small class="mute">tickets & PPV</small>
-        </div>
-        <div class="card">
-          <div class="kpi"><div class="k">Impayé total</div><div class="v" id="k-unpaid">0.00 CHF</div></div>
-          <small class="mute">à verser aux créatrices</small>
-        </div>
-
-        <div class="card wide">
-          <h3 style="margin:0 0 10px">Dernières ventes</h3>
-          <table class="table" id="tbl-lastSales">
-            <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Client</th><th>Statut</th><th>Action</th></tr></thead>
-            <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
-          </table>
+        <div class="actions">
+          <button class="btn ghost" id="btnPrune">🧹 Purger inactifs (90 j)</button>
+          <button class="btn ghost" id="btnReload">Rafraîchir</button>
         </div>
       </div>
 
-      <!-- ====== COMPTES ====== -->
-      <div class="grid" id="tab-accounts" style="display:none">
-        <div class="card h6">
-          <h3 style="margin:0 0 8px">Filtrer</h3>
-          <div class="filterbar">
-            <select id="f-status">
+      <div class="content" id="overview">
+        <section class="cards">
+          <div class="card"><h3>Utilisateurs en ligne</h3><div class="big pulse" id="k-online">0</div><div class="muted">dans les 5 dernières minutes</div></div>
+          <div class="card"><h3>Inscriptions en attente</h3><div class="big" id="k-pending">0</div><div class="muted">à valider</div></div>
+          <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="big" id="k-today">0.00 CHF</div><div class="muted">tickets & PPV</div></div>
+          <div class="card"><h3>Impayé total</h3><div class="big bad" id="k-unpaid">0.00 CHF</div><div class="muted">à verser aux créatrices</div></div>
+        </section>
+
+        <section class="grid-2">
+          <div class="panel">
+            <h3>Dernières ventes</h3>
+            <table id="tbl-latest">
+              <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Client</th><th>Action</th></tr></thead>
+              <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Récap ventes par créatrice</h3>
+            <table id="tbl-creators">
+              <thead><tr><th>Créatrice</th><th class="right">Ventes (CHF)</th><th class="right">Pour elle (70%)</th><th class="right">Pour Velvet (30%)</th><th class="right">Impayé</th><th>Action</th></tr></thead>
+              <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+            </table>
+            <div class="right" style="margin-top:10px">
+              <button class="btn small" id="exportCSV">Exporter CSV</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="accounts" class="panel">
+          <h3>Comptes — valider / suspendre / supprimer</h3>
+          <div class="muted" style="margin:6px 0 10px">“Suspendre” bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</div>
+          <div class="search" style="margin-bottom:10px">
+            <select id="fStatus">
               <option value="">Statut : Tous</option>
-              <option value="pending">En attente</option>
-              <option value="active">Actifs</option>
-              <option value="suspended">Suspendus</option>
+              <option value="pending">pending</option>
+              <option value="active">active</option>
+              <option value="suspended">suspended</option>
             </select>
-            <select id="f-role">
+            <select id="fRole">
               <option value="">Rôle : Tous</option>
-              <option value="creatrice">Créatrices</option>
-              <option value="client">Clients</option>
+              <option value="creatrice">creatrice</option>
+              <option value="client">client</option>
             </select>
-            <input class="input" id="f-q" placeholder="pseudo / email…"/>
-            <button class="btn" id="btnFilter">Filtrer</button>
+            <input id="fQuery" placeholder="pseudo / email…"/>
+            <button class="btn small" id="btnFilter">Filtrer</button>
           </div>
 
-          <table class="table" id="tbl-users">
+          <table id="tbl-users">
             <thead><tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Action</th></tr></thead>
             <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
           </table>
-        </div>
+        </section>
 
-        <div class="card h6">
-          <h3 style="margin:0 0 8px">Récap ventes par créatrice</h3>
-          <table class="table" id="tbl-creators">
-            <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
-            <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ====== VENTES ====== -->
-      <div class="grid" id="tab-sales" style="display:none">
-        <div class="card wide">
-          <h3 style="margin:0 0 8px">Détail des ventes</h3>
-          <table class="table" id="tbl-sales">
-            <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
+        <section id="sales" class="panel">
+          <h3>Détail des ventes</h3>
+          <table id="tbl-sales">
+            <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
             <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
           </table>
-        </div>
+        </section>
+
+        <section id="conversations" class="panel">
+          <h3>Conversations (aperçu)</h3>
+          <div id="chatBox" class="muted">Indisponible.</div>
+        </section>
+
+        <section id="lives" class="panel">
+          <h3>Lives en cours / à venir</h3>
+          <div id="liveBox" class="muted">Indisponible.</div>
+        </section>
+
       </div>
+    </main>
+  </div>
 
-      <!-- ====== CONVERSATIONS (placeholder) ====== -->
-      <div class="grid" id="tab-chat" style="display:none">
-        <div class="card wide">
-          <h3 style="margin:0 0 8px">Conversations (aperçu)</h3>
-          <p class="badge">Bientôt : fil des derniers messages + modération</p>
-          <div id="chatBox" style="margin-top:10px">Chargement…</div>
-        </div>
-      </div>
-
-      <!-- ====== LIVES (placeholder) ====== -->
-      <div class="grid" id="tab-live" style="display:none">
-        <div class="card wide">
-          <h3 style="margin:0 0 8px">Lives en cours / à venir</h3>
-          <div id="liveBox">Chargement…</div>
-        </div>
-      </div>
-
-      <div class="footer">© Velvet Creators VIP</div>
-    </div>
-  </section>
-</div>
-
-<!-- ====== JS (connexion aux endpoints existants) ====== -->
-<script>
-// util
-const $ = (s,rt=document)=>rt.querySelector(s);
-const $$ = (s,rt=document)=>[...rt.querySelectorAll(s)];
-const api = (p, opt={}) => fetch(p, { headers:{'Content-Type':'application/json'}, ...opt });
-const money = n => (Number(n||0)).toFixed(2)+' CHF';
-const setStatus = (t)=> $("#lastStatus").textContent = t;
-
-// Tabs
-$$('.nav a[data-tab]').forEach(a=>{
-  a.onclick=e=>{
-    e.preventDefault();
-    $$('.nav a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    const tab = a.dataset.tab;
-    ['overview','accounts','sales','chat','live'].forEach(id=>{
-      $('#tab-'+id).style.display = (id===tab)?'grid':'none';
-    });
+  <script>
+  // ====== CONFIG ENDPOINTS ======
+  const ENDPOINTS = {
+    listUsers:       '/api/list-users',
+    updateUser:      '/api/update-user',
+    listLedger:      '/api/list-ledger',
+    markPaid:        '/api/mark-paid',
+    listConversations:'/api/list-conversations',
+    listLives:       '/api/list-lives',
+    pruneUsers:      '/api/prune-users'
   };
-});
 
-// ===== Données =====
-async function loadUsers() {
-  try{
-    const qs = new URLSearchParams();
-    const st = $('#f-status').value, role = $('#f-role').value, q = $('#f-q').value.trim();
-    if(st) qs.set('status', st);
-    if(role) qs.set('role', role);
-    if(q) qs.set('q', q);
-    const r = await api('/api/list-users?'+qs.toString());
-    const data = await r.json();
-    const tb = $('#tbl-users tbody');
-    tb.innerHTML = '';
-    (data.users||[]).forEach(u=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${new Date(u.createdAt||u.created||Date.now()).toLocaleDateString()}</td>
-        <td>${u.username||u.pseudo||'—'}</td>
-        <td>${u.email||'—'}</td>
-        <td>${u.role||'—'}</td>
-        <td><span class="status ${u.status==='active'?'ok':u.status==='suspended'?'sus':'pending'}">${u.status}</span></td>
-        <td class="actions">
-          <button class="btn" data-act="approve" data-id="${u.id}">Valider</button>
-          <button class="btn" data-act="suspend" data-id="${u.id}">Suspendre</button>
-          <button class="btn danger" data-act="delete" data-id="${u.id}">Supprimer</button>
-        </td>`;
-      tb.appendChild(tr);
-    });
-    $('#k-pending').textContent = (data.users||[]).filter(x=>x.status==='pending').length;
-  }catch(e){
-    $('#tbl-users tbody').innerHTML = `<tr><td colspan="6">Erreur chargement utilisateurs</td></tr>`;
+  const $ = (s,rt=document)=>rt.querySelector(s);
+  const $$ = (s,rt=document)=>[...rt.querySelectorAll(s)];
+  const CHF = (n)=> (Number(n||0)).toFixed(2)+' CHF';
+
+  function setLastRefresh(){
+    const el = $('#lastRefresh');
+    if(el) el.textContent = new Date().toLocaleTimeString();
   }
-}
-async function moderateUser(action,id){
-  const reason = (action==='suspend') ? prompt('Motif de suspension ?','Modération') : undefined;
-  const body = { action, userId:id, reason };
-  const r = await api('/api/moderate',{method:'POST',body:JSON.stringify(body)});
-  if(r.ok){ setStatus('Comptes: '+action+' ✔'); loadUsers(); } else alert('Erreur modération');
-}
-document.addEventListener('click',(e)=>{
-  const b = e.target.closest('button[data-act]');
-  if(!b) return;
-  moderateUser(b.dataset.act, b.dataset.id);
-});
 
-async function loadLedger() {
-  try{
-    const r = await api('/api/list-ledger');
+  // ====== LOAD USERS ======
+  async function loadUsers(){
+    try{
+      const qs = new URLSearchParams();
+      const st = $('#fStatus').value, role = $('#fRole').value, q = $('#fQuery').value.trim();
+      if(st) qs.set('status', st);
+      if(role) qs.set('role', role);
+      if(q) qs.set('q', q);
+
+      const r = await fetch(ENDPOINTS.listUsers + (qs.toString() ? ('?'+qs.toString()) : ''));
+      const j = await r.json();
+      const users = j.users || j || [];
+
+      // pending count
+      $('#k-pending').textContent = users.filter(u=>u.status==='pending').length;
+
+      const tb = $('#tbl-users tbody'); tb.innerHTML = '';
+      if(!users.length){ tb.innerHTML = '<tr><td colspan="6">Aucun compte</td></tr>'; return; }
+
+      users.forEach(u=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(u.createdAt||u.created||Date.now()).toLocaleDateString()}</td>
+          <td>${u.username||u.pseudo||'—'}</td>
+          <td>${u.email||'—'}</td>
+          <td>${u.role||'—'}</td>
+          <td><span class="status ${u.status==='active'?'ok':(u.status==='suspended'?'bad':'')}">${u.status||'-'}</span></td>
+          <td>
+            <button class="btn small" data-act="approve" data-id="${u.id}">Valider</button>
+            <button class="btn small" data-act="suspend" data-id="${u.id}">Suspendre</button>
+            <button class="btn small" data-act="delete" data-id="${u.id}">Supprimer</button>
+          </td>`;
+        tb.appendChild(tr);
+      });
+    }catch(e){
+      $('#tbl-users tbody').innerHTML = '<tr><td colspan="6">Erreur chargement utilisateurs</td></tr>';
+    }
+  }
+
+  // ====== LOAD LEDGER ======
+  async function loadLedger(){
+    try{
+      const r = await fetch(ENDPOINTS.listLedger);
+      const j = await r.json();
+      const items = j.items || j.sales || [];
+      const latest = [...items].sort((a,b)=> new Date(b.date||0)-new Date(a.date||0)).slice(0,10);
+
+      // KPIs
+      const today = new Date(); today.setHours(0,0,0,0);
+      const todaySum = items.filter(x=> new Date(x.date||0) >= today )
+                            .reduce((s,x)=> s + Number(x.amount||0), 0);
+      const unpaidSum = items.filter(x=> !x.paid)
+                             .reduce((s,x)=> s + Number(x.amount||0), 0);
+      $('#k-today').textContent = CHF( j.today ?? todaySum );
+      $('#k-unpaid').textContent = CHF( j.unpaidTotal ?? unpaidSum );
+
+      // Dernières ventes
+      const tb0 = $('#tbl-latest tbody'); tb0.innerHTML = '';
+      latest.forEach(s=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(s.date||Date.now()).toLocaleString()}</td>
+          <td>${s.creatorName||s.creator||'—'}</td>
+          <td>${s.type||'ppv'}</td>
+          <td class="right">${CHF(s.amount)}</td>
+          <td>${s.clientEmail||'—'}</td>
+          <td>${s.paid?'':'<button class="btn small" data-pay="'+(s.id||'')+'">Marquer payé</button>'}</td>`;
+        tb0.appendChild(tr);
+      });
+      if(!latest.length){ tb0.innerHTML = '<tr><td colspan="6">Aucune vente</td></tr>'; }
+
+      // Détail ventes (sales table)
+      const tb = $('#tbl-sales tbody'); tb.innerHTML = '';
+      items.slice(0,50).forEach(s=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${new Date(s.date||Date.now()).toLocaleString()}</td>
+          <td>${s.creatorName||s.creator||'—'}</td>
+          <td>${s.type||'ppv'}</td>
+          <td class="right">${CHF(s.amount)}</td>
+          <td><code>${s.txn||'—'}</code></td>
+          <td>${s.clientEmail||'—'}</td>
+          <td><span class="status ${s.paid?'ok':''}">${s.paid?'payé':'impayé'}</span></td>
+          <td>${s.paid?'':'<button class="btn small" data-pay="'+(s.id||'')+'">Marquer payé</button>'}</td>`;
+        tb.appendChild(tr);
+      });
+
+      // Par créatrice
+      const by = {};
+      items.forEach(s=>{
+        const id = s.creatorId || s.creator || '—';
+        by[id] ??= { name: s.creatorName || s.creator || id, total:0, unpaid:0 };
+        by[id].total += Number(s.amount||0);
+        if(!s.paid) by[id].unpaid += Number(s.amount||0);
+      });
+      const tb2 = $('#tbl-creators tbody'); tb2.innerHTML = '';
+      Object.values(by).sort((a,b)=>b.total-a.total).forEach(c=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.name}</td>
+          <td class="right">${CHF(c.total)}</td>
+          <td class="right">${CHF(c.total*0.7)}</td>
+          <td class="right">${CHF(c.total*0.3)}</td>
+          <td class="right">${CHF(c.unpaid)}</td>
+          <td>${c.unpaid>0?'<button class="btn small" data-pay-creator="'+(c.name||'')+'">Marquer payés</button>':''}</td>`;
+        tb2.appendChild(tr);
+      });
+      if(!Object.keys(by).length){ tb2.innerHTML = '<tr><td colspan="6">Aucune donnée</td></tr>'; }
+
+    }catch(e){
+      $('#tbl-sales tbody').innerHTML = '<tr><td colspan="8">Erreur chargement ventes</td></tr>';
+    }
+  }
+
+  // ====== LOAD CHAT & LIVE (placeholders si non branchés) ======
+  async function loadConversations(){
+    const box = $('#chatBox');
+    try{
+      const r = await fetch(ENDPOINTS.listConversations);
+      const j = await r.json();
+      box.innerHTML = (j.items||[]).slice(0,20).map(m=>`
+        <div style="padding:10px;border-bottom:1px solid var(--line)">
+          <b>${m.creator||'—'}</b> → <span>${m.client||'—'}</span>
+          <span class="chip">${new Date(m.date||Date.now()).toLocaleString()}</span><br/>
+          <span class="muted">${(m.lastMsg||'').slice(0,160)}</span>
+        </div>
+      `).join('') || '<p>Aucune conversation.</p>';
+    }catch(e){ box.textContent='Indisponible.'; }
+  }
+  async function loadLive(){
+    const box = $('#liveBox');
+    try{
+      const r = await fetch(ENDPOINTS.listLives);
+      const j = await r.json();
+      box.innerHTML = (j.items||[]).map(x=>`
+        <div style="padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--panel)">
+          <b>${x.title||'Live privé'}</b> — <span class="chip">${x.status||'à venir'}</span><br/>
+          <small class="muted">Salle: ${x.room||'-'} • Début: ${new Date(x.start||Date.now()).toLocaleString()}</small>
+        </div>
+      `).join('') || '<p>Aucun live.</p>';
+    }catch(e){ box.textContent='Indisponible.'; }
+  }
+
+  // ====== ACTIONS ======
+  document.addEventListener('click', async (e)=>{
+    const pay = e.target.closest('button[data-pay]');
+    if(pay){
+      if(!confirm('Confirmer marquer PAYÉ cette vente ?')) return;
+      const r = await fetch(ENDPOINTS.markPaid, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ saleId: pay.dataset.pay }) });
+      if(r.ok){ await loadLedger(); }
+      return;
+    }
+    const payCreator = e.target.closest('button[data-pay-creator]');
+    if(payCreator){
+      if(!confirm('Marquer comme payés tous les impayés de cette créatrice ?')) return;
+      const r = await fetch(ENDPOINTS.markPaid, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ creatorName: payCreator.dataset.payCreator }) });
+      if(r.ok){ await loadLedger(); }
+      return;
+    }
+    const actBtn = e.target.closest('button[data-act]');
+    if(actBtn){
+      const id = actBtn.dataset.id, act = actBtn.dataset.act;
+      let body = { id };
+      if(act==='approve'){ body.status='active'; }
+      if(act==='suspend'){ body.status='suspended'; body.reason = prompt('Motif (optionnel) :',''); }
+      if(act==='delete'){ if(!confirm('Supprimer définitivement ce profil ?')) return; body.delete=true; }
+      const r = await fetch(ENDPOINTS.updateUser, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      if(r.ok){ await loadUsers(); }
+      return;
+    }
+  });
+
+  $('#btnFilter').onclick = loadUsers;
+  $('#btnSearch').onclick = ()=>{ $('#fQuery').value = $('#q').value; loadUsers(); };
+  $('#btnReload').onclick = ()=>{ loadUsers(); loadLedger(); loadConversations(); loadLive(); setLastRefresh(); };
+
+  // Purge 90 j
+  $('#btnPrune').onclick = async ()=>{
+    const ok = confirm('Confirmer la purge des comptes inactifs (≥ 90 jours) ?');
+    if(!ok) return;
+    const r = await fetch(ENDPOINTS.pruneUsers);
     const j = await r.json();
+    alert(j.success ? `Purge OK — Supprimés: ${j.deleted} / Vérifiés: ${j.checked}` : ('Échec purge: '+(j.error||'inconnu')));
+    loadUsers();
+  };
 
-    // KPIs
-    $('#k-today').textContent = money(j.today||0);
-    $('#k-unpaid').textContent = money(j.unpaidTotal||0);
+  // Auto-refresh toutes les 30 s
+  setInterval(()=>{ $('#btnReload').click(); }, 30000);
 
-    // Dernières ventes
-    const tb0 = $('#tbl-lastSales tbody');
-    tb0.innerHTML='';
-    (j.last||[]).forEach(s=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${new Date(s.date||Date.now()).toLocaleString()}</td>
-        <td>${s.creator||'—'}</td>
-        <td>${s.type||'ppv'}</td>
-        <td>${money(s.amount)}</td>
-        <td><code style="font-family:var(--mono)">${s.txn||'—'}</code></td>
-        <td>${s.clientEmail||'—'}</td>
-        <td><span class="status ${s.paid?'ok':'pending'}">${s.paid?'payé':'impayé'}</span></td>
-        <td class="actions">
-          ${s.paid?'':`<button class="btn gold" data-pay="${s.id}">Marquer payé</button>`}
-        </td>`;
-      tb0.appendChild(tr);
-    });
-
-    // Détail ventes
-    const tb = $('#tbl-sales tbody');
-    tb.innerHTML='';
-    (j.sales||[]).forEach(s=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${new Date(s.date||Date.now()).toLocaleString()}</td>
-        <td>${s.creator||'—'}</td>
-        <td>${s.type||'ppv'}</td>
-        <td>${money(s.amount)}</td>
-        <td><code style="font-family:var(--mono)">${s.txn||'—'}</code></td>
-        <td>${s.clientEmail||'—'}</td>
-        <td><span class="status ${s.paid?'ok':'pending'}">${s.paid?'payé':'impayé'}</span></td>
-        <td class="actions">
-          ${s.paid?'':`<button class="btn gold" data-pay="${s.id}">Marquer payé</button>`}
-        </td>`;
-      tb.appendChild(tr);
-    });
-
-    // Par créatrice
-    const tb2 = $('#tbl-creators tbody');
-    tb2.innerHTML='';
-    (j.creators||[]).forEach(c=>{
-      const tr = document.createElement('tr');
-      const p70 = (c.total||0)*0.70, p30=(c.total||0)*0.30;
-      tr.innerHTML = `
-        <td>${c.creator}</td>
-        <td>${money(c.total)}</td>
-        <td>${money(p70)}</td>
-        <td>${money(p30)}</td>
-        <td>${money(c.unpaid||0)}</td>
-        <td class="actions">${(c.unpaid>0)?`<button class="btn gold" data-pay-creator="${c.creatorId}">Marquer payé</button>`:''}</td>`;
-      tb2.appendChild(tr);
-    });
-
-  }catch(e){
-    $('#tbl-sales tbody').innerHTML = `<tr><td colspan="8">Erreur chargement ventes</td></tr>`;
-  }
-}
-
-document.addEventListener('click', async (e)=>{
-  // marquer payé (vente)
-  const b = e.target.closest('button[data-pay]');
-  if(b){
-    if(!confirm('Confirmer le marquage “payé” pour cette vente ?')) return;
-    const r = await api('/api/mark-paid',{method:'POST',body:JSON.stringify({ saleId:b.dataset.pay })});
-    if(r.ok){ setStatus('Vente marquée payée ✔'); loadLedger(); } else alert('Erreur');
-  }
-  // marquer payé (créatrice – tout impayé)
-  const c = e.target.closest('button[data-pay-creator]');
-  if(c){
-    if(!confirm('Marquer comme payé tous les impayés de cette créatrice ?')) return;
-    const r = await api('/api/mark-paid',{method:'POST',body:JSON.stringify({ creatorId:c.dataset.payCreator })});
-    if(r.ok){ setStatus('Créatrice payée ✔'); loadLedger(); } else alert('Erreur');
-  }
-});
-
-// placeholders “live”
-async function loadConversations(){
-  const box = $('#chatBox');
-  try{
-    const r = await api('/api/list-conversations');
-    const j = await r.json();
-    box.innerHTML = (j.items||[]).slice(0,20).map(m=>`
-      <div style="padding:10px;border-bottom:1px solid var(--line)">
-        <b>${m.creator||'—'}</b> → <span>${m.client||'—'}</span>
-        <span class="badge">${new Date(m.date||Date.now()).toLocaleString()}</span><br/>
-        <span style="color:var(--mute)">${(m.lastMsg||'').slice(0,160)}</span>
-      </div>
-    `).join('') || '<p>Aucune conversation.</p>';
-  }catch(e){ box.textContent='Indisponible.'; }
-}
-async function loadLive(){
-  const box = $('#liveBox');
-  try{
-    const r = await api('/api/list-lives');
-    const j = await r.json();
-    box.innerHTML = (j.items||[]).map(x=>`
-      <div style="padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--panel)">
-        <b>${x.title||'Live privé'}</b> — <span class="badge">${x.status||'à venir'}</span><br/>
-        <small class="mute">Salle: ${x.room||'-'} • Début: ${new Date(x.start||Date.now()).toLocaleString()}</small>
-      </div>
-    `).join('') || '<p>Aucun live.</p>';
-  }catch(e){ box.textContent='Indisponible.'; }
-}
-
-// évènements
-$('#btnFilter').onclick = loadUsers;
-$('#reloadAll').onclick = ()=>{ loadUsers(); loadLedger(); loadConversations(); loadLive(); setStatus('Rafraîchi '+new Date().toLocaleTimeString()); };
-
-// init
-loadUsers(); loadLedger(); loadConversations(); loadLive();
-setStatus('Chargé '+new Date().toLocaleTimeString());
-</script>
+  // First load
+  $('#btnReload').click();
+  </script>
 </body>
 </html>
