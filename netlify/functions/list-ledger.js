@@ -1,32 +1,47 @@
 // netlify/functions/list-ledger.js
-import { getStore } from '@netlify/blobs';
-const asKeys = (lst) => Array.isArray(lst) ? lst : (lst?.keys || []);
-const parse = (raw) => !raw ? null : (typeof raw === 'string' ? JSON.parse(raw) : raw);
+const fs = require('fs');
+const path = require('path');
+const DB = p => path.join(__dirname, '..', '..', 'data', p);
+function readJSON(name, fallback) {
+  try { return JSON.parse(fs.readFileSync(DB(name), 'utf8')); }
+  catch { return fallback; }
+}
+exports.handler = async (event) => {
+  // Data files
+  const sales   = readJSON('sales.json',   []);      // [{id,date,creator,type,amount,txn,clientEmail,paid}]
+  const users   = readJSON('users.json',   []);      // [{id,username,email,role,status,createdAt,lastSeen}]
+  // KPIs simples
+  const now = Date.now();
+  const online  = users.filter(u => (now - (new Date(u.lastSeen||0)).getTime()) < 5*60*1000).length;
+  const pending = users.filter(u => u.status==='pending').length;
+  const today   = sales.filter(s => new Date(s.date).toDateString()===new Date().toDateString())
+                       .reduce((a,s)=>a+Number(s.amount||0),0);
+  const dueTotal= sales.filter(s => !s.paid).reduce((a,s)=>a+Number(s.amount||0)*0.70,0); // impayé part créatrice
 
-export const handler = async () => {
-  try {
-    const store = getStore('ledger');
-    const ids = await store.list();
-    const rows = [];
-    for (const id of asKeys(ids)) {
-      const raw = await store.get(id);
-      const obj = parse(raw);
-      if (obj) rows.push(obj);
-    }
-
-    const creators = {};
-    for (const r of rows) {
-      const cid = r.creatorId || 'velvet';
-      creators[cid] = creators[cid] || { total:0, dueToCreator:0, dueToVelvet:0, unpaid:0 };
-      const amt = Number(r.amount||0);
-      creators[cid].total += amt;
-      creators[cid].dueToCreator += amt*0.70;
-      creators[cid].dueToVelvet  += amt*0.30;
-      if (!r.paid) creators[cid].unpaid += amt*0.70;
-    }
-
-    return { statusCode: 200, body: JSON.stringify({ rows, creators }) };
-  } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
+  // recap créatrices
+  const creatorsMap = {};
+  for (const s of sales) {
+    const k = s.creator || '—';
+    creatorsMap[k] = creatorsMap[k] || { total:0, due:0 };
+    creatorsMap[k].total += Number(s.amount||0);
+    if (!s.paid) creatorsMap[k].due += Number(s.amount||0)*0.70;
   }
+
+  // CSV export
+  if ((event.queryStringParameters||{}).format === 'csv') {
+    const head = ['date','creator','type','amount','txn','clientEmail','paid'];
+    const lines = [head.join(',')].concat(
+      sales.map(s => head.map(k => `"${String(s[k]??'').replace(/"/g,'""')}"`).join(','))
+    ).join('\n');
+    return { statusCode:200, headers:{'Content-Type':'text/csv'}, body:lines };
+  }
+
+  const body = {
+    online, pending,
+    totals: { today, due: dueTotal },
+    last: [...sales].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10),
+    ledger: [...sales].sort((a,b)=>new Date(b.date)-new Date(a.date)),
+    creators: creatorsMap
+  };
+  return { statusCode:200, body: JSON.stringify(body) };
 };
