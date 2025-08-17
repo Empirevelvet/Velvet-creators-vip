@@ -75,3 +75,46 @@ body.has-cookie-banner{padding-bottom:84px}
 /* Hero logo image */
 .hero-logo{width:min(520px, 78vw); height:auto; display:block; margin:10px auto 12px; filter: drop-shadow(0 4px 16px rgba(0,0,0,.6));}
 @media (max-width:480px){ .hero-logo{width:min(78vw, 340px)} }
+/* FORMULAIRES */
+form {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #ff4da6;
+}
+
+form input, form select, form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #2a2a2a;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+form input[type="file"] {
+  border: none;
+}
+
+form button {
+  background: #ff4da6;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+form button:hover {
+  background: #e63c90;
+}
