@@ -1,166 +1,147 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Velvet — Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/styles.css">
-  <style>
-    /* ==== Styles spécifiques au dashboard ==== */
-    body{ display:flex; min-height:100vh; background:#0b0b0c; color:#e6e6e9; }
-    .sidebar{
-      width:220px; background:#121214; padding:20px 12px;
-      display:flex; flex-direction:column; gap:20px;
-      border-right:1px solid #2a2a2f;
-    }
-    .sidebar h2{ font-size:18px; margin:0 0 20px; color:#d4af37; }
-    .sidebar a{
-      display:block; padding:10px 14px; border-radius:8px;
-      color:#e6e6e9; text-decoration:none; font-size:15px;
-    }
-    .sidebar a:hover{ background:#1a1a1f; color:#d4af37; }
-
-    .main{ flex:1; padding:20px; overflow-x:hidden; }
-    .topbar{
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:20px;
-    }
-    .search{ display:flex; gap:8px; }
-    .search input{
-      background:#0f0f12; border:1px solid #2a2a2f; border-radius:6px;
-      color:#e6e6e9; padding:8px 10px;
-    }
-    .btn-small{
-      padding:8px 14px; border-radius:6px;
-      border:1px solid #3b2e10;
-      background:linear-gradient(#3b2e10,#2a210b);
-      color:#d4af37; cursor:pointer;
-    }
-    .grid-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:20px; }
-    .card{ background:#121214; border:1px solid #2a2a2f; border-radius:12px; padding:14px; box-shadow:0 4px 10px rgba(0,0,0,.5); }
-    .card h3{ font-size:15px; margin:0 0 6px; color:#9aa0a8; }
-    .card .value{ font-size:20px; font-weight:700; color:#d4af37; }
-    .card .danger{ color:#ff6b6b; }
-    .card .ok{ color:#3dd399; }
-
-    table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:14px; }
-    th,td{ padding:10px; border-bottom:1px solid #2a2a2f; text-align:left; }
-    th{ background:#1b1b1f; color:#dcdce2; }
-    tr:hover{ background:#0f0f12; }
-    .section{ margin-top:24px; }
-    .section h2{ font-size:18px; margin:0 0 12px; color:#d4af37; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
 </head>
 <body>
-  <!-- Sidebar -->
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
-    <a href="#">Aperçu</a>
-    <a href="#">Comptes</a>
-    <a href="#">Ventes</a>
-    <a href="#">Conversations</a>
-    <a href="#">Lives</a>
-    <a href="#">Créer un item</a>
-    <p style="margin-top:auto; font-size:12px; color:#777">© Velvet Creators VIP</p>
+    <nav class="nav">
+      <a class="active" href="/admin-dashboard.html">Aperçu</a>
+      <a href="/admin-users.html">Comptes</a>
+      <a href="#sales">Ventes</a>
+      <a href="#convs">Conversations</a>
+      <a href="#lives">Lives</a>
+      <a href="/admin-items.html">Créer un item</a>
+    </nav>
+    <div class="foot">© Velvet Creators VIP</div>
   </aside>
 
-  <!-- Main -->
   <main class="main">
     <div class="topbar">
       <div class="search">
-        <input type="text" placeholder="Rechercher (pseudo, email)">
-        <button class="btn-small">Filtrer</button>
+        <input id="q" class="input" type="text" placeholder="Rechercher (pseudo, email)" />
+        <button class="btn" id="btnFilter">Filtrer</button>
       </div>
-      <div>
-        <span style="margin-right:12px;">21:40:29</span>
-        <button class="btn-small">Purger inactifs (90 j)</button>
-        <button class="btn-small">Rafraîchir</button>
-      </div>
-    </div>
-
-    <!-- Stats cards -->
-    <div class="grid-cards">
-      <div class="card">
-        <h3>Utilisateurs en ligne</h3>
-        <div class="value">0</div>
-        <small>dans les 5 dernières minutes</small>
-      </div>
-      <div class="card">
-        <h3>Inscriptions en attente</h3>
-        <div class="value">0</div>
-        <small>à valider</small>
-      </div>
-      <div class="card">
-        <h3>Ventes (aujourd’hui)</h3>
-        <div class="value">0.00 CHF</div>
-        <small>tickets & PPV</small>
-      </div>
-      <div class="card">
-        <h3>Impayé total</h3>
-        <div class="value danger">0.00 CHF</div>
-        <small>à verser aux créatrices</small>
+      <div class="chips">
+        <span class="chip" id="clock">--:--:--</span>
+        <button class="btn" id="btnPurge">Purger inactifs (90 j)</button>
+        <button class="btn" id="btnReload">Rafraîchir</button>
       </div>
     </div>
 
-    <!-- Dernières ventes -->
-    <div class="section">
+    <div class="grid">
+      <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
+      <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
+      <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="value" id="k-today">0.00 CHF</div><small>tickets & PPV</small></div>
+      <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
+    </div>
+
+    <section class="section">
       <h2>Dernières ventes</h2>
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="6">Chargement...</td></tr>
-        </tbody>
+      <table id="t-last">
+        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
-    </div>
+    </section>
 
-    <!-- Récap ventes par créatrice -->
-    <div class="section">
+    <section class="section">
       <h2>Récap ventes par créatrice</h2>
-      <table>
-        <thead>
-          <tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="6">Chargement...</td></tr>
-        </tbody>
+      <table id="t-creators">
+        <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
-      <button class="btn-small" style="margin-top:10px;">Exporter CSV</button>
-    </div>
+      <button class="btn" id="btnCsv" style="margin-top:10px">Exporter CSV</button>
+    </section>
 
-    <!-- Comptes -->
-    <div class="section">
-      <h2>Comptes — valider / suspendre / supprimer</h2>
-      <p><small>"Suspendre" bloque l’accès sans supprimer les données. Les motifs sont enregistrés.</small></p>
-      <div class="search" style="margin-bottom:10px;">
-        <select><option>Statut : Tous</option></select>
-        <select><option>Rôle : Tous</option></select>
-        <input type="text" placeholder="pseudo / email">
-        <button class="btn-small">Filtrer</button>
-      </div>
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="6">Erreur chargement utilisateurs</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Détail des ventes -->
-    <div class="section">
+    <section class="section" id="sales">
       <h2>Détail des ventes</h2>
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="8">Chargement...</td></tr>
-        </tbody>
+      <table id="t-ledger">
+        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
       </table>
-    </div>
+    </section>
+
+    <footer class="small">Besoin d’un filtre/onglet en plus ? Tu me dis et je l’ajoute.</footer>
   </main>
+
+  <script>
+    // util
+    const $ = s => document.querySelector(s);
+    const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'},...opt});
+
+    // horloge + auto refresh 30s
+    setInterval(()=>{$('#clock').textContent=new Date().toLocaleTimeString()},1000);
+    setInterval(()=>reloadAll(),30_000);
+
+    // chargement
+    async function loadStats(){
+      try{
+        const r = await api('/api/list-ledger'); // suppose { last:[], creators:{}, totals:{today,due}, online,pending }
+        const j = await r.json();
+        // cartes
+        $('#k-online').textContent = j.online ?? 0;
+        $('#k-pending').textContent = j.pending ?? 0;
+        $('#k-today').textContent = (j.totals?.today ?? 0).toFixed(2)+' CHF';
+        $('#k-due').textContent = (j.totals?.due ?? 0).toFixed(2)+' CHF';
+        // dernières ventes
+        const tb1 = $('#t-last tbody'); tb1.innerHTML='';
+        (j.last||[]).slice(0,8).forEach(v=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `<td>${v.date||'-'}</td><td>${v.creator||'-'}</td><td>${v.type||'-'}</td><td>${Number(v.amount||0).toFixed(2)} CHF</td><td>${v.clientEmail||'-'}</td>
+          <td>${v.paid?'Payé':'<button class="btn" data-pay="'+(v.id||'')+'">Marquer payé</button>'}</td>`;
+          tb1.appendChild(tr);
+        });
+        // recap créatrices
+        const tb2=$('#t-creators tbody'); tb2.innerHTML='';
+        Object.entries(j.creators||{}).forEach(([name,val])=>{
+          const total=Number(val.total||0), c70=total*0.7, v30=total*0.3, due=Number(val.due||0);
+          const tr=document.createElement('tr');
+          tr.innerHTML=`<td>${name}</td><td>${total.toFixed(2)}</td><td>${c70.toFixed(2)}</td><td>${v30.toFixed(2)}</td>
+          <td>${due.toFixed(2)}</td><td>${due>0?'<button class="btn" data-bulk="'+name+'">Marquer payé</button>':'—'}</td>`;
+          tb2.appendChild(tr);
+        });
+        // ledger complet
+        const tb3=$('#t-ledger tbody'); tb3.innerHTML='';
+        (j.ledger||[]).forEach(v=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML=`<td>${v.date||'-'}</td><td>${v.creator||'-'}</td><td>${v.type||'-'}</td>
+          <td>${Number(v.amount||0).toFixed(2)}</td><td>${v.txn||'-'}</td><td>${v.clientEmail||'-'}</td>
+          <td>${v.paid?'Payé':'Impayé'}</td>
+          <td>${v.paid?'—':'<button class="btn" data-pay="'+(v.id||'')+'">Payé</button>'}</td>`;
+          tb3.appendChild(tr);
+        });
+      }catch(e){
+        console.error(e);
+      }
+    }
+
+    async function markPaid(id){ try{
+      const r = await api('/api/mark-paid',{method:'POST',body:JSON.stringify({id})});
+      const j = await r.json(); if(!j.ok) alert(j.error||'Erreur');
+    }catch(e){ alert('Erreur'); } }
+
+    async function purgeInactive(){ try{
+      if(!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
+      const r = await api('/api/purge-inactive',{method:'POST'}); const j=await r.json();
+      alert(j.ok?('Comptes supprimés : '+(j.count||0)):(j.error||'Erreur')); reloadAll();
+    }catch(e){ alert('Erreur purge'); } }
+
+    // events
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('button[data-pay]'); if(b){ markPaid(b.dataset.pay).then(reloadAll); }
+      const c=e.target.closest('button[data-bulk]'); if(c){ markPaid('creator:'+c.dataset.bulk).then(reloadAll); }
+    });
+    $('#btnReload').onclick = reloadAll;
+    $('#btnPurge').onclick = purgeInactive;
+    $('#btnCsv').onclick = ()=>window.location='/api/list-ledger?format=csv';
+    $('#btnFilter').onclick = ()=>{ location.href = '/admin-users.html?q='+encodeURIComponent($('#q').value||''); };
+
+    function reloadAll(){ loadStats(); }
+    reloadAll();
+  </script>
 </body>
 </html>
