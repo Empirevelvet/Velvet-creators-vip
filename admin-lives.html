@@ -1,36 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <title>Velvet — Admin Lives</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" href="/admin.css"/>
-  <style>
-    body{margin:0;display:flex;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b0b0d;color:#f6f6f6}
-    .sidebar{width:250px;min-height:100vh;background:#0f0f12;border-right:1px solid #212129;padding:18px 16px;position:sticky;top:0}
-    .nav a{display:block;padding:10px 12px;border-radius:10px;color:#ddd;text-decoration:none;background:#131318;border:1px solid #1f1f26;margin:6px 0}
-    .nav a.active,.nav a:hover{border-color:#8a6d2f;color:#f7f0da}
-    .main{flex:1;min-height:100vh;padding:18px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
-    .input{background:#111114;border:1px solid #23232b;color:#eee;border-radius:10px;padding:10px 12px}
-    .btn{background:#1a1a1f;border:1px solid #2b2b33;color:#eee;border-radius:10px;padding:10px 12px;cursor:pointer}
-    .btn:hover{border-color:#8a6d2f}
-    .chip{background:#121219;border:1px solid #24242c;color:#bfbfcc;border-radius:999px;padding:6px 10px;font-size:12px}
-    table{width:100%;border-collapse:separate;border-spacing:0;background:#0f0f14;border:1px solid #212129;border-radius:12px;overflow:hidden}
-    thead th{background:#111117;color:#cfcfdb;text-align:left;font-weight:600;padding:10px;border-bottom:1px solid #1f1f26}
-    tbody td{padding:10px;border-top:1px solid #17171d}
-    tbody tr:hover{background:#12121a}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
 </head>
 <body>
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
     <nav class="nav">
       <a href="/admin-dashboard.html">📊 Aperçu</a>
-      <a href="/admin-users.html">👤 Comptes</a>
+      <a href="/admin-users.html">👥 Comptes</a>
       <a href="/admin-dashboard.html#sales">💳 Ventes</a>
       <a href="/admin-convs.html">💬 Conversations</a>
-      <a class="active" href="/admin-lives.html">🎥 Lives</a>
+      <a class="active" href="/admin-lives.html">📺 Lives</a>
       <a href="/admin-items.html">➕ Créer un item</a>
     </nav>
     <div class="foot">© Velvet Creators VIP</div>
@@ -38,54 +22,87 @@
 
   <main class="main">
     <div class="topbar">
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="q" class="input" placeholder="Filtrer (créatrice / room / statut)"/>
+      <h1>📺 Lives</h1>
+      <div class="chips">
+        <span class="chip" id="clock">--:--:--</span>
         <button class="btn" id="btnReload">Rafraîchir</button>
       </div>
-      <span class="chip" id="k-count">0 live</span>
     </div>
 
-    <section>
-      <table id="t-lives">
+    <section class="section">
+      <h2>Lives en cours</h2>
+      <table id="t-live">
         <thead>
-          <tr><th>Room</th><th>Créatrice</th><th>Statut</th><th>Début</th><th>Viewers</th><th>Action</th></tr>
+          <tr><th>Créatrice</th><th>Titre</th><th>Spectateurs</th><th>Statut</th><th>Action</th></tr>
         </thead>
-        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+        <tbody>
+          <tr><td colspan="5">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Lives passés</h2>
+      <table id="t-archive">
+        <thead>
+          <tr><th>Date</th><th>Créatrice</th><th>Titre</th><th>Durée</th><th>Recettes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5">Chargement…</td></tr>
+        </tbody>
       </table>
     </section>
   </main>
 
-<script>
-const $=s=>document.querySelector(s);
-let DATA=[];
-async function load(){
-  const tb=$('#t-lives tbody'); tb.innerHTML='<tr><td colspan="6">Chargement…</td></tr>';
-  const r=await fetch('/data/lives.json'); if(!r.ok){ tb.innerHTML='<tr><td colspan="6">Erreur</td></tr>'; return; }
-  DATA=await r.json(); render();
-}
-function render(){
-  const tb=$('#t-lives tbody'); const q=($('#q').value||'').toLowerCase();
-  let rows=DATA;
-  if(q) rows=rows.filter(l=>{
-    const text=[l.room,l.creator,l.status].filter(Boolean).join(' ');
-    return text.toLowerCase().includes(q);
-  });
-  $('#k-count').textContent=(rows.length||0)+' live(s)';
-  if(!rows.length){ tb.innerHTML='<tr><td colspan="6">Aucun résultat</td></tr>'; return; }
-  tb.innerHTML = rows.map(l=>`
-    <tr>
-      <td>${l.room||'—'}</td>
-      <td>${l.creator||'—'}</td>
-      <td>${l.status||'—'}</td>
-      <td>${l.startAt? new Date(l.startAt).toLocaleString():'—'}</td>
-      <td>${l.viewers ?? '—'}</td>
-      <td>${l.adminUrl? `<a class="btn" target="_blank" href="${l.adminUrl}">Ouvrir</a>`:'—'}</td>
-    </tr>
-  `).join('');
-}
-$('#btnReload').onclick=load;
-$('#q').addEventListener('input',render);
-load();
-</script>
+  <script>
+    const $ = s => document.querySelector(s);
+
+    // horloge en haut
+    setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString(),1000);
+
+    async function loadLives(){
+      try{
+        const r = await fetch('/data/lives.json'); // ou /.netlify/functions/list-lives
+        const j = await r.json();
+
+        // lives en cours
+        const tb1=$('#t-live tbody'); tb1.innerHTML='';
+        if(!j.active?.length){ tb1.innerHTML='<tr><td colspan="5">Aucun live en cours.</td></tr>'; }
+        else j.active.forEach(l=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `
+            <td>${l.creator||'—'}</td>
+            <td>${l.title||'—'}</td>
+            <td>${l.viewers||0}</td>
+            <td>${l.status||'—'}</td>
+            <td><button class="btn">👀 Voir</button></td>
+          `;
+          tb1.appendChild(tr);
+        });
+
+        // archives
+        const tb2=$('#t-archive tbody'); tb2.innerHTML='';
+        if(!j.archive?.length){ tb2.innerHTML='<tr><td colspan="5">Aucun live passé.</td></tr>'; }
+        else j.archive.forEach(l=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `
+            <td>${(l.date||'').replace('T',' ').slice(0,16)}</td>
+            <td>${l.creator||'—'}</td>
+            <td>${l.title||'—'}</td>
+            <td>${l.duration||'—'}</td>
+            <td>${(l.revenue||0).toFixed(2)} CHF</td>
+          `;
+          tb2.appendChild(tr);
+        });
+      }catch(e){
+        console.error(e);
+        $('#t-live tbody').innerHTML='<tr><td colspan="5">Erreur API</td></tr>';
+        $('#t-archive tbody').innerHTML='<tr><td colspan="5">Erreur API</td></tr>';
+      }
+    }
+
+    $('#btnReload').onclick = loadLives;
+    loadLives();
+  </script>
 </body>
 </html>
