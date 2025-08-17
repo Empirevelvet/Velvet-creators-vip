@@ -107,20 +107,58 @@
 
       <div class="full">
         <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
-        <input class="input" id="selfie" name="selfie" type="file" required accept=".jpg,.jpeg,.png"/>
-      </div>
+        <form id="signup-form" autocomplete="off">
+  <label>Pseudo</label>
+  <input id="username" type="text" required placeholder="@pseudo">
 
-      <div class="full row-inline">
-        <input id="consent" name="consent" type="checkbox" required/>
-        <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité &amp; sécurité).</label>
-      </div>
+  <label>Email</label>
+  <input id="email" type="email" required placeholder="vous@example.com">
 
-      <div class="full form-actions">
-        <button class="btn gold" type="submit">Envoyer ma demande</button>
-        <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
-      </div>
-    </div>
-  </form>
+  <label>Mot de passe</label>
+  <input id="password" type="password" required minlength="6">
+
+  <button type="submit">Créer mon compte</button>
+  <div id="signup-msg" class="help"></div>
+</form>
+
+<script>
+(() => {
+  const form = document.getElementById('signup-form');
+  const emailEl = document.getElementById('email');
+  const userEl  = document.getElementById('username');
+  const passEl  = document.getElementById('password');
+  const msgEl   = document.getElementById('signup-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msgEl.textContent = 'Création du compte...';
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email: emailEl.value,
+          username: userEl.value,
+          password: passEl.value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        msgEl.textContent = data.error || 'Erreur inscription';
+        msgEl.style.color = '#ff6b6b';
+        return;
+      }
+      msgEl.textContent = 'Compte créé ✅';
+      msgEl.style.color = '#7CFC00';
+      // Redirige si tu veux :
+      // location.href = 'thanks.html';
+    } catch (err) {
+      msgEl.textContent = 'Erreur réseau';
+      msgEl.style.color = '#ff6b6b';
+    }
+  });
+})();
+</script>
 
   <p class="help" style="text-align:center; margin-top:14px">
     Dans votre espace privé, vous renseignerez vos coordonnées de paiement (IBAN ou PayPal).<br/>
