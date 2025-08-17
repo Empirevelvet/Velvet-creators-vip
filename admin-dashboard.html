@@ -11,7 +11,7 @@
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
     <nav class="nav">
-      <a class="active" href="/admin-dashboard.html">📊 Aperçu</a>
+      <a class="active" href="#overview">📊 Aperçu</a>
       <a href="/admin-users.html">👤 Comptes</a>
       <a href="#sales">💳 Ventes</a>
       <a href="#convs">💬 Conversations</a>
@@ -36,35 +36,38 @@
       </div>
     </div>
 
-    <!-- KPIs -->
-    <div class="grid">
-      <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
-      <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
-      <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="value" id="k-today">0.00 CHF</div><small>tickets &amp; PPV</small></div>
-      <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
-    </div>
+    <!-- ======= OVERVIEW (onglet) ======= -->
+    <section class="section" id="overview" data-tab>
+      <!-- KPIs -->
+      <div class="grid">
+        <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
+        <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
+        <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="value" id="k-today">0.00 CHF</div><small>tickets &amp; PPV</small></div>
+        <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
+      </div>
 
-    <!-- DERNIÈRES VENTES -->
-    <section class="section">
-      <h2>Dernières ventes</h2>
-      <table id="t-last">
-        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr></thead>
-        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
-      </table>
+      <!-- DERNIÈRES VENTES -->
+      <div class="section">
+        <h2>Dernières ventes</h2>
+        <table id="t-last">
+          <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- RECAP CRÉATRICES -->
+      <div class="section">
+        <h2>Récap ventes par créatrice</h2>
+        <table id="t-creators">
+          <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+        </table>
+        <button class="btn" id="btnCsv" style="margin-top:10px">Exporter CSV</button>
+      </div>
     </section>
 
-    <!-- RECAP CRÉATRICES -->
-    <section class="section">
-      <h2>Récap ventes par créatrice</h2>
-      <table id="t-creators">
-        <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
-        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
-      </table>
-      <button class="btn" id="btnCsv" style="margin-top:10px">Exporter CSV</button>
-    </section>
-
-    <!-- VENTES (DÉTAIL) -->
-    <section class="section" id="sales" data-tab>
+    <!-- ======= VENTES (onglet) ======= -->
+    <section class="section" id="sales" data-tab hidden>
       <h2>Détail des ventes</h2>
       <table id="t-ledger">
         <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
@@ -72,8 +75,8 @@
       </table>
     </section>
 
-    <!-- CONVERSATIONS -->
-    <section class="section" id="convs" data-tab>
+    <!-- ======= CONVERSATIONS (onglet) ======= -->
+    <section class="section" id="convs" data-tab hidden>
       <h2>Conversations (aperçu)</h2>
       <table id="t-conv">
         <thead><tr><th>Date</th><th>Participants</th><th>Dernier message</th><th>Action</th></tr></thead>
@@ -81,8 +84,8 @@
       </table>
     </section>
 
-    <!-- LIVES -->
-    <section class="section" id="lives" data-tab>
+    <!-- ======= LIVES (onglet) ======= -->
+    <section class="section" id="lives" data-tab hidden>
       <h2>Lives</h2>
       <table id="t-lives">
         <thead><tr><th>Room</th><th>Créatrice</th><th>Statut</th><th>Viewers</th><th>Action</th></tr></thead>
@@ -95,35 +98,34 @@
 
   <!-- SCRIPT UNIQUE -->
   <script>
+    // ===== Utils =====
     const $  = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
     const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
     const fmt = n => Number(n||0).toFixed(2);
 
+    // ===== Horloge + auto refresh =====
     setInterval(()=>{ const el=$('#clock'); if(el) el.textContent=new Date().toLocaleTimeString(); }, 1000);
     setInterval(()=>reloadAll(), 30_000);
 
-    document.addEventListener('click', (e)=>{
-      const a = e.target.closest('.nav a[href^="#"]');
-      if (!a) return;
-      e.preventDefault();
-      location.hash = a.getAttribute('href');
-      activateFromHash();
-    });
+    // ===== Tabs (hash) =====
     function activateFromHash(){
-      const hash = location.hash || '';
-      $$('.nav a').forEach(a => {
-        const isActive = a.getAttribute('href')===hash || (!hash && a.getAttribute('href')==='/admin-dashboard.html');
-        a.classList.toggle('active', isActive);
-      });
-      $$('[data-tab]').forEach(sec => { sec.hidden = (hash && ('#'+sec.id)!==hash); });
-      if(hash){ const el = $(hash); if(el) el.scrollIntoView({block:'start'}); }
+      const hash = location.hash || '#overview';
+      // Activer lien
+      $$('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')===hash));
+      // Afficher section ciblée (data-tab)
+      const all = $$('[data-tab]');
+      all.forEach(sec => { sec.hidden = ('#'+sec.id !== hash); });
+      // Scroll top
+      const el = $(hash); if(el) el.scrollIntoView({block:'start'});
     }
     window.addEventListener('hashchange', activateFromHash);
     document.addEventListener('DOMContentLoaded', activateFromHash);
 
+    // ===== Rendus =====
     function renderLast(rows=[]){
-      const tb = $('#t-last tbody'); tb.innerHTML='';
+      const tb = $('#t-last tbody'); if(!tb) return;
+      tb.innerHTML='';
       if (!rows.length){ tb.innerHTML = '<tr><td colspan="6">Aucune vente.</td></tr>'; return; }
       rows.slice(0,8).forEach(v=>{
         const tr=document.createElement('tr');
@@ -138,7 +140,8 @@
       });
     }
     function renderCreators(map={}){
-      const tb = $('#t-creators tbody'); tb.innerHTML='';
+      const tb = $('#t-creators tbody'); if(!tb) return;
+      tb.innerHTML='';
       const entries = Object.entries(map);
       if (!entries.length){ tb.innerHTML = '<tr><td colspan="6">Aucune donnée.</td></tr>'; return; }
       entries.forEach(([name,val])=>{
@@ -151,7 +154,8 @@
       });
     }
     function renderLedger(rows=[]){
-      const tb = $('#t-ledger tbody'); tb.innerHTML='';
+      const tb = $('#t-ledger tbody'); if(!tb) return;
+      tb.innerHTML='';
       if (!rows.length){ tb.innerHTML = '<tr><td colspan="8">Aucune ligne.</td></tr>'; return; }
       rows.forEach(v=>{
         const tr=document.createElement('tr');
@@ -168,7 +172,8 @@
       });
     }
     function renderConvs(rows=[]){
-      const tb = $('#t-conv tbody'); tb.innerHTML='';
+      const tb = $('#t-conv tbody'); if(!tb) return;
+      tb.innerHTML='';
       if (!rows.length){ tb.innerHTML = '<tr><td colspan="4">Aucune donnée.</td></tr>'; return; }
       rows.forEach(c=>{
         const tr=document.createElement('tr');
@@ -181,7 +186,8 @@
       });
     }
     function renderLives(rows=[]){
-      const tb = $('#t-lives tbody'); tb.innerHTML='';
+      const tb = $('#t-lives tbody'); if(!tb) return;
+      tb.innerHTML='';
       if (!rows.length){ tb.innerHTML = '<tr><td colspan="5">Aucun live.</td></tr>'; return; }
       rows.forEach(l=>{
         const tr=document.createElement('tr');
@@ -193,40 +199,38 @@
       });
     }
 
+    // ===== Chargements =====
     async function loadLedger(){
       try{
         const r = await api('/api/list-ledger');
         const j = await r.json();
-        $('#k-online').textContent  = j.online ?? 0;
-        $('#k-pending').textContent = j.pending ?? 0;
-        $('#k-today').textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF';
-        $('#k-due').textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF';
+        $('#k-online') && ($('#k-online').textContent  = j.online ?? 0);
+        $('#k-pending')&& ($('#k-pending').textContent = j.pending ?? 0);
+        $('#k-today')  && ($('#k-today').textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF');
+        $('#k-due')    && ($('#k-due').textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF');
         renderLast(j.last||[]);
         renderCreators(j.creators||{});
         renderLedger(j.ledger||[]);
-      }catch(e){ console.warn('list-ledger', e); }
+      }catch(e){ /* silencieux */ }
     }
     async function loadConversations(){
       try{
-        const r = await api('/api/list-conversations');
-        if (!r.ok) throw 0;
-        const j = await r.json();
-        renderConvs(j.items||[]);
+        const r = await api('/api/list-conversations'); if (!r.ok) throw 0;
+        const j = await r.json(); renderConvs(j.items||[]);
       }catch(e){
         const tb = $('#t-conv tbody'); if(tb) tb.innerHTML='<tr><td colspan="4">Indisponible.</td></tr>';
       }
     }
     async function loadLives(){
       try{
-        const r = await api('/api/list-lives');
-        if (!r.ok) throw 0;
-        const j = await r.json();
-        renderLives(j.items||[]);
+        const r = await api('/api/list-lives'); if (!r.ok) throw 0;
+        const j = await r.json(); renderLives(j.items||[]);
       }catch(e){
         const tb = $('#t-lives tbody'); if(tb) tb.innerHTML='<tr><td colspan="5">Indisponible.</td></tr>';
       }
     }
 
+    // ===== Actions =====
     async function markPaid(id){
       try{
         const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id }) });
@@ -255,6 +259,7 @@
     }
     function exportCsv(){ window.location.href = '/api/list-ledger?format=csv'; }
 
+    // ===== Events =====
     document.addEventListener('click', (e)=>{
       const bPay  = e.target.closest('button[data-pay]');
       const bBulk = e.target.closest('button[data-bulk]');
@@ -266,6 +271,7 @@
     $('#btnCsv').onclick    = exportCsv;
     $('#btnFilter').onclick = ()=>{ const q=($('#q')?.value||'').trim(); location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); };
 
+    // ===== Init =====
     function reloadAll(){ loadLedger(); loadConversations(); loadLives(); }
     reloadAll();
   </script>
