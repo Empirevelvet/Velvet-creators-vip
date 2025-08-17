@@ -1,0 +1,24 @@
+[
+  {
+    "id": "c1",
+    "participants": ["@sofia", "alex@example.com"],
+    "lastMessage": "OK pour 20 CHF ?",
+    "updatedAt": "2025-08-17T12:00:00Z",
+    "messages": [
+      { "from":"alex@example.com", "text":"Bonjour 👋", "at":"2025-08-17T11:45:00Z" },
+      { "from":"@sofia",          "text":"Salut 😘",   "at":"2025-08-17T11:46:00Z" },
+      { "from":"@sofia",          "text":"OK pour 20 CHF ?", "at":"2025-08-17T11:59:00Z" }
+    ]
+  },
+  {
+    "id": "c2",
+    "participants": ["@emma", "ben@example.com"],
+    "lastMessage": "J'envoie après paiement.",
+    "updatedAt": "2025-08-17T10:20:00Z",
+    "messages": [
+      { "from":"@emma", "text":"J'ai une vidéo exclusive ✨", "at":"2025-08-17T10:15:00Z" },
+      { "from":"ben@example.com", "text":"Combien ?",         "at":"2025-08-17T10:16:00Z" },
+      { "from":"@emma", "text":"J'envoie après paiement.",    "at":"2025-08-17T10:20:00Z" }
+    ]
+  }
+]
