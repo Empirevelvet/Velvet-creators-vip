@@ -38,35 +38,17 @@
 
     <!-- KPIs -->
     <div class="grid">
-      <div class="card">
-        <h3>Utilisateurs en ligne</h3>
-        <div class="value" id="k-online">0</div>
-        <small>dans les 5 dernières minutes</small>
-      </div>
-      <div class="card">
-        <h3>Inscriptions en attente</h3>
-        <div class="value" id="k-pending">0</div>
-        <small>à valider</small>
-      </div>
-      <div class="card">
-        <h3>Ventes (aujourd’hui)</h3>
-        <div class="value" id="k-today">0.00 CHF</div>
-        <small>tickets &amp; PPV</small>
-      </div>
-      <div class="card">
-        <h3>Impayé total</h3>
-        <div class="value bad" id="k-due">0.00 CHF</div>
-        <small>à verser aux créatrices</small>
-      </div>
+      <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
+      <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
+      <div class="card"><h3>Ventes (aujourd’hui)</h3><div class="value" id="k-today">0.00 CHF</div><small>tickets &amp; PPV</small></div>
+      <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
     </div>
 
     <!-- DERNIÈRES VENTES -->
     <section class="section">
       <h2>Dernières ventes</h2>
       <table id="t-last">
-        <thead>
-          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Client</th><th>Action</th></tr></thead>
         <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
     </section>
@@ -75,9 +57,7 @@
     <section class="section">
       <h2>Récap ventes par créatrice</h2>
       <table id="t-creators">
-        <thead>
-          <tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Créatrice</th><th>Ventes (CHF)</th><th>Pour elle (70%)</th><th>Pour Velvet (30%)</th><th>Impayé</th><th>Action</th></tr></thead>
         <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
       </table>
       <button class="btn" id="btnCsv" style="margin-top:10px">Exporter CSV</button>
@@ -87,9 +67,7 @@
     <section class="section" id="sales" data-tab>
       <h2>Détail des ventes</h2>
       <table id="t-ledger">
-        <thead>
-          <tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr>
-        </thead>
+        <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
         <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
       </table>
     </section>
@@ -117,17 +95,14 @@
 
   <!-- SCRIPT UNIQUE -->
   <script>
-    // ===== Utils =====
     const $  = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
     const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
     const fmt = n => Number(n||0).toFixed(2);
 
-    // ===== Horloge + auto refresh =====
     setInterval(()=>{ const el=$('#clock'); if(el) el.textContent=new Date().toLocaleTimeString(); }, 1000);
     setInterval(()=>reloadAll(), 30_000);
 
-    // ===== Navigation interne (hash) =====
     document.addEventListener('click', (e)=>{
       const a = e.target.closest('.nav a[href^="#"]');
       if (!a) return;
@@ -141,18 +116,12 @@
         const isActive = a.getAttribute('href')===hash || (!hash && a.getAttribute('href')==='/admin-dashboard.html');
         a.classList.toggle('active', isActive);
       });
-      // show/hide sections with data-tab
-      $$('[data-tab]').forEach(sec => {
-        sec.hidden = (hash && ('#'+sec.id)!==hash);
-      });
-      if(hash){
-        const el = $(hash); if(el) el.scrollIntoView({block:'start'});
-      }
+      $$('[data-tab]').forEach(sec => { sec.hidden = (hash && ('#'+sec.id)!==hash); });
+      if(hash){ const el = $(hash); if(el) el.scrollIntoView({block:'start'}); }
     }
     window.addEventListener('hashchange', activateFromHash);
     document.addEventListener('DOMContentLoaded', activateFromHash);
 
-    // ===== Rendus =====
     function renderLast(rows=[]){
       const tb = $('#t-last tbody'); tb.innerHTML='';
       if (!rows.length){ tb.innerHTML = '<tr><td colspan="6">Aucune vente.</td></tr>'; return; }
@@ -175,10 +144,9 @@
       entries.forEach(([name,val])=>{
         const total = Number(val.total||0), c70=total*0.7, v30=total*0.3, due=Number(val.due||0);
         const tr=document.createElement('tr');
-        tr.innerHTML = `
-          <td>${name}</td><td>${fmt(total)}</td><td>${fmt(c70)}</td><td>${fmt(v30)}</td>
-          <td>${fmt(due)}</td>
-          <td>${due>0 ? `<button class="btn" data-bulk="${name}">Marquer tout payé</button>` : '—'}</td>`;
+        tr.innerHTML = `<td>${name}</td><td>${fmt(total)}</td><td>${fmt(c70)}</td><td>${fmt(v30)}</td>
+                        <td>${fmt(due)}</td>
+                        <td>${due>0 ? `<button class="btn" data-bulk="${name}">Marquer tout payé</button>` : '—'}</td>`;
         tb.appendChild(tr);
       });
     }
@@ -225,7 +193,6 @@
       });
     }
 
-    // ===== Chargements =====
     async function loadLedger(){
       try{
         const r = await api('/api/list-ledger');
@@ -260,7 +227,6 @@
       }
     }
 
-    // ===== Actions =====
     async function markPaid(id){
       try{
         const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id }) });
@@ -289,7 +255,6 @@
     }
     function exportCsv(){ window.location.href = '/api/list-ledger?format=csv'; }
 
-    // ===== Events =====
     document.addEventListener('click', (e)=>{
       const bPay  = e.target.closest('button[data-pay]');
       const bBulk = e.target.closest('button[data-bulk]');
@@ -301,7 +266,6 @@
     $('#btnCsv').onclick    = exportCsv;
     $('#btnFilter').onclick = ()=>{ const q=($('#q')?.value||'').trim(); location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); };
 
-    // ===== Init =====
     function reloadAll(){ loadLedger(); loadConversations(); loadLives(); }
     reloadAll();
   </script>
