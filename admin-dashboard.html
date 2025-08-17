@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Velvet — Admin</title>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body class="admin-ui">
+  <div class="topbar">
+    <div class="wrap inner">
+      <div class="brand">Velvet <b>Admin</b></div>
+      <a href="index.html">Accueil</a>
+      <a href="admin-items.html">Items</a>
+      <button class="btn" id="refresh">Rafraîchir</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- tes sections Comptes / Ventes / Détails
+         conservent TA logique JS actuelle,
+         mais entoure chaque bloc d’une .panel
+         et utilise .table pour les tableaux -->
+
+    <!-- … CONTENU + SCRIPTS EXISTANTS ICI … -->
+
+  </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Velvet — Admin Dashboard</title>
@@ -458,6 +488,7 @@ $("#blockUser").onclick=async()=>{ if(!CURRENT) return;
 function setStatus(t){ $("#lastStatus").textContent=`[${new Date().toLocaleTimeString()}] ${t}`; }
 $("#reloadAll").onclick=$("#btnReload").onclick=()=>{ loadUsers(); loadLedger(); loadConversations(); toast('Rafraîchi'); };
 loadUsers(); loadLedger(); loadConversations();
+  
 </script>
 </body>
 </html>
