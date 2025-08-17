@@ -3,356 +3,505 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Velvet — Admin Dashboard (VIP)</title>
+<title>Velvet — Admin Dashboard</title>
+
+<!-- ==== THEME CLAIR & LISIBLE (sans dépendances) ==== -->
 <style>
-  /* ========= THEME LUXE ========= */
   :root{
-    --bg:#0b0c10; --panel:#11131a; --elev:#151827; --ink:#e9ecf5;
-    --muted:#9aa3b2; --line:#23283b; --chip:#1a1f30;
-    --brand:#b39bff; --brand-2:#7c5cff; --gold:#f0c674;
-    --ok:#28c79a; --warn:#ffb020; --danger:#ff567a;
-    --thead:#0f1322; --shadow:0 10px 30px rgba(0,0,0,.35);
+    --bg:#f7f8fb;
+    --panel:#ffffff;
+    --ink:#1b2330;
+    --muted:#6a7383;
+    --line:#e7e9ef;
+    --brand:#2b59ff;
+    --brand-ink:#1c3bb3;
+    --ok:#17a772;
+    --warn:#f59f00;
+    --danger:#e03131;
+    --thead:#f2f4fa;
+    --chip:#f3f5fb;
+    --shadow:0 8px 24px rgba(12, 24, 48, .06);
+    --radius:14px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:linear-gradient(180deg,#0a0b0f 0%,#0b0c10 70%);color:var(--ink);font:14px/1.45 "Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  a{color:var(--gold);text-decoration:none}
-  .wrap{max-width:1240px;margin:0 auto;padding:18px 14px}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 16px}
+  a{color:var(--brand);text-decoration:none}
 
-  /* ======= TOP BAR ======= */
-  header{position:sticky;top:0;z-index:10;background:rgba(8,10,16,.65);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.06)}
-  .top{display:flex;align-items:center;gap:12px}
-  .logo{font-weight:800;letter-spacing:.2px}
-  .badge{background:linear-gradient(90deg,#7c5cff,#b39bff);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+  /* Header */
+  header{position:sticky;top:0;z-index:10;background:rgba(247,248,251,.85);backdrop-filter:saturate(120%) blur(8px);border-bottom:1px solid var(--line)}
+  .top{display:flex;gap:12px;align-items:center}
+  .logo{font-weight:800;font-size:18px}
   .sp{flex:1}
-  .btn{background:var(--brand-2);border:0;color:#fff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
-  .btn.ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line);box-shadow:none}
-  .btn.small{padding:7px 10px;font-size:12px;border-radius:8px}
-  .btn.flat{box-shadow:none}
-  .btn.destruct{background:#2a1320;border:1px solid #4a1c2f;color:#ff9fb1}
+  .btn{appearance:none;background:var(--brand);color:#fff;border:0;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)}
+  .btn:hover{background:var(--brand-ink)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn.small{padding:8px 12px;font-size:13px;border-radius:9px}
   .tabs{display:flex;gap:6px;flex-wrap:wrap}
-  .tab{padding:8px 10px;border-radius:9px;background:var(--chip);border:1px solid var(--line);cursor:pointer;font-weight:700}
-  .tab.active{background:linear-gradient(180deg,#181c2c,#121622);border-color:#3a4160}
+  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:700}
+  .tab.active{background:var(--thead);border-color:#dfe3ee}
 
-  /* ======= PANELS & CARDS ======= */
-  .grid{display:grid;grid-template-columns:2.2fr 1.1fr;gap:14px}
-  .panel{background:linear-gradient(180deg,#121523,#0f121d);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
-  .panel h1{font-size:20px;margin:0 0 10px}
-  .panel h2{font-size:16px;margin:0 0 10px}
+  /* Layout */
+  .grid{display:grid;grid-template-columns:2.1fr 1fr;gap:16px}
+  @media (max-width:1024px){ .grid{grid-template-columns:1fr} }
+
+  /* Panels / cards */
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+  h1{margin:0 0 10px;font-size:20px}
+  h2{margin:0 0 10px;font-size:17px}
   .muted{color:var(--muted)}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 2px}
-  .kpi{background:linear-gradient(180deg,#151a2a,#121626);border:1px solid var(--line);border-radius:14px;padding:12px}
-  .kpi .l{color:var(--muted);font-size:12px}
-  .kpi .v{font-size:20px;font-weight:900;margin-top:6px;color:#fff}
-  .searchbar{display:grid;grid-template-columns:160px 160px 1fr 120px;gap:8px;margin:10px 0}
-  .input,select{width:100%;background:#0f141e;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px}
-  .input::placeholder{color:#8e96a6}
+  .help{color:var(--muted);font-size:13px;margin:6px 0 10px}
 
-  /* ======= TABLES ======= */
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .kpi .l{color:var(--muted);font-size:12px}
+  .kpi .v{margin-top:6px;font-size:22px;font-weight:900}
+
+  /* Search bar */
+  .searchbar{display:grid;grid-template-columns:160px 160px 1fr 130px;gap:8px;margin:10px 0}
+  .input, select{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .input::placeholder{color:#a1a8b3}
+
+  /* Tables */
   .tablewrap{border:1px solid var(--line);border-radius:12px;overflow:auto}
   table{width:100%;border-collapse:collapse;min-width:900px}
-  thead th{position:sticky;top:0;background:var(--thead);color:#b7c0d8;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.3px}
-  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}
-  tbody tr:hover{background:#13182a}
+  thead th{position:sticky;top:0;background:var(--thead);color:#485063;text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.25px}
+  tbody td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr:hover{background:#fafbfe}
   .right{text-align:right}
   .row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid var(--line);background:var(--chip)}
-  .chip.ok{background:rgba(40,199,154,.12);border-color:rgba(40,199,154,.36);color:#9ef0d2}
-  .chip.warn{background:rgba(255,176,32,.12);border-color:rgba(255,176,32,.36);color:#ffd993}
-  .chip.bad{background:rgba(255,86,122,.12);border-color:rgba(255,86,122,.36);color:#ffb5c3}
 
-  /* ======= SIDECARD ======= */
-  .side .card{background:linear-gradient(180deg,#14182a,#111629);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
-  .side .card h3{margin:0 0 8px;font-size:15px}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#d4d9e8}
+  .chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;background:var(--chip);border:1px solid var(--line);color:#3b4251}
+  .chip.ok{background:#edfbf6;border-color:#d7f3e9;color:#128660}
+  .chip.warn{background:#fff7e6;border-color:#ffe6b0;color:#9a6b00}
+  .chip.bad{background:#fff0f0;border-color:#ffd7d7;color:#a12536}
 
-  /* ======= TOAST ======= */
-  .toast{position:fixed;right:14px;bottom:14px;background:#0f1726;border:1px solid var(--line);padding:12px 14px;border-radius:12px;display:none;box-shadow:var(--shadow);font-weight:800}
+  /* Side cards */
+  .side .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#3b4251;font-size:13px}
 
-  /* ======= MOBILE ======= */
-  @media (max-width:980px){
-    .grid{grid-template-columns:1fr}
-    .kpis{grid-template-columns:1fr 1fr}
+  /* Chat viewer (conversations) */
+  .flex{display:flex;gap:16px}
+  .col{flex:1}
+  .convlist{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .convlist .item{padding:12px;border-bottom:1px solid var(--line);cursor:pointer}
+  .convlist .item:hover{background:#f7f9ff}
+  .convlist .top{display:flex;justify-content:space-between}
+  .convlist .meta{font-size:12px;color:var(--muted)}
+  .chat{border:1px solid var(--line);border-radius:12px;background:#fff;min-height:520px;max-height:520px;overflow:auto;padding:10px}
+  .msg{display:flex;gap:10px;margin:8px 0}
+  .msg .bubble{max-width:78%;padding:10px 12px;border-radius:12px;border:1px solid var(--line)}
+  .msg .from{font-size:12px;color:#647089;margin-bottom:4px}
+  .me .bubble{background:#eef4ff;border-color:#dbe6ff}
+  .them .bubble{background:#f7f8fb}
+  .msg img{max-width:200px;border-radius:8px;border:1px solid #e9edf5}
+  .msg video{max-width:260px;border-radius:8px;border:1px solid #e9edf5}
+
+  /* Toast */
+  .toast{position:fixed;right:16px;bottom:16px;background:#1e293b;color:#fff;border-radius:10px;padding:12px 14px;display:none;box-shadow:var(--shadow);font-weight:700}
+
+  /* Mobile */
+  @media (max-width:920px){
     .searchbar{grid-template-columns:1fr 1fr}
-    table,thead,tbody,tr,td,th{display:block;width:100%}
+    .kpis{grid-template-columns:1fr 1fr}
+    table, thead, tbody, tr, td, th{display:block;width:100%}
     thead{display:none}
-    tbody td{border:none;padding:6px 0}
+    tbody td{border:none;padding:8px 0}
     .row-actions{justify-content:flex-start}
+    .flex{flex-direction:column}
+    .chat{min-height:380px;max-height:420px}
   }
 </style>
 </head>
+
 <body>
-<header>
-  <div class="wrap top">
-    <div class="logo">Velvet <span class="badge">VIP</span> — Dashboard</div>
-    <div class="tabs">
-      <div class="tab active" data-tab="accounts">Comptes</div>
-      <div class="tab" data-tab="ledger">Ventes</div>
-      <div class="tab" data-tab="moderation">Modération</div>
+  <!-- ===== TOP BAR ===== -->
+  <header>
+    <div class="wrap top">
+      <div class="logo">Velvet — <strong>Admin</strong></div>
+      <div class="tabs">
+        <div class="tab active" data-tab="accounts">Comptes</div>
+        <div class="tab" data-tab="ledger">Ventes</div>
+        <div class="tab" data-tab="conversations">Conversations</div>
+        <div class="tab" data-tab="moderation">Modération</div>
+      </div>
+      <span class="sp"></span>
+      <a class="btn ghost small" href="/index.html">Accueil</a>
+      <a class="btn ghost small" href="/admin-items.html">Admin Items</a>
+      <button id="reloadAll" class="btn small">Rafraîchir</button>
     </div>
-    <span class="sp"></span>
-    <a class="btn ghost small" href="/index.html">Accueil</a>
-    <a class="btn ghost small" href="/admin-items.html">Admin Items</a>
-    <button id="reloadAll" class="btn small">Rafraîchir</button>
-  </div>
-</header>
+  </header>
 
-<main class="wrap grid">
-  <!-- ========== COLONNE PRINCIPALE ========== -->
-  <section class="panel main">
-    <!-- ===== Comptes ===== -->
-    <div class="view" id="view-accounts">
-      <h1>Comptes — valider · suspendre · supprimer</h1>
-      <div class="searchbar">
-        <select id="fStatus">
-          <option value="">Statut : Tous</option>
-          <option value="pending">En attente</option>
-          <option value="approved">Validé</option>
-          <option value="suspended">Suspendu</option>
-        </select>
-        <select id="fRole">
-          <option value="">Rôle : Tous</option>
-          <option value="creator">Créatrice</option>
-          <option value="client">Client</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input id="fQuery" class="input" placeholder="🔎 Pseudo, email…"/>
-        <button class="btn flat" id="applyUsers">Filtrer</button>
+  <main class="wrap grid">
+    <!-- ===== COLONNE PRINCIPALE ===== -->
+    <section class="panel">
+      <!-- ===== Accounts ===== -->
+      <div class="view" id="view-accounts">
+        <h1>Comptes</h1>
+        <div class="help">Valider, suspendre ou supprimer les comptes. Filtrer par statut, rôle, ou recherche.</div>
+
+        <div class="searchbar">
+          <select id="fStatus">
+            <option value="">Statut : Tous</option>
+            <option value="pending">En attente</option>
+            <option value="approved">Validé</option>
+            <option value="suspended">Suspendu</option>
+          </select>
+          <select id="fRole">
+            <option value="">Rôle : Tous</option>
+            <option value="creator">Créatrice</option>
+            <option value="client">Client</option>
+            <option value="admin">Admin</option>
+          </select>
+          <input id="fQuery" class="input" placeholder="🔎 Pseudo, email…"/>
+          <button class="btn ghost" id="applyUsers">Filtrer</button>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="l">Total comptes</div><div class="v" id="kUsers">—</div></div>
+          <div class="kpi"><div class="l">En attente</div><div class="v" id="kPending">—</div></div>
+          <div class="kpi"><div class="l">Créatrices</div><div class="v" id="kCreators">—</div></div>
+          <div class="kpi"><div class="l">Clients</div><div class="v" id="kClients">—</div></div>
+        </div>
+
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Actions</th></tr></thead>
+            <tbody id="tbUsers"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="kpis">
-        <div class="kpi"><div class="l">Total comptes</div><div class="v" id="kUsers">—</div></div>
-        <div class="kpi"><div class="l">En attente</div><div class="v" id="kPending">—</div></div>
-        <div class="kpi"><div class="l">Créatrices</div><div class="v" id="kCreators">—</div></div>
-        <div class="kpi"><div class="l">Clients</div><div class="v" id="kClients">—</div></div>
+      <!-- ===== Ledger ===== -->
+      <div class="view" id="view-ledger" style="display:none">
+        <h1>Ventes & répartition</h1>
+        <div class="help">Répartition automatique 70% créatrice / 30% Velvet. Marque “payé” après virement PayPal.</div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="l">Ventes (CHF)</div><div class="v" id="kTot">—</div></div>
+          <div class="kpi"><div class="l">Part créatrices (70%)</div><div class="v" id="k70">—</div></div>
+          <div class="kpi"><div class="l">Part Velvet (30%)</div><div class="v" id="k30">—</div></div>
+          <div class="kpi"><div class="l">Impayé total</div><div class="v" id="kUnpaid">—</div></div>
+        </div>
+
+        <h2 style="margin-top:12px">Par créatrice</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Créatrice</th><th class="right">Ventes</th><th class="right">70%</th><th class="right">30%</th><th class="right">Impayé</th><th class="right">Action</th></tr></thead>
+            <tbody id="tbCreators"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2 style="margin-top:12px">Détail des ventes</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th></tr></thead>
+            <tbody id="tbSales"><tr><td colspan="7" class="muted">Chargement…</td></tr></tbody>
+          </table>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button id="exportCsv" class="btn ghost small">Exporter CSV</button>
+          <button id="refreshLedger" class="btn ghost small">Rafraîchir</button>
+        </div>
       </div>
 
-      <div class="tablewrap" style="margin-top:10px">
-        <table>
-          <thead><tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th class="right">Action</th></tr></thead>
-          <tbody id="tbUsers"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
-        </table>
+      <!-- ===== Conversations ===== -->
+      <div class="view" id="view-conversations" style="display:none">
+        <h1>Conversations (messages & médias)</h1>
+        <div class="help">À gauche, les fils (triés par dernier message). À droite, le fil complet avec médias.</div>
+
+        <div class="flex" style="margin-top:8px">
+          <div class="col">
+            <div class="panel" style="padding:10px">
+              <div class="searchbar" style="grid-template-columns:1fr 130px">
+                <input id="cQuery" class="input" placeholder="🔎 Chercher par pseudo, email, id conversation"/>
+                <button class="btn ghost" id="applyConv">Filtrer</button>
+              </div>
+              <div class="convlist" id="convList">
+                <div class="item"><div class="top"><strong>Chargement…</strong><span class="meta">—</span></div><div class="meta">—</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="panel" style="padding:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 4px 10px">
+                <div><strong id="convTitle">Conversation</strong> <span class="muted" id="convUsers">—</span></div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn ghost small" id="flagConv">Signaler</button>
+                  <button class="btn ghost small" id="blockUser">Bloquer</button>
+                </div>
+              </div>
+              <div class="chat" id="chatBox">
+                <div class="muted" style="padding:10px">Sélectionne une conversation à gauche.</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- ===== Ledger ===== -->
-    <div class="view" id="view-ledger" style="display:none">
-      <h1>Ventes & répartition (70% / 30%)</h1>
-      <p class="muted">Clique “Marquer payé” après ton virement PayPal à la créatrice.</p>
+      <!-- ===== Modération ===== -->
+      <div class="view" id="view-moderation" style="display:none">
+        <h1>Modération</h1>
+        <div class="help">Liste de contrôle pour les signalements, pièces d’identité à revérifier et historiques de suspension.</div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Date</th><th>Type</th><th>Utilisateur</th><th>Détail</th><th class="right">Action</th></tr></thead>
+            <tbody id="tbMod"><tr><td colspan="5" class="muted">Aucun élément.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-      <div class="kpis">
-        <div class="kpi"><div class="l">Ventes (CHF)</div><div class="v" id="kTot">—</div></div>
-        <div class="kpi"><div class="l">Créatrices (70%)</div><div class="v" id="k70">—</div></div>
-        <div class="kpi"><div class="l">Velvet (30%)</div><div class="v" id="k30">—</div></div>
-        <div class="kpi"><div class="l">Impayé total</div><div class="v" id="kUnpaid">—</div></div>
+    <!-- ===== COLONNE DROITE ===== -->
+    <aside class="side">
+      <div class="card">
+        <h2>Raccourcis</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="btn ghost small" href="/admin-items.html">Créer un item</a>
+          <a class="btn ghost small" href="/paiement.html">Paiement direct</a>
+          <button class="btn ghost small" id="btnReload">Rafraîchir</button>
+        </div>
       </div>
 
-      <h2 style="margin-top:12px">Récap par créatrice</h2>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Créatrice</th><th class="right">Ventes</th><th class="right">70%</th><th class="right">30%</th><th class="right">Impayé</th><th class="right">Action</th></tr></thead>
-          <tbody id="tbCreators"><tr><td colspan="6" class="muted">Chargement…</td></tr></tbody>
-        </table>
+      <div class="card">
+        <h2>Derniers statuts</h2>
+        <div id="lastStatus" class="mono">—</div>
       </div>
 
-      <h2 style="margin-top:14px">Détail des ventes</h2>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th class="right">Montant</th><th>Txn</th><th>Email client</th><th>Statut</th></tr></thead>
-          <tbody id="tbSales"><tr><td colspan="7" class="muted">Chargement…</td></tr></tbody>
-        </table>
+      <div class="card">
+        <h2>Aide rapide</h2>
+        <div class="help" style="margin:0">
+          • <b>Valider</b> : active un compte approuvé.<br/>
+          • <b>Suspendre</b> : bloque l’accès (réversible).<br/>
+          • <b>Supprimer</b> : suppression définitive.<br/>
+          • <b>Marquer payé</b> : après virement PayPal (soldes la créatrice).<br/>
+        </div>
       </div>
+    </aside>
+  </main>
 
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        <button id="exportCsv" class="btn ghost small">Exporter CSV</button>
-        <button id="refreshLedger" class="btn ghost small">Rafraîchir</button>
-      </div>
-    </div>
-
-    <!-- ===== Modération ===== -->
-    <div class="view" id="view-moderation" style="display:none">
-      <h1>Modération & sécurité</h1>
-      <p class="muted">Ici s’afficheront les signalements, documents d’identité à revérifier et historiques de suspension.</p>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>Date</th><th>Type</th><th>Utilisateur</th><th>Détail</th><th class="right">Action</th></tr></thead>
-          <tbody id="tbMod"><tr><td colspan="5" class="muted">Aucun élément pour l’instant.</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== SIDE ========== -->
-  <aside class="side">
-    <div class="panel card">
-      <h2>Raccourcis</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn ghost small" href="/admin-items.html">Créer un item</a>
-        <a class="btn ghost small" href="/paiement.html">Paiement direct</a>
-        <button class="btn ghost small" id="btnReload">Rafraîchir</button>
-      </div>
-    </div>
-
-    <div class="panel card">
-      <h2>Derniers statuts</h2>
-      <div id="lastStatus" class="mono muted">—</div>
-    </div>
-
-    <div class="panel card">
-      <h2>Aide rapide</h2>
-      <div class="muted" style="font-size:13px;line-height:1.5">
-        • <b>Valider</b> : active un compte approuvé.<br/>
-        • <b>Suspendre</b> : bloque l’accès (réversible).<br/>
-        • <b>Supprimer</b> : suppression définitive.<br/>
-        • <b>Marquer payé</b> : après virement PayPal (passe “impayé” à 0).<br/>
-      </div>
-    </div>
-  </aside>
-</main>
-
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
 <script>
-  // ===== Helpers =====
-  const $=(s,r=document)=>r.querySelector(s); const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-  const fmtCHF=v=>`${Number(v||0).toFixed(2)} CHF`; const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-  const toast=(t,ok=true)=>{const el=$("#toast"); el.textContent=t; el.style.display="block"; el.style.borderColor=ok?"#244e39":"#5b1f2e"; setTimeout(()=>el.style.display="none",2400);};
-  const J=async(u,o)=>{try{const r=await fetch(u,{headers:{'Content-Type':'application/json'},...o});const d=await r.json().catch(()=>null);return{ok:r.ok,status:r.status,data:d}}catch(e){return{ok:false,status:0,data:null}}};
+/* ===== Endpoints attendus =====
+   Comptes:
+     GET  /api/list-users           -> { users:[{id,username,email,role,status,created}] }
+     POST /api/admin-users          -> { action:'approve'|'suspend'|'delete', id, reason? }
+   Ventes:
+     GET  /api/list-ledger          -> { sales:[{id,date,creatorId,type,amount,txn,clientEmail,paid}] }
+     POST /api/mark-paid            -> { creatorId }
+   Conversations:
+     GET  /api/list-conversations?query=...&page=1
+         -> { conversations:[{id,users:[...],lastMsg,lastDate,mediaCount,msgCount,flagged}], total }
+     GET  /api/conversation?id=XXX
+         -> { id, users:[...], messages:[{id,from,role,text,image,video,file,date,price,paid,deleted,flagged}] }
+     POST /api/moderate -> { action:'flag'|'unflag'|'delete-message'|'block-user'|'unblock-user', conversationId, messageId?, userId?, reason? }
+*/
 
-  // ===== Tabs =====
-  $$(".tab").forEach(t=>t.onclick=()=>{
-    $$(".tab").forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");
-    const id=t.dataset.tab;
-    $$(".view").forEach(v=>v.style.display=(v.id==="view-"+id)?"block":"none");
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const toast=(t,ok=true)=>{const el=$("#toast"); el.textContent=t; el.style.display="block"; el.style.background=ok?"#1e293b":"#8a1f1f"; setTimeout(()=>el.style.display="none",2300);};
+const J=async(u,o)=>{try{const r=await fetch(u,{headers:{'Content-Type':'application/json'},...o});const d=await r.json().catch(()=>null);return{ok:r.ok,status:r.status,data:d}}catch(e){return{ok:false,status:0,data:null}}};
+const CHF=n=>`${Number(n||0).toFixed(2)} CHF`; const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+
+// Tabs
+$$(".tab").forEach(t=>t.onclick=()=>{ $$(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
+  const id=t.dataset.tab; $$(".view").forEach(v=>v.style.display=(v.id==="view-"+id)?"block":"none"); });
+
+// ========== COMPTES ==========
+let USERS=[];
+async function loadUsers(){
+  $("#tbUsers").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
+  const r=await J('/api/list-users'); setStatus('list-users:'+r.status);
+  if(!r.ok){ $("#tbUsers").innerHTML=`<tr><td colspan="6" class="muted">/api/list-users → ${r.status}</td></tr>`; return; }
+  USERS=r.data?.users||r.data||[];
+  renderUsers();
+}
+function renderUsers(){
+  const st=$("#fStatus").value, ro=$("#fRole").value, q=($("#fQuery").value||'').toLowerCase();
+  const rows=USERS.filter(u=>!st||u.status===st)
+                  .filter(u=>!ro||u.role===ro)
+                  .filter(u=>!q||(String(u.username||'').toLowerCase().includes(q)||String(u.email||'').toLowerCase().includes(q)))
+                  .sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')));
+  $("#kUsers").textContent=USERS.length;
+  $("#kPending").textContent=USERS.filter(u=>u.status==='pending').length;
+  $("#kCreators").textContent=USERS.filter(u=>u.role==='creator').length;
+  $("#kClients").textContent=USERS.filter(u=>u.role==='client').length;
+
+  const tb=$("#tbUsers"); tb.innerHTML=rows.length?'':`<tr><td colspan="6" class="muted">Aucun compte.</td></tr>`;
+  rows.forEach(u=>{
+    const d=u.created?new Date(u.created).toLocaleString():'—';
+    const chip=u.status==='approved'?'<span class="chip ok">validé</span>':u.status==='suspended'?'<span class="chip warn">suspendu</span>':'<span class="chip">en attente</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${d}</td><td>@${esc(u.username||'')}</td><td>${esc(u.email||'')}</td>
+      <td><span class="chip">${esc(u.role||'client')}</span></td><td>${chip}</td>
+      <td class="right row-actions">
+        ${u.status!=='approved'?`<button class="btn small ghost" data-act="approve" data-id="${u.id}">Valider</button>`:''}
+        ${u.status!=='suspended'?`<button class="btn small ghost" data-act="suspend" data-id="${u.id}">Suspendre</button>`:''}
+        <button class="btn small ghost" style="border-color:#ffd7d7;color:#a12536" data-act="delete" data-id="${u.id}">Supprimer</button>
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+$("#tbUsers").addEventListener('click', async e=>{
+  const b=e.target.closest('button[data-act]'); if(!b) return;
+  const id=b.dataset.id, act=b.dataset.act;
+  if(act==='delete' && !confirm('Supprimer définitivement ce profil ?')) return;
+  const body={action:act,id};
+  if(act==='suspend'){ const reason=prompt('Motif (interne) :','Non conforme'); if(reason===null) return; body.reason=reason; }
+  const r=await J('/api/admin-users',{method:'POST',body:JSON.stringify(body)}); setStatus('admin-users:'+r.status);
+  r.ok?(toast('Action effectuée'), loadUsers()):toast('Erreur admin-users',false);
+});
+$("#applyUsers").onclick=renderUsers;
+$("#fStatus").onchange=$("#fRole").onchange=$("#fQuery").oninput=()=>{ clearTimeout(window.__u); window.__u=setTimeout(renderUsers,150); };
+
+// ========== VENTES ==========
+let SALES=[];
+async function loadLedger(){
+  $("#tbCreators").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
+  $("#tbSales").innerHTML='<tr><td colspan="7" class="muted">Chargement…</td></tr>';
+  const r=await J('/api/list-ledger'); setStatus('list-ledger:'+r.status);
+  if(!r.ok){ $("#tbCreators").innerHTML=`<tr><td colspan="6" class="muted">/api/list-ledger → ${r.status}</td></tr>`;
+             $("#tbSales").innerHTML=`<tr><td colspan="7" class="muted">/api/list-ledger → ${r.status}</td></tr>`; return; }
+  SALES=r.data?.sales||r.data||[];
+  renderLedger();
+}
+function renderLedger(){
+  const tot=SALES.reduce((a,s)=>a+Number(s.amount||0),0);
+  $("#kTot").textContent=CHF(tot); $("#k70").textContent=CHF(tot*0.70); $("#k30").textContent=CHF(tot*0.30);
+  const unpaid=SALES.filter(s=>!s.paid).reduce((a,s)=>a+Number(s.amount||0)*0.70,0);
+  $("#kUnpaid").textContent=CHF(unpaid);
+
+  const by={}; SALES.forEach(s=>{const id=s.creatorId||'—'; (by[id]||(by[id]={id,total:0,unpaid:0})).total+=Number(s.amount||0); if(!s.paid) by[id].unpaid+=Number(s.amount||0)*0.70;});
+  const tb=$("#tbCreators"); tb.innerHTML='';
+  const arr=Object.values(by).sort((a,b)=>b.total-a.total);
+  if(!arr.length) tb.innerHTML=`<tr><td colspan="6" class="muted">Pas encore de ventes.</td></tr>`;
+  arr.forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${esc(c.id)}</td>
+      <td class="right">${CHF(c.total)}</td>
+      <td class="right">${CHF(c.total*0.70)}</td>
+      <td class="right">${CHF(c.total*0.30)}</td>
+      <td class="right">${c.unpaid>0?`<span class="chip warn">${CHF(c.unpaid)}</span>`:`<span class="chip ok">0,00 CHF</span>`}</td>
+      <td class="right">${c.unpaid>0?`<button class="btn small ghost" data-mark="${esc(c.id)}">Marquer payé</button>`:'—'}</td>`;
+    tb.appendChild(tr);
   });
 
-  // ===== USERS =====
-  let USERS=[];
-  async function loadUsers(){
-    $("#tbUsers").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
-    const r=await J('/api/list-users');
-    if(!r.ok){ $("#tbUsers").innerHTML=`<tr><td colspan="6" class="muted">/api/list-users → ${r.status}</td></tr>`; setStatus('list-users: '+r.status); return; }
-    USERS=r.data?.users||r.data||[];
-    renderUsers();
-  }
-  function renderUsers(){
-    const st=$("#fStatus").value, ro=$("#fRole").value, q=($("#fQuery").value||'').toLowerCase();
-    const rows=USERS
-      .filter(u=>!st||u.status===st)
-      .filter(u=>!ro||u.role===ro)
-      .filter(u=>!q||(String(u.username||'').toLowerCase().includes(q)||String(u.email||'').toLowerCase().includes(q)))
-      .sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')));
-
-    const kTotal=USERS.length, kPending=USERS.filter(u=>u.status==='pending').length, kCreators=USERS.filter(u=>u.role==='creator').length, kClients=USERS.filter(u=>u.role==='client').length;
-    $("#kUsers").textContent=kTotal; $("#kPending").textContent=kPending; $("#kCreators").textContent=kCreators; $("#kClients").textContent=kClients;
-
-    const tb=$("#tbUsers"); tb.innerHTML= rows.length? '' : `<tr><td colspan="6" class="muted">Aucun compte.</td></tr>`;
-    rows.forEach(u=>{
-      const d=u.created?new Date(u.created).toLocaleString():'—';
-      const chip=u.status==='approved'?'<span class="chip ok">validé</span>':u.status==='suspended'?'<span class="chip warn">suspendu</span>':'<span class="chip">en attente</span>';
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${d}</td>
-        <td>@${esc(u.username||'')}</td>
-        <td>${esc(u.email||'')}</td>
-        <td><span class="chip">${esc(u.role||'client')}</span></td>
-        <td>${chip}</td>
-        <td class="right row-actions">
-          ${u.status!=='approved'?`<button class="btn small ghost" data-act="approve" data-id="${u.id}">Valider</button>`:''}
-          ${u.status!=='suspended'?`<button class="btn small ghost" data-act="suspend" data-id="${u.id}">Suspendre</button>`:''}
-          <button class="btn small destruct" data-act="delete" data-id="${u.id}">Supprimer</button>
-        </td>`;
-      tb.appendChild(tr);
-    });
-  }
-  $("#tbUsers").addEventListener('click', async e=>{
-    const b=e.target.closest('button[data-act]'); if(!b) return;
-    const id=b.dataset.id, act=b.dataset.act;
-    if(act==='delete' && !confirm('Supprimer définitivement ce profil ?')) return;
-    const body={action:act,id};
-    if(act==='suspend'){ const reason=prompt('Motif (interne) :','Non conforme'); if(reason===null) return; body.reason=reason; }
-    const r=await J('/api/admin-users',{method:'POST',body:JSON.stringify(body)});
-    setStatus('admin-users:'+r.status);
-    r.ok? (toast('Action OK'), loadUsers()) : toast('Erreur admin-users',false);
+  const ts=$("#tbSales"); ts.innerHTML='';
+  if(!SALES.length) ts.innerHTML=`<tr><td colspan="7" class="muted">Aucune vente.</td></tr>`;
+  SALES.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${s.date?new Date(s.date).toLocaleString():'—'}</td>
+      <td>${esc(s.creatorId||'')}</td>
+      <td><span class="chip">${esc(s.type||'ppv')}</span></td>
+      <td class="right">${CHF(s.amount||0)}</td>
+      <td>${esc(s.txn||'—')}</td>
+      <td>${esc(s.clientEmail||'—')}</td>
+      <td>${s.paid?'<span class="chip ok">payé</span>':'<span class="chip warn">impayé</span>'}</td>`;
+    ts.appendChild(tr);
   });
-  $("#applyUsers").onclick=renderUsers;
-  $("#fStatus").onchange=$("#fRole").onchange=$("#fQuery").oninput=()=>{ clearTimeout(window.__d); window.__d=setTimeout(renderUsers,180); };
+}
+$("#tbCreators").addEventListener('click', async e=>{
+  const b=e.target.closest('button[data-mark]'); if(!b) return;
+  if(!confirm('Confirmer : marquer PAYÉ pour cette créatrice ?')) return;
+  const r=await J('/api/mark-paid',{method:'POST',body:JSON.stringify({creatorId:b.dataset.mark})}); setStatus('mark-paid:'+r.status);
+  r.ok?(toast('Marqué payé'), loadLedger()):toast('Erreur mark-paid',false);
+});
+$("#exportCsv").onclick=()=>{
+  const head=['date','creatorId','type','amount','txn','clientEmail','paid'];
+  const rows=SALES.map(s=>[s.date||'',s.creatorId||'',s.type||'ppv',String(s.amount||0),s.txn||'',s.clientEmail||'',s.paid?'yes':'no']);
+  const csv=[head,...rows].map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`velvet-sales-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),400);
+};
+$("#refreshLedger").onclick=loadLedger;
 
-  // ===== LEDGER =====
-  let SALES=[];
-  async function loadLedger(){
-    $("#tbCreators").innerHTML='<tr><td colspan="6" class="muted">Chargement…</td></tr>';
-    $("#tbSales").innerHTML='<tr><td colspan="7" class="muted">Chargement…</td></tr>';
-    const r=await J('/api/list-ledger');
-    setStatus('list-ledger:'+r.status);
-    if(!r.ok){ $("#tbCreators").innerHTML=`<tr><td colspan="6" class="muted">/api/list-ledger → ${r.status}</td></tr>`; $("#tbSales").innerHTML=`<tr><td colspan="7" class="muted">/api/list-ledger → ${r.status}</td></tr>`; return; }
-    SALES=r.data?.sales||r.data||[];
-    renderLedger();
-  }
-  function renderLedger(){
-    const total=SALES.reduce((a,s)=>a+Number(s.amount||0),0);
-    $("#kTot").textContent=fmtCHF(total);
-    $("#k70").textContent=fmtCHF(total*0.70);
-    $("#k30").textContent=fmtCHF(total*0.30);
-    const unpaid=SALES.filter(s=>!s.paid).reduce((a,s)=>a+Number(s.amount||0)*0.70,0);
-    $("#kUnpaid").textContent=fmtCHF(unpaid);
-
-    const by={}; SALES.forEach(s=>{const id=s.creatorId||'—'; (by[id]||(by[id]={id,total:0,unpaid:0})).total+=Number(s.amount||0); if(!s.paid) by[id].unpaid+=Number(s.amount||0)*0.70;});
-    const tb=$("#tbCreators"); tb.innerHTML='';
-    const arr=Object.values(by).sort((a,b)=>b.total-a.total);
-    if(!arr.length) tb.innerHTML=`<tr><td colspan="6" class="muted">Pas encore de ventes.</td></tr>`;
-    arr.forEach(c=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${esc(c.id)}</td>
-        <td class="right">${fmtCHF(c.total)}</td>
-        <td class="right">${fmtCHF(c.total*0.70)}</td>
-        <td class="right">${fmtCHF(c.total*0.30)}</td>
-        <td class="right">${c.unpaid>0?`<span class="chip warn">${fmtCHF(c.unpaid)}</span>`:`<span class="chip ok">0,00 CHF</span>`}</td>
-        <td class="right">${c.unpaid>0?`<button class="btn small ghost" data-mark="${esc(c.id)}">Marquer payé</button>`:'—'}</td>`;
-      tb.appendChild(tr);
-    });
-
-    const ts=$("#tbSales"); ts.innerHTML='';
-    if(!SALES.length) ts.innerHTML=`<tr><td colspan="7" class="muted">Aucune vente.</td></tr>`;
-    SALES.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).forEach(s=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${s.date?new Date(s.date).toLocaleString():'—'}</td>
-        <td>${esc(s.creatorId||'')}</td>
-        <td><span class="chip">${esc(s.type||'ppv')}</span></td>
-        <td class="right">${fmtCHF(s.amount||0)}</td>
-        <td>${esc(s.txn||'—')}</td>
-        <td>${esc(s.clientEmail||'—')}</td>
-        <td>${s.paid?'<span class="chip ok">payé</span>':'<span class="chip warn">impayé</span>'}</td>`;
-      ts.appendChild(tr);
-    });
-  }
-  $("#tbCreators").addEventListener('click', async e=>{
-    const b=e.target.closest('button[data-mark]'); if(!b) return;
-    if(!confirm('Confirmer : marquer payé cette créatrice ?')) return;
-    const r=await J('/api/mark-paid',{method:'POST',body:JSON.stringify({creatorId:b.dataset.mark})});
-    setStatus('mark-paid:'+r.status);
-    r.ok?(toast('Marqué payé'), loadLedger()):toast('Erreur mark-paid',false);
+// ========== CONVERSATIONS ==========
+let CONVS=[], CURRENT=null;
+async function loadConversations(q=''){
+  $("#convList").innerHTML='<div class="item"><div class="top"><strong>Chargement…</strong><span class="meta">—</span></div><div class="meta">—</div></div>';
+  const r=await J(`/api/list-conversations${q?`?query=${encodeURIComponent(q)}`:''}`); setStatus('list-conversations:'+r.status);
+  if(!r.ok){ $("#convList").innerHTML='<div class="item"><div class="top"><strong>Erreur</strong><span class="meta">/api/list-conversations</span></div><div class="meta">Vérifie les functions</div></div>'; return; }
+  CONVS=r.data?.conversations||r.data||[];
+  renderConvList();
+}
+function renderConvList(){
+  const box=$("#convList"); box.innerHTML='';
+  if(!CONVS.length){ box.innerHTML='<div class="item"><div class="top"><strong>Aucune conversation</strong><span class="meta">—</span></div><div class="meta">—</div></div>'; return; }
+  CONVS.sort((a,b)=>String(b.lastDate||'').localeCompare(String(a.lastDate||''))).forEach(c=>{
+    const el=document.createElement('div'); el.className='item'; el.dataset.id=c.id;
+    el.innerHTML=`<div class="top"><strong>${esc((c.users||[]).join(' · '))}</strong><span class="meta">${c.lastDate?new Date(c.lastDate).toLocaleString():'—'}</span></div>
+                  <div class="meta">${esc(c.lastMsg||'')}${c.mediaCount?` • ${c.mediaCount} média(s)`:''} • ${c.msgCount||0} msg</div>`;
+    el.onclick=()=>openConv(c.id);
+    box.appendChild(el);
   });
-  $("#exportCsv").onclick=()=>{
-    const head=['date','creatorId','type','amount','txn','clientEmail','paid'];
-    const rows=SALES.map(s=>[s.date||'',s.creatorId||'',s.type||'ppv',String(s.amount||0),s.txn||'',s.clientEmail||'',s.paid?'yes':'no']);
-    const csv=[head,...rows].map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-    a.download=`velvet-sales-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
-  };
-  $("#refreshLedger").onclick=loadLedger;
+}
+async function openConv(id){
+  $("#chatBox").innerHTML='<div class="muted" style="padding:10px">Chargement…</div>'; $("#convTitle").textContent='Conversation'; $("#convUsers").textContent='—'; CURRENT=id;
+  const r=await J(`/api/conversation?id=${encodeURIComponent(id)}`); setStatus('conversation:'+r.status);
+  if(!r.ok){ $("#chatBox").innerHTML='<div class="muted" style="padding:10px">Erreur /api/conversation</div>'; return; }
+  const data=r.data||{};
+  $("#convTitle").textContent=`#${data.id||id}`; $("#convUsers").textContent=(data.users||[]).join(' · ');
+  const box=$("#chatBox"); box.innerHTML='';
 
-  // ===== Status panel =====
-  function setStatus(t){ $("#lastStatus").textContent = `[${new Date().toLocaleTimeString()}] ${t}`; }
+  (data.messages||[]).forEach(m=>{
+    const row=document.createElement('div'); row.className='msg '+(m.role==='creator'?'them':'me');
+    const bubble=document.createElement('div'); bubble.className='bubble';
+    bubble.innerHTML = `
+      <div class="from">${esc(m.from||'')}</div>
+      ${m.text?`<div>${esc(m.text)}</div>`:''}
+      ${m.image?`<div style="margin-top:6px"><img src="${esc(m.image)}" alt=""></div>`:''}
+      ${m.video?`<div style="margin-top:6px"><video src="${esc(m.video)}" controls></video></div>`:''}
+      ${m.file?`<div style="margin-top:6px"><a href="${esc(m.file)}" download>Télécharger fichier</a></div>`:''}
+      ${m.price?`<div class="chip" style="margin-top:6px">Payant ${CHF(m.price)} ${m.paid?'<span class="ok">• payé</span>':'• impayé'}</div>`:''}
+      <div class="meta" style="margin-top:6px;color:#6a7383;font-size:12px">${m.date?new Date(m.date).toLocaleString():'—'}
+        ${m.deleted?'<span class="chip bad" style="margin-left:6px">supprimé</span>':''}
+        ${m.flagged?'<span class="chip warn" style="margin-left:6px">signalé</span>':''}
+        <span style="float:right">
+          <button class="btn ghost small" data-del="${esc(m.id||'')}" style="padding:4px 8px">Supprimer</button>
+          <button class="btn ghost small" data-flag="${esc(m.id||'')}" style="padding:4px 8px">${m.flagged?'Retirer signalement':'Signaler'}</button>
+        </span>
+      </div>`;
+    row.appendChild(bubble); box.appendChild(row);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+// actions message
+$("#chatBox").addEventListener('click', async e=>{
+  const del=e.target.closest('button[data-del]'), flag=e.target.closest('button[data-flag]');
+  if(!del && !flag) return;
+  const idMsg=(del?del.dataset.del:flag.dataset.flag);
+  const action = del ? 'delete-message' : (e.target.textContent.includes('Retirer') ? 'unflag' : 'flag');
+  const reason = action==='flag' ? (prompt('Motif de signalement :','Contenu non conforme')||'Signalement admin') : undefined;
+  const r=await J('/api/moderate',{method:'POST',body:JSON.stringify({action,conversationId:CURRENT,messageId:idMsg,reason})});
+  setStatus('moderate:'+r.status);
+  r.ok ? (toast('OK'), openConv(CURRENT)) : toast('Erreur modération', false);
+});
+$("#applyConv").onclick=()=>loadConversations( $("#cQuery").value||'' );
+$("#flagConv").onclick=async()=>{ if(!CURRENT) return;
+  const r=await J('/api/moderate',{method:'POST',body:JSON.stringify({action:'flag',conversationId:CURRENT,reason:'Flag global'})});
+  setStatus('moderate:'+r.status); r.ok?toast('Conversation signalée'):toast('Erreur',false);
+};
+$("#blockUser").onclick=async()=>{ if(!CURRENT) return;
+  const uid=prompt('ID utilisateur à bloquer :'); if(!uid) return;
+  const r=await J('/api/moderate',{method:'POST',body:JSON.stringify({action:'block-user',conversationId:CURRENT,userId:uid,reason:'Blocage admin'})});
+  setStatus('moderate:'+r.status); r.ok?toast('Utilisateur bloqué'):toast('Erreur',false);
+};
 
-  // ===== Global events / boot =====
-  $("#reloadAll").onclick=()=>{ loadUsers(); loadLedger(); toast('Rafraîchi'); };
-  $("#btnReload").onclick=()=>{ loadUsers(); loadLedger(); };
+// Status panel
+function setStatus(t){ $("#lastStatus").textContent=`[${new Date().toLocaleTimeString()}] ${t}`; }
 
-  // Premier chargement
-  loadUsers(); loadLedger();
+// Global
+$("#reloadAll").onclick=()=>{ loadUsers(); loadLedger(); loadConversations(); toast('Rafraîchi'); };
+$("#btnReload").onclick=()=>{ loadUsers(); loadLedger(); loadConversations(); };
+
+// Boot
+loadUsers(); loadLedger(); loadConversations();
 </script>
 </body>
 </html>
