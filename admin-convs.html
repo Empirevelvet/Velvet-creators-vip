@@ -1,42 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <title>Velvet — Admin Conversations</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" href="/admin.css"/>
-  <style>
-    body{margin:0;display:flex;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b0b0d;color:#f6f6f6}
-    .sidebar{width:250px;min-height:100vh;background:#0f0f12;border-right:1px solid #212129;padding:18px 16px;position:sticky;top:0}
-    .nav a{display:block;padding:10px 12px;border-radius:10px;color:#ddd;text-decoration:none;background:#131318;border:1px solid #1f1f26;margin:6px 0}
-    .nav a.active,.nav a:hover{border-color:#8a6d2f;color:#f7f0da}
-    .main{flex:1;min-height:100vh;padding:18px}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
-    .input{background:#111114;border:1px solid #23232b;color:#eee;border-radius:10px;padding:10px 12px}
-    .btn{background:#1a1a1f;border:1px solid #2b2b33;color:#eee;border-radius:10px;padding:10px 12px;cursor:pointer}
-    .btn:hover{border-color:#8a6d2f}
-    .chip{background:#121219;border:1px solid #24242c;color:#bfbfcc;border-radius:999px;padding:6px 10px;font-size:12px}
-    table{width:100%;border-collapse:separate;border-spacing:0;background:#0f0f14;border:1px solid #212129;border-radius:12px;overflow:hidden}
-    thead th{background:#111117;color:#cfcfdb;text-align:left;font-weight:600;padding:10px;border-bottom:1px solid #1f1f26}
-    tbody td{padding:10px;border-top:1px solid #17171d}
-    tbody tr:hover{background:#12121a}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px}
-    .modal .box{max-width:720px;width:100%;background:#101015;border:1px solid #212129;border-radius:14px;overflow:hidden}
-    .modal header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #1f1f26}
-    .messages{max-height:60vh;overflow:auto;padding:10px}
-    .msg{margin:8px 0}
-    .msg small{display:block;color:#9a9aa3}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
 </head>
 <body>
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
     <nav class="nav">
       <a href="/admin-dashboard.html">📊 Aperçu</a>
-      <a href="/admin-users.html">👤 Comptes</a>
+      <a href="/admin-users.html">👥 Comptes</a>
       <a href="/admin-dashboard.html#sales">💳 Ventes</a>
       <a class="active" href="/admin-convs.html">💬 Conversations</a>
-      <a href="/admin-lives.html">🎥 Lives</a>
+      <a href="/admin-lives.html">📺 Lives</a>
       <a href="/admin-items.html">➕ Créer un item</a>
     </nav>
     <div class="foot">© Velvet Creators VIP</div>
@@ -44,73 +22,56 @@
 
   <main class="main">
     <div class="topbar">
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="q" class="input" placeholder="Filtrer (pseudo / email / mots)"/>
+      <h1>💬 Conversations</h1>
+      <div class="chips">
+        <span class="chip" id="clock">--:--:--</span>
         <button class="btn" id="btnReload">Rafraîchir</button>
       </div>
-      <span class="chip" id="k-count">0 conv.</span>
     </div>
 
-    <section>
+    <section class="section">
+      <h2>Dernières conversations</h2>
       <table id="t-conv">
         <thead>
-          <tr><th>Dernier update</th><th>Participants</th><th>Dernier message</th><th>Action</th></tr>
+          <tr><th>Participants</th><th>Dernier message</th><th>Date</th><th>Action</th></tr>
         </thead>
-        <tbody><tr><td colspan="4">Chargement…</td></tr></tbody>
+        <tbody>
+          <tr><td colspan="4">Chargement…</td></tr>
+        </tbody>
       </table>
     </section>
   </main>
 
-  <!-- Modal -->
-  <div class="modal" id="modal">
-    <div class="box">
-      <header>
-        <strong id="m-title">Conversation</strong>
-        <button class="btn" id="m-close">Fermer</button>
-      </header>
-      <div class="messages" id="m-body"></div>
-    </div>
-  </div>
+  <script>
+    const $ = s => document.querySelector(s);
 
-<script>
-const $=s=>document.querySelector(s);
-let DATA=[];
-async function load(){
-  const tb=$('#t-conv tbody'); tb.innerHTML='<tr><td colspan="4">Chargement…</td></tr>';
-  const r=await fetch('/data/convs.json'); if(!r.ok){ tb.innerHTML='<tr><td colspan="4">Erreur</td></tr>'; return; }
-  DATA=await r.json(); render();
-}
-function render(){
-  const tb=$('#t-conv tbody'); const q=($('#q').value||'').toLowerCase();
-  let rows=DATA;
-  if(q) rows=rows.filter(c=>{
-    const text=(c.lastMessage||'')+' '+(c.participants||[]).join(' ')+' '+(c.room||'');
-    return text.toLowerCase().includes(q);
-  });
-  $('#k-count').textContent = (rows.length||0)+' conv.';
-  if(!rows.length){ tb.innerHTML='<tr><td colspan="4">Aucun résultat</td></tr>'; return; }
-  tb.innerHTML = rows.map(c=>`
-    <tr>
-      <td>${new Date(c.updatedAt||c.date||Date.now()).toLocaleString()}</td>
-      <td>${(c.participants||[]).join(', ')||'—'}</td>
-      <td>${c.lastMessage||'—'}</td>
-      <td><button class="btn" data-view="${c.id||''}">Voir</button></td>
-    </tr>
-  `).join('');
-}
-document.addEventListener('click',e=>{
-  const b=e.target.closest('button[data-view]'); if(!b) return;
-  const id=b.dataset.view; const conv = DATA.find(x=>String(x.id)===String(id));
-  if(!conv) return;
-  $('#m-title').textContent = `Conversation ${conv.id||''} — ${(conv.participants||[]).join(', ')}`;
-  const msgs = (conv.messages||[]).map(m=>`<div class="msg"><strong>${m.from||'—'}</strong> — ${m.text||''}<small>${new Date(m.at||Date.now()).toLocaleString()}</small></div>`).join('');
-  $('#m-body').innerHTML = msgs || '<div style="padding:10px;color:#9a9aa3">Aucun message</div>';
-  $('#modal').style.display='flex';
-});
-$('#m-close').onclick=()=>{$('#modal').style.display='none';}
-$('#btnReload').onclick=load;
-$('#q').addEventListener('input',render);
-load();
-</script>
+    // horloge
+    setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString(),1000);
+
+    async function loadConvs(){
+      try{
+        const r = await fetch('/data/convs.json'); // ou /.netlify/functions/list-conversations
+        const j = await r.json();
+        const tb=$('#t-conv tbody'); tb.innerHTML='';
+        if(!j.length){ tb.innerHTML='<tr><td colspan="4">Aucune conversation.</td></tr>'; return; }
+        j.forEach(c=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `
+            <td>${(c.participants||[]).join(', ')}</td>
+            <td>${c.lastMessage||'—'}</td>
+            <td>${(c.updatedAt||'').replace('T',' ').slice(0,16)}</td>
+            <td><button class="btn">👀 Voir</button></td>
+          `;
+          tb.appendChild(tr);
+        });
+      }catch(e){
+        console.error(e);
+        $('#t-conv tbody').innerHTML='<tr><td colspan="4">Erreur API</td></tr>';
+      }
+    }
+
+    $('#btnReload').onclick = loadConvs;
+    loadConvs();
+  </script>
 </body>
 </html>
