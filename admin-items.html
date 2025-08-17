@@ -1,150 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Velvet — Créer un item</title>
-<style>
-  .ui{--bg:#0f1115;--panel:#171923;--ink:#e8ecf3;--muted:#9aa4b2;--line:#262a36;
-      --brand:#8b5cf6;--brand-ink:#7245ea;--ok:#2bd4a7;--danger:#ef4444;--chip:#1b2030;--radius:14px;
-      background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,Inter,Roboto,Arial}
-  *{box-sizing:border-box}
-  .wrap{max-width:940px;margin:0 auto;padding:22px 16px}
-  header{position:sticky;top:0;z-index:10;background:#0f1115cc;backdrop-filter:saturate(120%) blur(8px);
-         border-bottom:1px solid var(--line)}
-  h1{font-size:28px;margin:8px 0 6px}
-  .muted{color:var(--muted)}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
-  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
-  @media (max-width:920px){.grid{grid-template-columns:1fr}}
-  label{display:block;margin:12px 0 6px;font-weight:700}
-  .input,select,textarea{width:100%;background:#121522;color:var(--ink);border:1px solid var(--line);
-    border-radius:12px;padding:12px 12px;outline:none}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .btn{appearance:none;background:var(--brand);color:#fff;border:0;border-radius:11px;
-       padding:10px 14px;font-weight:800;cursor:pointer}
-  .btn:hover{background:var(--brand-ink)}
-  .btn.ghost{background:#0f1115;border:1px solid var(--line);color:var(--ink)}
-  .help{font-size:13px;color:var(--muted)}
-  .chip{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#131722;color:#c9d1e3;font-size:12px}
-  .preview{margin-top:10px;border:1px dashed #30364a;border-radius:12px;padding:10px;min-height:80px;display:flex;align-items:center;justify-content:center;color:#94a3b8}
-  .ok{color:var(--ok)} .err{color:var(--danger)}
-</style>
+  <meta charset="UTF-8" />
+  <title>Velvet — Créer un item</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
 </head>
-<body class="ui">
-<header><div class="wrap" style="display:flex;gap:10px;align-items:center">
-  <strong>Velvet — Admin</strong><span style="opacity:.5">/ Créer un item</span>
-  <span style="flex:1"></span>
-  <a class="btn ghost" href="/admin-dashboard.html">Dashboard</a>
-</div></header>
+<body>
+  <aside class="sidebar">
+    <h2>VELVET ADMIN</h2>
+    <nav class="nav">
+      <a href="/admin-dashboard.html">Aperçu</a>
+      <a href="/admin-users.html">Comptes</a>
+      <a href="/admin-dashboard.html#sales">Ventes</a>
+      <a href="/admin-dashboard.html#convs">Conversations</a>
+      <a href="/admin-dashboard.html#lives">Lives</a>
+      <a class="active" href="/admin-items.html">Créer un item</a>
+    </nav>
+    <div class="foot">© Velvet Creators VIP</div>
+  </aside>
 
-<main class="wrap">
-  <h1>Créer un item (photo / vidéo / PPV / live)</h1>
-  <p class="muted">Renseigne le prix et (optionnel) associe l’item à une créatrice pour le suivi des revenus.</p>
+  <main class="main">
+    <div class="topbar">
+      <div class="chips"><a class="btn ghost" href="/admin-dashboard.html">Dashboard</a></div>
+      <div class="chips"><button class="btn" id="reset">Réinitialiser</button></div>
+    </div>
 
-  <div class="grid">
-    <section class="panel">
-      <label for="creatorId">ID créatrice (optionnel)</label>
-      <input class="input" id="creatorId" placeholder="ex: user_1234 (ou laisse vide pour ‘creatrice-demo’)"/>
+    <section class="section">
+      <h2>Créer un item (photo / vidéo / PPV / live)</h2>
+      <p class="help">Renseigne le prix et (optionnel) associe l’item à une créatrice pour le suivi des revenus.</p>
 
-      <div class="row">
+      <form class="form-grid" id="f">
         <div>
-          <label for="title">Titre</label>
-          <input class="input" id="title" placeholder="ex: Live privé du samedi soir"/>
+          <label>ID créatrice (optionnel)</label>
+          <input class="input" id="creatorId" placeholder="ex: user_1234 (ou vide pour ‘creatrice-demo’)" />
         </div>
+
         <div>
-          <label for="type">Type</label>
-          <select id="type" class="input">
-            <option value="ppv_image">Image (PPV)</option>
-            <option value="ppv_video">Vidéo (PPV)</option>
-            <option value="ppv_file">Fichier (PPV)</option>
-            <option value="live">Accès Live — ticket</option>
+          <label>Type</label>
+          <select class="input" id="type">
+            <option value="image">Image (PPV)</option>
+            <option value="video">Vidéo (PPV)</option>
+            <option value="ppv">PPV (texte/lien)</option>
+            <option value="live">LIVE (ticket)</option>
           </select>
         </div>
-      </div>
 
-      <div class="row">
         <div>
-          <label for="price">Prix (CHF)</label>
-          <input class="input" id="price" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0.00"/>
+          <label>Titre</label>
+          <input class="input" id="title" placeholder="ex: Live privé du samedi soir" />
         </div>
-        <div id="liveFields" style="display:none">
-          <label for="room">Nom de salle (pour LIVE)</label>
-          <input class="input" id="room" placeholder="ex: saturday-live-21h"/>
+
+        <div>
+          <label>Prix (CHF)</label>
+          <input class="input" id="price" type="number" step="0.01" min="0" value="0.00" />
         </div>
-      </div>
 
-      <label for="notes">Notes privées (optionnel)</label>
-      <textarea id="notes" rows="3" class="input" placeholder="Infos internes (non visibles client)"></textarea>
+        <div class="full" id="roomWrap" hidden>
+          <label>Nom de salle (pour LIVE)</label>
+          <input class="input" id="room" placeholder="ex: saturday-live-21h" />
+        </div>
 
-      <div class="preview" id="pv">Aucun aperçu</div>
+        <div class="full">
+          <label>Notes privées (optionnel)</label>
+          <textarea class="input" id="notes" placeholder="Infos internes (non visibles client)"></textarea>
+        </div>
 
-      <div style="display:flex;gap:10px;margin-top:14px">
-        <button id="create" class="btn">Créer l’item</button>
-        <button id="reset" class="btn ghost">Réinitialiser</button>
-        <span id="msg" class="help"></span>
-      </div>
+        <div class="full chips">
+          <button type="button" class="btn" id="create">Créer l’item</button>
+          <button type="button" class="btn ghost" id="reset2">Réinitialiser</button>
+        </div>
+      </form>
     </section>
 
-    <aside class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;font-size:16px">Récapitulatif</h3>
-        <span class="chip" id="rev">70% / 30%</span>
+    <section class="section">
+      <h2>Récapitulatif</h2>
+      <div class="card">
+        <p>• <b>70% pour la créatrice</b>, 30% pour Velvet.<br/>• Pour un <b>LIVE</b>, renseigne le <b>nom de salle</b> (room).<br/>• Après création, partage l’<b>URL de paiement</b> au client.</p>
+        <p><b>Exemple d’URL de paiement générée :</b><br><code id="payUrl">—</code></p>
       </div>
-      <div class="help" style="margin-top:8px">
-        • <b>70%</b> pour la créatrice, <b>30%</b> pour Velvet.<br/>
-        • Pour un <b>LIVE</b>, renseigne le <b>nom de salle</b> (room).<br/>
-        • Après création, partage l’URL de paiement au client.
-      </div>
-      <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
-      <div class="help">Exemple d’URL de paiement générée :</div>
-      <code id="urlEx" class="chip" style="display:block;margin-top:8px;overflow:auto">—</code>
-    </aside>
-  </div>
-</main>
+    </section>
+  </main>
 
-<script>
-  const $=s=>document.querySelector(s);
-  const fmt=v=>Number(v||0).toFixed(2);
-  const u=(id)=>encodeURIComponent(id);
+  <script>
+    const $ = s=>document.querySelector(s);
+    const api = (p,opt={})=>fetch(p,{headers:{'Content-Type':'application/json'},...opt});
 
-  function refreshRevenue(){
-    const p=parseFloat($("#price").value||0);
-    const c=fmt(p*0.70), v=fmt(p*0.30);
-    $("#rev").textContent=`Créatrice ${c} / Velvet ${v}`;
-  }
-  $("#price").oninput=refreshRevenue; refreshRevenue();
-  $("#type").onchange=()=>{ const isLive=$("#type").value==='live'; $("#liveFields").style.display=isLive?'block':'none'; };
+    const typeEl = $('#type'), roomWrap = $('#roomWrap');
+    typeEl.onchange = ()=>{ roomWrap.hidden = (typeEl.value!=='live'); };
+    $('#reset').onclick = $('#reset2').onclick = ()=>{ $('#f').reset(); $('#payUrl').textContent='—'; roomWrap.hidden=true; };
 
-  $("#reset").onclick=()=>{
-    ["creatorId","title","price","room","notes"].forEach(id=>$("#"+id).value="");
-    $("#type").value="ppv_image"; $("#liveFields").style.display="none";
-    $("#pv").textContent="Aucun aperçu"; $("#msg").textContent=""; $("#urlEx").textContent="—";
-  };
+    $('#create').onclick = async ()=>{
+      const body = {
+        creatorId: $('#creatorId').value.trim() || 'creatrice-demo',
+        type: $('#type').value,
+        title: $('#title').value.trim(),
+        price: parseFloat($('#price').value||'0'),
+        roomName: $('#room').value.trim() || undefined,
+        notes: $('#notes').value.trim() || undefined
+      };
+      if(!body.title) return alert('Titre requis');
+      if(isNaN(body.price)||body.price<0) return alert('Prix invalide');
+      if(body.type==='live' && !body.roomName) return alert('Nom de salle requis pour un live');
 
-  $("#create").onclick=async()=>{
-    const price=parseFloat($("#price").value||"0");
-    if(!price || price<=0){ $("#msg").textContent="Le prix doit être supérieur à 0"; $("#msg").className="err"; return; }
-    const body={
-      creatorId: ($("#creatorId").value||'creatrice-demo').trim(),
-      title: ($("#title").value||'Sans titre').trim(),
-      type: $("#type").value,
-      price,
-      roomName: ($("#room").value||'').trim(),
-      notes: ($("#notes").value||'').trim()
+      try{
+        const r = await api('/api/upsert-item',{method:'POST',body:JSON.stringify(body)});
+        const j = await r.json();
+        if(!r.ok || !j.itemId){ alert(j.error||'Erreur création'); return; }
+        const url = location.origin + '/paiement.html?itemId=' + encodeURIComponent(j.itemId);
+        $('#payUrl').textContent = url;
+        alert('Item créé ! URL paiement générée.');
+      }catch(e){ alert('Erreur réseau'); }
     };
-    $("#msg").textContent="Création…"; $("#msg").className="help";
-    try{
-      const r=await fetch('/api/upsert-item',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const j=await r.json();
-      if(!r.ok || !j.success){ $("#msg").textContent=j.error||'Erreur serveur'; $("#msg").className="err"; return; }
-      const payUrl=`/paiement.html?itemId=${u(j.itemId)}`;
-      $("#pv").innerHTML=`Item <b class="ok">${j.itemId}</b> créé.`;
-      $("#urlEx").textContent=location.origin+payUrl;
-      $("#msg").textContent="OK – lien de paiement prêt.";
-      $("#msg").className="ok";
-    }catch(e){ $("#msg").textContent="Erreur réseau"; $("#msg").className="err"; }
-  };
-</script>
+  </script>
 </body>
 </html>
