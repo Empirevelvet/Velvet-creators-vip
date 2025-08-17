@@ -18,3 +18,6 @@
   status = 302
   force = true
   conditions = { role = ["admin"] }
+[[scheduled.functions]]
+name = "prune-users"
+cron = "0 3 * * *"
