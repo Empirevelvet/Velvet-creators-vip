@@ -1,21 +1,25 @@
-(function(){
-  var KEY='velvet_cookies_accepted_v1';
-  var banner=document.getElementById('cookie-banner');
-  if(!banner) return;
-  if(localStorage.getItem(KEY)!=='true'){
-    banner.hidden=false;
-    document.body.classList.add('has-cookie-banner');
-    requestAnimationFrame(function(){ banner.classList.add('show'); });
+// cookies.js — bandeau non bloquant, mobile-friendly
+document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.getElementById('cookie-banner');
+  if (!banner) return;
+
+  // Déjà accepté ?
+  if (localStorage.getItem('cookieConsent') === 'yes') {
+    try { banner.remove(); } catch {}
+    return;
   }
-  var btn=document.getElementById('cookie-accept');
-  if(btn){
-    btn.addEventListener('click', function(){
-      localStorage.setItem(KEY,'true');
-      banner.classList.remove('show');
-      setTimeout(function(){
-        banner.hidden=true;
-        document.body.classList.remove('has-cookie-banner');
-      }, 250);
+
+  // Affiche le bandeau et réserve l’espace en bas pour ne rien masquer
+  banner.hidden = false;
+  document.body.classList.add('cookie-open');
+
+  // Bouton "Accepter"
+  const btn = document.getElementById('cookie-accept');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      localStorage.setItem('cookieConsent', 'yes');
+      try { banner.remove(); } catch {}
+      document.body.classList.remove('cookie-open');
     });
   }
-})();
+});
