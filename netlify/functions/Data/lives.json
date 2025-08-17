@@ -1,0 +1,18 @@
+[
+  {
+    "room": "live_public_2000",
+    "creator": "@sofia",
+    "status": "scheduled",
+    "startAt": "2025-08-17T20:00:00Z",
+    "viewers": 0,
+    "adminUrl": "#"
+  },
+  {
+    "room": "live_private_1to1_anna",
+    "creator": "@anna",
+    "status": "live",
+    "startAt": "2025-08-17T18:30:00Z",
+    "viewers": 1,
+    "adminUrl": "#"
+  }
+]
