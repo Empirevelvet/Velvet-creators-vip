@@ -3,11 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <title>Velvet — Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/admin.css" />
+  <style>
+    /* filet minimal au cas où admin.css ne charge pas */
+    body{margin:0;display:flex;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b0b0d;color:#f6f6f6}
+    .sidebar{width:250px;min-height:100vh;background:#0f0f12;border-right:1px solid #212129;padding:18px 16px;position:sticky;top:0}
+    .sidebar h2{margin:0 0 10px;font-weight:700;letter-spacing:.6px}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .nav a{display:block;padding:10px 12px;border-radius:10px;color:#ddd;text-decoration:none;background:#131318;border:1px solid #1f1f26}
+    .nav a.active,.nav a:hover{border-color:#8a6d2f;color:#f7f0da;box-shadow:0 0 0 1px #4b3a18 inset}
+    .foot{margin-top:auto;font-size:12px;color:#9a9aa3}
+    .main{flex:1;min-height:100vh;padding:18px 18px 80px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+    .search{display:flex;gap:8px;align-items:center}
+    .chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .input{background:#111114;border:1px solid #23232b;color:#eee;border-radius:10px;padding:10px 12px;min-width:220px}
+    .btn{background:#1a1a1f;border:1px solid #2b2b33;color:#eee;border-radius:10px;padding:10px 12px;cursor:pointer}
+    .btn:hover{border-color:#8a6d2f}
+    .btn.ghost{background:transparent}
+    .btn.warn{border-color:#b88700}
+    .btn.danger{border-color:#b03a3a}
+    .chip{background:#121219;border:1px solid #24242c;color:#bfbfcc;border-radius:999px;padding:6px 10px;font-size:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.grid{grid-template-columns:1fr}}
+    .card{background:#101015;border:1px solid #212129;border-radius:14px;padding:14px}
+    .card h3{margin:0 0 6px;font-size:14px;color:#cfcfdb;font-weight:600}
+    .card .value{font-size:26px;font-weight:700}
+    .card .value.bad{color:#f2c66d}
+    .section{margin-top:16px}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:#0f0f14;border:1px solid #212129;border-radius:12px;overflow:hidden}
+    thead th{background:#111117;color:#cfcfdb;text-align:left;font-weight:600;padding:10px;border-bottom:1px solid #1f1f26}
+    tbody td{padding:10px;border-top:1px solid #17171d}
+    tbody tr:hover{background:#12121a}
+    .small{margin-top:24px;color:#9a9aa3;font-size:12px}
+  </style>
 </head>
 <body>
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>VELVET ADMIN</h2>
     <nav class="nav">
@@ -21,9 +54,7 @@
     <div class="foot">© Velvet Creators VIP</div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
-    <!-- TOP BAR -->
     <div class="topbar">
       <div class="search">
         <input id="q" class="input" type="text" placeholder="Rechercher (pseudo, email)" />
@@ -36,9 +67,8 @@
       </div>
     </div>
 
-    <!-- ======= OVERVIEW (onglet) ======= -->
+    <!-- OVERVIEW -->
     <section class="section" id="overview" data-tab>
-      <!-- KPIs -->
       <div class="grid">
         <div class="card"><h3>Utilisateurs en ligne</h3><div class="value" id="k-online">0</div><small>dans les 5 dernières minutes</small></div>
         <div class="card"><h3>Inscriptions en attente</h3><div class="value" id="k-pending">0</div><small>à valider</small></div>
@@ -46,7 +76,6 @@
         <div class="card"><h3>Impayé total</h3><div class="value bad" id="k-due">0.00 CHF</div><small>à verser aux créatrices</small></div>
       </div>
 
-      <!-- DERNIÈRES VENTES -->
       <div class="section">
         <h2>Dernières ventes</h2>
         <table id="t-last">
@@ -55,7 +84,6 @@
         </table>
       </div>
 
-      <!-- RECAP CRÉATRICES -->
       <div class="section">
         <h2>Récap ventes par créatrice</h2>
         <table id="t-creators">
@@ -66,7 +94,7 @@
       </div>
     </section>
 
-    <!-- ======= VENTES (onglet) ======= -->
+    <!-- SALES -->
     <section class="section" id="sales" data-tab hidden>
       <h2>Détail des ventes</h2>
       <table id="t-ledger">
@@ -75,7 +103,7 @@
       </table>
     </section>
 
-    <!-- ======= CONVERSATIONS (onglet) ======= -->
+    <!-- CONVERSATIONS -->
     <section class="section" id="convs" data-tab hidden>
       <h2>Conversations (aperçu)</h2>
       <table id="t-conv">
@@ -84,7 +112,7 @@
       </table>
     </section>
 
-    <!-- ======= LIVES (onglet) ======= -->
+    <!-- LIVES -->
     <section class="section" id="lives" data-tab hidden>
       <h2>Lives</h2>
       <table id="t-lives">
@@ -96,33 +124,27 @@
     <footer class="small">Besoin d’un filtre/onglet en plus ? Dis‑moi et je l’ajoute.</footer>
   </main>
 
-  <!-- SCRIPT UNIQUE -->
   <script>
-    // ===== Utils =====
     const $  = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
     const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
     const fmt = n => Number(n||0).toFixed(2);
 
-    // ===== Horloge + auto refresh =====
+    // Horloge + auto-refresh
     setInterval(()=>{ const el=$('#clock'); if(el) el.textContent=new Date().toLocaleTimeString(); }, 1000);
-    setInterval(()=>reloadAll(), 30_000);
+    setInterval(()=>reloadAll(), 30000);
 
-    // ===== Tabs (hash) =====
+    // Tabs
     function activateFromHash(){
       const hash = location.hash || '#overview';
-      // Activer lien
       $$('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')===hash));
-      // Afficher section ciblée (data-tab)
-      const all = $$('[data-tab]');
-      all.forEach(sec => { sec.hidden = ('#'+sec.id !== hash); });
-      // Scroll top
+      $$('[data-tab]').forEach(sec => { sec.hidden = ('#'+sec.id !== hash); });
       const el = $(hash); if(el) el.scrollIntoView({block:'start'});
     }
     window.addEventListener('hashchange', activateFromHash);
     document.addEventListener('DOMContentLoaded', activateFromHash);
 
-    // ===== Rendus =====
+    // Rendus
     function renderLast(rows=[]){
       const tb = $('#t-last tbody'); if(!tb) return;
       tb.innerHTML='';
@@ -199,15 +221,15 @@
       });
     }
 
-    // ===== Chargements =====
+    // Chargements
     async function loadLedger(){
       try{
         const r = await api('/api/list-ledger');
         const j = await r.json();
-        $('#k-online') && ($('#k-online').textContent  = j.online ?? 0);
-        $('#k-pending')&& ($('#k-pending').textContent = j.pending ?? 0);
-        $('#k-today')  && ($('#k-today').textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF');
-        $('#k-due')    && ($('#k-due').textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF');
+        $('#k-online')  && ($('#k-online').textContent  = j.online ?? 0);
+        $('#k-pending') && ($('#k-pending').textContent = j.pending ?? 0);
+        $('#k-today')   && ($('#k-today').textContent   = (j.totals?.today ?? 0).toFixed(2)+' CHF');
+        $('#k-due')     && ($('#k-due').textContent     = (j.totals?.due   ?? 0).toFixed(2)+' CHF');
         renderLast(j.last||[]);
         renderCreators(j.creators||{});
         renderLedger(j.ledger||[]);
@@ -216,50 +238,39 @@
     async function loadConversations(){
       try{
         const r = await api('/api/list-conversations'); if (!r.ok) throw 0;
-        const j = await r.json(); renderConvs(j.items||[]);
-      }catch(e){
-        const tb = $('#t-conv tbody'); if(tb) tb.innerHTML='<tr><td colspan="4">Indisponible.</td></tr>';
-      }
+        renderConvs((await r.json()).items||[]);
+      }catch{ const tb=$('#t-conv tbody'); if(tb) tb.innerHTML='<tr><td colspan="4">Indisponible.</td></tr>'; }
     }
     async function loadLives(){
       try{
         const r = await api('/api/list-lives'); if (!r.ok) throw 0;
-        const j = await r.json(); renderLives(j.items||[]);
-      }catch(e){
-        const tb = $('#t-lives tbody'); if(tb) tb.innerHTML='<tr><td colspan="5">Indisponible.</td></tr>';
-      }
+        renderLives((await r.json()).items||[]);
+      }catch{ const tb=$('#t-lives tbody'); if(tb) tb.innerHTML='<tr><td colspan="5">Indisponible.</td></tr>'; }
     }
 
-    // ===== Actions =====
+    // Actions
     async function markPaid(id){
       try{
         const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id }) });
-        const j = await r.json();
-        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
-        loadLedger();
-      }catch(e){ alert('Erreur marquage payé'); }
+        const j = await r.json(); if (!r.ok || !j.ok) throw 0; loadLedger();
+      }catch{ alert('Erreur marquage payé'); }
     }
     async function markAllForCreator(name){
       if (!confirm('Marquer TOUT impayé comme versé pour cette créatrice ?')) return;
       try{
         const r = await api('/api/mark-paid', { method:'POST', body: JSON.stringify({ id: 'creator:'+name }) });
-        const j = await r.json();
-        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
-        loadLedger();
-      }catch(e){ alert('Erreur marquage global'); }
+        const j = await r.json(); if (!r.ok || !j.ok) throw 0; loadLedger();
+      }catch{ alert('Erreur marquage global'); }
     }
     async function purgeInactive90d(){
       if (!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
       try{
         const r = await api('/api/purge-inactive', { method:'POST' });
-        const j = await r.json();
-        if (!r.ok || !j.ok) throw new Error(j.error||'Erreur');
-        alert('Comptes supprimés : ' + (j.count||0));
-      }catch(e){ alert('Erreur purge'); }
+        const j = await r.json(); if (!r.ok || !j.ok) throw 0; alert('Comptes supprimés : ' + (j.count||0));
+      }catch{ alert('Erreur purge'); }
     }
     function exportCsv(){ window.location.href = '/api/list-ledger?format=csv'; }
 
-    // ===== Events =====
     document.addEventListener('click', (e)=>{
       const bPay  = e.target.closest('button[data-pay]');
       const bBulk = e.target.closest('button[data-bulk]');
@@ -271,7 +282,7 @@
     $('#btnCsv').onclick    = exportCsv;
     $('#btnFilter').onclick = ()=>{ const q=($('#q')?.value||'').trim(); location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); };
 
-    // ===== Init =====
+    // Init
     function reloadAll(){ loadLedger(); loadConversations(); loadLives(); }
     reloadAll();
   </script>
