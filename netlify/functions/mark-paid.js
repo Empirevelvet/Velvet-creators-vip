@@ -1,30 +1,21 @@
 // netlify/functions/mark-paid.js
-import { getStore } from '@netlify/blobs';
-const asKeys = (lst) => Array.isArray(lst) ? lst : (lst?.keys || []);
-const parse = (raw) => !raw ? null : (typeof raw === 'string' ? JSON.parse(raw) : raw);
-
-export const handler = async (event) => {
-  if (event.httpMethod !== 'POST') return { statusCode: 405, body:'Method not allowed' };
-  try {
-    const { creatorId, txn } = JSON.parse(event.body || '{}');
-    if (!creatorId && !txn) return { statusCode: 400, body: 'Missing creatorId or txn' };
-
-    const store = getStore('ledger');
-    const ids = await store.list();
-    let count = 0;
-
-    for (const id of asKeys(ids)) {
-      const raw = await store.get(id); const row = parse(raw); if (!row) continue;
-      const match = txn ? (row.txn === txn) : (row.creatorId === creatorId && !row.paid);
-      if (match) {
-        row.paid = true;
-        row.paidAt = new Date().toISOString();
-        await store.set(id, JSON.stringify(row), { contentType: 'application/json' });
-        count++;
-      }
-    }
-    return { statusCode: 200, body: JSON.stringify({ success:true, updated: count }) };
-  } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error:e.message }) };
+const fs = require('fs'); const path = require('path');
+const DB = p => path.join(__dirname, '..', '..', 'data', p);
+function readJSON(name,fallback){ try{return JSON.parse(fs.readFileSync(DB(name),'utf8'))}catch{ return fallback; } }
+function writeJSON(name,data){ fs.mkdirSync(path.dirname(DB(name)),{recursive:true}); fs.writeFileSync(DB(name), JSON.stringify(data,null,2)); }
+exports.handler = async (event)=>{
+  if (event.httpMethod!=='POST') return {statusCode:405, body:'Method Not Allowed'};
+  const { id, creatorId } = JSON.parse(event.body||'{}');
+  const sales = readJSON('sales.json', []);
+  let updated = 0;
+  if (id && String(id).startsWith('creator:')) {
+    const name = String(id).slice('creator:'.length);
+    for (const s of sales) if (s.creator===name && !s.paid){ s.paid=true; updated++; }
+  } else if (creatorId) {
+    for (const s of sales) if (s.creator===creatorId && !s.paid){ s.paid=true; updated++; }
+  } else if (id) {
+    const s = sales.find(x=>String(x.id)===String(id)); if (s && !s.paid){ s.paid = true; updated = 1; }
   }
+  writeJSON('sales.json', sales);
+  return { statusCode:200, body: JSON.stringify({ ok:true, updated }) };
 };
