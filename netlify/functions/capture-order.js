@@ -1,89 +1,79 @@
 // netlify/functions/capture-order.js
-// Capture une commande PayPal puis enregistre la vente pour le dashboard
+const API = (env) => env === 'live'
+  ? 'https://api-m.paypal.com'
+  : 'https://api-m.sandbox.paypal.com';
 
-exports.handler = async (event) => {
+async function getAccessToken() {
+  const base = API(process.env.PAYPAL_ENV || 'sandbox');
+  const auth = Buffer.from(
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+  ).toString('base64');
+
+  const r = await fetch(`${base}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials'
+  });
+  if (!r.ok) throw new Error(`PayPal token ${r.status}`);
+  const j = await r.json();
+  return j.access_token;
+}
+
+export const handler = async (event) => {
+  if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method not allowed' };
+
   try {
-    // 1) Récupérer l'orderID envoyé depuis paiement.html
-    const { orderID } = JSON.parse(event.body);
+    const { orderId } = JSON.parse(event.body || '{}');
+    if (!orderId) return { statusCode: 400, body: 'Missing orderId' };
 
-    // 2) Authentification PayPal (utilise tes variables Netlify)
-    const auth = Buffer.from(
-      process.env.PAYPAL_CREATRICES_ID + ":" + process.env.PAYPAL_VIP_SECRET
-    ).toString("base64");
+    const access = await getAccessToken();
+    const base = API(process.env.PAYPAL_ENV || 'sandbox');
 
-    // 3) Appel PayPal CAPTURE
-    const response = await fetch(
-      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Basic ${auth}`,
-        },
-      }
-    );
+    // CAPTURE
+    const r = await fetch(`${base}/v2/checkout/orders/${orderId}/capture`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${access}`, 'Content-Type': 'application/json' }
+    });
 
-    const capture = await response.json();
+    const capture = await r.json();
+    if (!r.ok) return { statusCode: r.status, body: JSON.stringify(capture) };
 
-    // 4) Essayer d'enregistrer la vente dans le ledger (sans bloquer la capture si ça échoue)
-    try {
-      // On extrait quelques infos utiles de la réponse PayPal
-      const purchaseUnit = capture?.purchase_units?.[0];
-      const paypalCapture = purchaseUnit?.payments?.captures?.[0];
+    // EXTRACTION DONNÉES
+    const pu = capture?.purchase_units?.[0] || {};
+    const cap = pu?.payments?.captures?.[0] || {};
+    const amount = cap?.amount?.value || '0.00';
+    const email  = capture?.payer?.email_address || '';
+    const txn    = cap?.id || orderId;
 
-      // On récupère ce qu'on a mis en custom_id lors du create-order :
-      // format recommandé: "creatorId|itemId|type"
-      const custom = purchaseUnit?.custom_id || "";
-      let creatorId = "velvet";
-      let itemId = null;
-      let itemType = null;
-
-      if (custom.includes("|")) {
-        const [cId, iId, t] = custom.split("|");
-        creatorId = cId || "velvet";
-        itemId = iId || null;
-        itemType = t || null;
-      }
-
-      const amount = paypalCapture?.amount?.value || null;
-      const currency = paypalCapture?.amount?.currency_code || "CHF";
-      const paypalTxnId = paypalCapture?.id || null;
-      const payerEmail =
-        capture?.payer?.email_address ||
-        capture?.payer?.payer_id ||
-        null;
-
-      // Appeler ta function Netlify "record-sale" (à créer si pas encore fait)
-      await fetch(process.env.URL + "/.netlify/functions/record-sale", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // minimum utile pour le dashboard
-          creatorId,
-          itemId,
-          itemType,
-          amount,
-          currency,
-          paypalTxnId,
-          payerEmail,
-          orderID,
-          raw: capture, // optionnel: trace complète
-        }),
-      });
-    } catch (e) {
-      // On log mais on n'échoue pas la capture
-      console.log("⚠️ Enregistrement ledger échoué (ignoré):", e);
+    // custom_id = "creatorId|itemId|type"
+    let creatorId = 'velvet', itemId = 'generic', type = 'ppv';
+    if (pu?.custom_id && pu.custom_id.includes('|')) {
+      const parts = pu.custom_id.split('|');
+      creatorId = parts[0] || 'velvet';
+      itemId    = parts[1] || 'generic';
+      type      = parts[2] || 'ppv';
     }
 
-    // 5) Répondre au frontend avec la capture PayPal
-    return {
-      statusCode: 200,
-      body: JSON.stringify(capture),
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
-    };
+    // ENREGISTREMENT DANS LEDGER
+    try {
+      await fetch(`${process.env.URL || ''}/api/record-sale`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          type,
+          amount: Number(amount),
+          email,
+          txn
+        })
+      });
+    } catch (e) {
+      // on ne bloque pas la capture si l’écriture échoue
+      console.error('record-sale error', e);
+    }
+
+    return { statusCode: 200, body: JSON.stringify({ success: true, capture }) };
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
 };
