@@ -2,7 +2,7 @@
   {
     "id": "u1",
     "username": "@sofia",
-    "email": "sofia@ex.com",
+    "email": "sofia@example.com",
     "role": "creatrice",
     "status": "pending",
     "createdAt": "2025-08-17T10:00:00Z",
@@ -11,7 +11,7 @@
   {
     "id": "u2",
     "username": "@alex",
-    "email": "alex@ex.com",
+    "email": "alex@example.com",
     "role": "client",
     "status": "active",
     "createdAt": "2025-08-16T18:00:00Z",
