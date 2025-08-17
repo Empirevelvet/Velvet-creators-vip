@@ -1,20 +1,20 @@
-/* === Thème VIP global (Velvet) === */
+/* === Thème VIP Velvet (Noir & Or) === */
 body {
-  background: #121212;
-  color: #f1f1f1;
+  background: #0b0b0b;
+  color: #f5f5f5;
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
 h1, h2, h3 {
-  color: #ff4da6;
+  color: #d4af37; /* Or */
   margin-bottom: 15px;
   font-weight: 700;
 }
 
 a {
-  color: #ff4da6;
+  color: #d4af37;
   text-decoration: none;
 }
 a:hover {
@@ -23,12 +23,12 @@ a:hover {
 
 /* === Cartes / Sections === */
 section, .card, .panel {
-  background: #1e1e1e;
+  background: #141414;
   border: 1px solid #333;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 25px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
 /* === Tableaux === */
@@ -36,14 +36,14 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
-  background: #1c1c1c;
+  background: #141414;
   border-radius: 6px;
   overflow: hidden;
 }
 
 th {
-  background: #292929;
-  color: #ff4da6;
+  background: #1f1f1f;
+  color: #d4af37;
   padding: 10px;
   text-align: left;
 }
@@ -68,7 +68,7 @@ label {
 }
 
 input, select, textarea {
-  background: #1c1c1c;
+  background: #1a1a1a;
   border: 1px solid #444;
   border-radius: 6px;
   padding: 10px;
@@ -79,36 +79,37 @@ input, select, textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #ff4da6;
+  border-color: #d4af37;
   outline: none;
 }
 
 /* Champs obligatoires en surbrillance */
 input[required], select[required], textarea[required] {
-  border-left: 3px solid #ff4da6;
+  border-left: 3px solid #d4af37;
 }
 
 /* === Boutons === */
 button, .btn {
-  background: #ff4da6;
-  color: #fff;
+  background: #d4af37;
+  color: #0b0b0b;
   border: none;
   padding: 12px 20px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 button:hover, .btn:hover {
-  background: #e63c95;
+  background: #b8962e;
+  color: #fff;
 }
 
 /* === Messages de validation === */
 .success {
   background: #1e4620;
-  color: #a5d6a7;
+  color: #c5e1a5;
   padding: 12px;
   border-radius: 6px;
 }
@@ -134,11 +135,11 @@ body.dashboard {
 .dashboard-nav a {
   padding: 8px 14px;
   border-radius: 6px;
-  background: #292929;
-  color: #f1f1f1;
+  background: #1f1f1f;
+  color: #f5f5f5;
 }
 
 .dashboard-nav a:hover {
-  background: #ff4da6;
-  color: #fff;
+  background: #d4af37;
+  color: #0b0b0b;
 }
