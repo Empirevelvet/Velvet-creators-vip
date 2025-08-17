@@ -1,87 +1,64 @@
-/* Fond général */
-body.admin-ui {
-  background-color: #0d0d0d;
-  color: #e6c770; /* or doux */
-  font-family: 'Segoe UI', 'Roboto', sans-serif;
-  margin: 0;
-  padding: 20px;
+/* ===== Thème noir & or (Velvet) ===== */
+:root{
+  --bg:#0b0b0c; --panel:#121214; --line:#2a2a2f;
+  --ink:#e6e6e9; --muted:#9aa0a8;
+  --gold:#d4af37; --gold-2:#c39a2e;
+  --ok:#3dd399; --danger:#ff6b6b;
+  --radius:12px; --shadow:0 6px 24px rgba(0,0,0,.45);
+  --input:#0f0f12; --chip:#232329;
 }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; font:15px/1.55 ui-sans-serif,system-ui,Segoe UI,Inter,Roboto,Arial,sans-serif; color:var(--ink); background:var(--bg); display:flex; min-height:100vh}
 
-/* Titres */
-.admin-ui h1, .admin-ui h2 {
-  color: #d4af37;
-  border-bottom: 1px solid #444;
-  padding-bottom: 8px;
-  margin-bottom: 20px;
+/* Sidebar */
+.sidebar{width:232px; background:var(--panel); border-right:1px solid var(--line); padding:20px 14px; display:flex; flex-direction:column; gap:16px}
+.sidebar h2{margin:0 0 10px; font-size:18px; color:var(--gold)}
+.nav a{display:block; padding:10px 14px; border-radius:8px; text-decoration:none; color:var(--ink)}
+.nav a:hover,.nav a.active{background:#1a1a20; color:var(--gold)}
+.sidebar .foot{margin-top:auto; font-size:12px; color:#7a7f87}
+
+/* Main frame */
+.main{flex:1; padding:20px 18px}
+.topbar{display:flex; justify-content:space-between; align-items:center; gap:12px; margin:0 0 18px}
+.search{display:flex; gap:8px; align-items:center}
+.input, input[type="text"], input[type="number"], input[type="date"], select, textarea{
+  background:var(--input); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:9px 11px; outline:none
 }
-
-/* Cartes */
-.admin-ui .card {
-  background: #1a1a1a;
-  border: 1px solid #d4af37;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+.input:focus, select:focus, textarea:focus{border-color:#3a3a46; box-shadow:0 0 0 2px rgba(58,58,70,.25)}
+.btn{
+  border:1px solid #3b2e10; background:linear-gradient(#3b2e10,#2a210b);
+  color:var(--gold); border-radius:8px; padding:10px 14px; cursor:pointer
 }
+.btn.ghost{background:transparent; border-color:var(--line); color:var(--ink)}
+.btn.danger{border-color:#5b1f1f; background:linear-gradient(#5b1f1f,#3b1414); color:#ffdede}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{background:var(--chip); border:1px solid var(--line); color:#cfcfe4; padding:6px 10px; border-radius:22px; font-size:13px}
 
-/* Tableaux */
-.admin-ui table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
+/* Cards & sections */
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:0 0 18px}
+.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow)}
+.card h3{margin:0 0 6px; font-size:14px; color:#9aa0a8}
+.card .value{font-size:22px; font-weight:700; color:var(--gold)}
+.card .value.ok{color:var(--ok)} .card .value.bad{color:var(--danger)}
 
-.admin-ui th {
-  background: #2a2a2a;
-  color: #f1c45c;
-  padding: 10px;
-  text-align: left;
-}
+.section{margin:18px 0}
+.section h2{font-size:18px; margin:0 0 10px; color:var(--gold)}
 
-.admin-ui td {
-  padding: 10px;
-  border-bottom: 1px solid #333;
-}
+table{width:100%; border-collapse:collapse; font-size:14px}
+th,td{padding:10px; border-bottom:1px solid var(--line)}
+th{background:#1b1b1f; color:#dcdce2; text-align:left}
+tbody tr:hover{background:#0f0f12}
 
-.admin-ui tr:nth-child(even) {
-  background: #151515;
-}
+.form-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+.form-grid .full{grid-column:1 / -1}
+.help{color:#9aa0a8; font-size:12px; margin-top:4px}
 
-/* Formulaires */
-.admin-ui input, 
-.admin-ui select, 
-.admin-ui textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: 1px solid #d4af37;
-  background: #111;
-  color: #f5f5f5;
-}
+footer.small{margin-top:12px; color:#7a7f87; font-size:12px}
 
-.admin-ui input:focus, 
-.admin-ui select:focus, 
-.admin-ui textarea:focus {
-  outline: none;
-  border-color: #ffd700;
-  box-shadow: 0 0 8px #d4af37;
-}
-
-/* Boutons */
-.admin-ui button {
-  background: #d4af37;
-  color: #0d0d0d;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.admin-ui button:hover {
-  background: #ffd700;
-  box-shadow: 0 0 10px #d4af37;
+/* Responsive */
+@media (max-width:980px){
+  .sidebar{display:none}
+  .main{padding:16px 12px}
+  .form-grid{grid-template-columns:1fr}
 }
