@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Velvet — Comptes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>VELVET ADMIN</h2>
+    <nav class="nav">
+      <a href="/admin-dashboard.html">Aperçu</a>
+      <a class="active" href="/admin-users.html">Comptes</a>
+      <a href="/admin-dashboard.html#sales">Ventes</a>
+      <a href="/admin-dashboard.html#convs">Conversations</a>
+      <a href="/admin-dashboard.html#lives">Lives</a>
+      <a href="/admin-items.html">Créer un item</a>
+    </nav>
+    <div class="foot">© Velvet Creators VIP</div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search">
+        <select class="input" id="fStatus">
+          <option value="">Statut : Tous</option>
+          <option value="pending">En attente</option>
+          <option value="active">Actif</option>
+          <option value="suspended">Suspendu</option>
+        </select>
+        <select class="input" id="fRole">
+          <option value="">Rôle : Tous</option>
+          <option value="creator">Créatrice</option>
+          <option value="client">Client</option>
+        </select>
+        <input class="input" id="q" placeholder="pseudo / email…" />
+        <button class="btn" id="btnFilter">Filtrer</button>
+      </div>
+      <div class="chips">
+        <button class="btn" id="btnReload">Rafraîchir</button>
+        <button class="btn" id="btnPurge">Purger inactifs (90 j)</button>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2>Comptes</h2>
+      <table id="t">
+        <thead><tr><th>Date</th><th>Pseudo</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody><tr><td colspan="6">Chargement…</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const $=s=>document.querySelector(s);
+    const api=(p,opt={})=>fetch(p,{headers:{'Content-Type':'application/json'},...opt});
+
+    async function loadUsers(){
+      const qs = new URLSearchParams({
+        q:$('#q').value||'', role:$('#fRole').value||'', status:$('#fStatus').value||''
+      }).toString();
+      const r = await api('/api/list-users?'+qs); const j = await r.json();
+      const tb=$('#t tbody'); tb.innerHTML='';
+      (j.users||[]).forEach(u=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${u.createdAt?.slice(0,10)||'-'}</td>
+          <td>${u.username||'-'}</td>
+          <td>${u.email||'-'}</td>
+          <td>${u.role||'-'}</td>
+          <td>${u.status||'-'}</td>
+          <td class="chips">
+            ${u.status==='pending'?'<button class="btn" data-act="approve" data-id="'+u.id+'">Valider</button>':''}
+            ${u.status!=='suspended'?'<button class="btn" data-act="suspend" data-id="'+u.id+'">Suspendre</button>':'<button class="btn" data-act="unsuspend" data-id="'+u.id+'">Réactiver</button>'}
+            <button class="btn danger" data-act="delete" data-id="${u.id}">Supprimer</button>
+          </td>`;
+        tb.appendChild(tr);
+      });
+      if(!tb.children.length) tb.innerHTML = '<tr><td colspan="6">Aucun résultat</td></tr>';
+    }
+
+    async function doAction(act,id){
+      const reason = (act==='suspend') ? (prompt('Motif de suspension ?')||'') : '';
+      const r=await api('/api/moderate',{method:'POST',body:JSON.stringify({action:act,userId:id,reason})});
+      const j=await r.json(); if(!j.ok) alert(j.error||'Erreur'); await loadUsers();
+    }
+
+    document.addEventListener('click',e=>{
+      const b=e.target.closest('button[data-act]'); if(!b) return;
+      if(b.dataset.act==='delete' && !confirm('Supprimer définitivement ce compte ?')) return;
+      doAction(b.dataset.act,b.dataset.id);
+    });
+    $('#btnFilter').onclick = $('#btnReload').onclick = loadUsers;
+    $('#btnPurge').onclick = async ()=>{
+      if(!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
+      const r=await api('/api/purge-inactive',{method:'POST'}); const j=await r.json();
+      alert(j.ok?('Comptes supprimés : '+(j.count||0)):(j.error||'Erreur')); loadUsers();
+    };
+    loadUsers();
+  </script>
+</body>
+</html>
