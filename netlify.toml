@@ -2,23 +2,26 @@
   publish   = "."
   functions = "netlify/functions"
 
+# === Redirections API vers Netlify Functions ===
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to   = "/.netlify/functions/:splat"
   status = 200
 
+# === Admin ===
+# URL raccourcie vers ton dashboard
 [[redirects]]
-  from = "/admin/*"
-  to = "/admin.html"
+  from = "/admin"
+  to   = "/admin-dashboard.html"
   status = 200
 
-# Autorise l'accès à /admin/* uniquement aux users rôle "admin"
+# Tu peux aussi forcer tous les /admin/* vers la page dashboard si tu veux
 [[redirects]]
   from = "/admin/*"
-  to = "/login.html"
-  status = 302
-  force = true
-  conditions = { role = ["admin"] }
+  to   = "/admin-dashboard.html"
+  status = 200
+
+# === Tâche planifiée ===
 [[scheduled.functions]]
-name = "prune-users"
-cron = "0 3 * * *"
+  name = "prune-users"
+  cron = "0 3 * * *"
