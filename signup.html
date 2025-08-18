@@ -169,33 +169,31 @@
   })();
   </script>
 <script>
-(() => {
-  const form = document.getElementById('signupForm');
-  if (!form) return;
+document.querySelector('#signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); // empêche rechargement classique
+  const form = e.target;
+  const data = new FormData(form);
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  try {
+    const r = await fetch('/.netlify/functions/signup', {
+      method: 'POST',
+      body: data
+    });
 
-    const fd = new FormData(form);
-    try {
-      const res = await fetch('/.netlify/functions/signup', { // utilise signup.js
-        method: 'POST',
-        body: fd
-      });
+    if (!r.ok) throw new Error('Erreur serveur');
+    const j = await r.json();
 
-      const data = await res.json().catch(()=>({}));
-      if (!res.ok || data.error || data.success === false) {
-        alert(data.error || 'Erreur serveur');
-        return;
-      }
-
-      // ✅ redirection quand tout va bien
-      window.location.href = 'thanks.html';
-    } catch (err) {
-      alert('Erreur réseau');
+    if (j.ok) {
+      // ✅ Succès → redirection
+      window.location.href = "/thanks.html";
+    } else {
+      alert(j.error || "Erreur lors de l'inscription.");
     }
-  });
-})();
+  } catch (err) {
+    console.error(err);
+    alert("Impossible d’envoyer le formulaire, réessaie.");
+  }
+});
 </script>
 </body>
 </html>
