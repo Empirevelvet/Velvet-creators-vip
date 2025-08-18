@@ -1,152 +1,124 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Inscription — Velvet Creators VIP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription Créatrice</title>
   <style>
-    :root { --bg:#0b0b0b; --panel:#111; --text:#f2f2f2; --muted:#b8b8b8; --gold:#c8a64d; --gold2:#ffd369; --bad:#ff6b6b; }
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto}
-    header{padding:14px 18px;border-bottom:1px solid #222;background:#0a0a0a;position:sticky;top:0;z-index:2}
-    header nav{display:flex;gap:16px;align-items:center;justify-content:flex-end}
-    header a{color:var(--text);text-decoration:none;opacity:.9} header a:hover{opacity:1}
-    .panel{max-width:920px;margin:8vh auto 10vh;padding:18px}
-    h1{margin:0 0 10px;font-size:28px;color:var(--gold2)}
-    .lead{color:var(--muted)}
-    form.form-grid{background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:24px;box-shadow:0 0 18px rgba(200,166,77,.25)}
-    label,legend{font-weight:600;color:var(--gold2)}
-    input[type="text"],input[type="email"],input[type="password"],input[type="tel"],input[type="date"],input[type="file"]{
-      width:100%;padding:10px 12px;margin:8px 0 18px;border:1px solid var(--gold);border-radius:6px;background:#1a1a1a;color:#fff}
-    input:focus{outline:none;border-color:var(--gold2);background:#141414}
-    fieldset{border:1px dashed #333;padding:10px 12px;border-radius:8px;margin:2px 0 16px}
-    .form-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{display:inline-block;padding:12px 18px;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#000;border:0;font-weight:700;cursor:pointer}
-    .btn:hover{filter:brightness(1.05)}
-    .help{color:var(--muted);font-size:13px;margin-top:-10px;margin-bottom:14px}
-    footer{padding:30px 18px;border-top:1px solid #222;text-align:center}
-    footer a{color:var(--gold2);text-decoration:none}
+    body {
+      background-color: #000;
+      color: #d4af37; /* or doré */
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 30px;
+      background: #111;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+    h2 {
+      text-align: center;
+      color: #d4af37;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #d4af37;
+      border-radius: 5px;
+      background: #222;
+      color: #fff;
+    }
+    input[type="file"] {
+      background: #111;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #d4af37;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #b89629;
+    }
+    .note {
+      margin-top: 20px;
+      font-size: 13px;
+      text-align: center;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="index.html">Accueil</a>
-      <a href="login.html">Se connecter</a>
-    </nav>
-  </header>
+  <div class="container">
+    <h2>Inscription Créatrice</h2>
+    <form id="signup-form" name="signup" method="POST" data-netlify="true" enctype="multipart/form-data">
+      <input type="hidden" name="form-name" value="signup">
 
-  <main class="panel">
-    <h1>Inscription</h1>
-    <p class="lead" style="text-align:center">
-      Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
-    </p>
+      <label>Pseudo</label>
+      <input type="text" name="pseudo" required>
 
-    <!-- ✅ Netlify Forms avec redirection automatique -->
-    <form name="creator-application"
-          id="signupForm"
-          method="POST"
-          action="/thanks.html"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          enctype="multipart/form-data"
-          class="form-grid">
+      <label>Email</label>
+      <input type="email" name="email" required>
 
-      <input type="hidden" name="form-name" value="creator-application" />
-      <input type="text" name="bot-field" style="display:none" />
+      <label>Mot de passe</label>
+      <input type="password" name="password" required>
 
-      <!-- Identifiants -->
-      <div>
-        <label for="username">Pseudo (obligatoire)</label>
-        <input id="username" name="username" placeholder="@pseudo" type="text" required />
-        <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
-      </div>
+      <label>Rôle</label>
+      <select name="role" required>
+        <option value="creator">Créatrice</option>
+        <option value="client">Client</option>
+      </select>
 
-      <div>
-        <label for="email">Email</label>
-        <input id="email" name="email" placeholder="vous@example.com" type="email" required />
-      </div>
+      <label>Compte PayPal</label>
+      <input type="email" name="paypal" required>
 
-      <div>
-        <label for="password">Mot de passe</label>
-        <input id="password" name="password" placeholder="Min. 6 caractères" type="password" minlength="6" required />
-      </div>
+      <label>Pièce d’identité (recto)</label>
+      <input type="file" name="id_recto" accept="image/*" required>
 
-      <!-- Coordonnées -->
-      <div>
-        <label for="fullname">Nom complet</label>
-        <input id="fullname" name="fullname" placeholder="Prénom Nom" type="text" required />
-      </div>
+      <label>Pièce d’identité (verso)</label>
+      <input type="file" name="id_verso" accept="image/*" required>
 
-      <div>
-        <label for="phone">Téléphone</label>
-        <input id="phone" name="phone" placeholder="+41 79 123 45 67" type="tel" />
-      </div>
+      <label>Selfie avec pièce d’identité</label>
+      <input type="file" name="selfie" accept="image/*" required>
 
-      <div>
-        <label for="address">Adresse</label>
-        <input id="address" name="address" placeholder="Rue, N°, Ville" type="text" />
-      </div>
-
-      <div>
-        <label for="country">Pays</label>
-        <input id="country" name="country" type="text" />
-      </div>
-
-      <div>
-        <label for="dob">Date de naissance</label>
-        <input id="dob" name="dob" type="date" required />
-      </div>
-
-      <!-- Rôle -->
-      <fieldset>
-        <legend>Vous êtes :</legend>
-        <label><input type="radio" name="role" value="creator" required /> Créatrice</label>
-        <label><input type="radio" name="role" value="client" /> Client</label>
-      </fieldset>
-
-      <!-- Fichiers -->
-      <div>
-        <label for="avatar">Photo de profil (avatar)</label>
-        <input id="avatar" name="avatar" type="file" accept="image/*" />
-      </div>
-
-      <div>
-        <label for="id_front">Pièce d’identité (recto)</label>
-        <input id="id_front" name="id_front" type="file" accept="image/*" required />
-      </div>
-
-      <div>
-        <label for="id_back">Pièce d’identité (verso)</label>
-        <input id="id_back" name="id_back" type="file" accept="image/*" required />
-      </div>
-
-      <div>
-        <label for="selfie">Selfie avec la pièce d’identité</label>
-        <input id="selfie" name="selfie" type="file" accept="image/*" required />
-      </div>
-
-      <!-- Consentement -->
-      <div>
-        <label>
-          <input type="checkbox" name="consent" required />
-          J’atteste être majeur(e) et j’accepte les conditions & la modération.
-        </label>
-      </div>
-
-      <!-- Boutons -->
-      <div class="form-actions">
-        <button type="submit" class="btn">Envoyer ma demande</button>
-        <a class="btn" href="login.html" style="background:#222;color:#fff;border:1px solid var(--gold)">Déjà inscrit(e) ?</a>
-      </div>
+      <button type="submit">Envoyer la demande</button>
     </form>
 
-    <p class="help" style="text-align:center;margin-top:14px">
-      Pour les créatrices : paiements uniquement via PayPal (à configurer dans votre espace après validation).
-    </p>
-  </main>
+    <div class="note">
+      Votre inscription sera vérifiée manuellement.  
+      Vous recevrez une confirmation par email après validation.
+    </div>
+  </div>
 
-  <footer>
-    <a href="legal.html">Mentions légales & CGU</a>
-  </footer>
+  <script>
+    const form = document.getElementById("signup-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      await fetch("/", {
+        method: "POST",
+        body: formData
+      });
+      window.location.href = "/thanks.html";
+    });
+  </script>
 </body>
 </html>
