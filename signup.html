@@ -159,8 +159,8 @@
 
         msg.textContent = '✅ Demande envoyée. Validation sous peu.';
         msg.style.color = '#7CFC00';
-        // Redirection possible ici
-        // location.href = 'merci_adhesion.html';
+        // Redirection automatique vers la page de remerciement
+        window.location.href = "thanks.html";
       } catch (err) {
         msg.textContent = '⚠️ Erreur réseau. Réessayez.';
         msg.style.color = '#ff6b6b';
