@@ -1,199 +1,165 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Velvet — Inscription</title>
-  <!-- On garde TON CSS global -->
-  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8">
+  <title>Inscription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="header">
-    <nav class="nav">
-      <a href="index.html">Accueil</a>
-      <a class="cta" href="login.html">Se connecter</a>
-    </nav>
-  </header>
 
-  <div class="panel" style="max-width:920px;margin:8vh auto 10vh;">
-    <h1>Inscription</h1>
-    <p class="lead" style="text-align:center;margin:0 0 14px;">
-      Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
-    </p>
+<header>
+  <nav>
+    <a class="cta" href="login.html">Se connecter</a>
+  </nav>
+</header>
 
-    <!-- FORMULAIRE — mêmes classes que ton site -->
-    <form id="signup-form" class="form-grid" enctype="multipart/form-data" novalidate>
-      <!-- Identifiants (une seule fois, en haut) -->
-      <div>
-        <label for="username">Pseudo (obligatoire)</label>
-        <input class="input" id="username" name="username" placeholder="@pseudo" required type="text"/>
-        <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
-      </div>
+<div class="panel" style="max-width:920px;margin:8vh auto 10vh;">
+  <h1>Inscription</h1>
+  <p class="lead" style="text-align:center;margin:0 0 14px;">
+    Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
+  </p>
 
-      <div>
-        <label for="email">Email</label>
-        <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
-      </div>
+  <!-- FORMULAIRE -->
+  <form id="signupForm" class="form-grid" autocomplete="off" enctype="multipart/form-data" novalidate>
 
-      <div>
-        <label for="password">Mot de passe</label>
-        <input class="input" id="password" name="password" placeholder="Min. 6 caractères" minlength="6" required type="password"/>
-        <div class="help">Il sera utilisé à l’activation de votre compte.</div>
-      </div>
+    <!-- Identifiants -->
+    <div>
+      <label for="username">Pseudo (obligatoire)</label>
+      <input class="input" id="username" name="username" placeholder="@pseudo" required type="text"/>
+      <div class="help">Ceci sera affiché publiquement sur votre profil.</div>
+    </div>
 
-      <!-- Coordonnées & rôle -->
-      <div>
-        <label for="fullname">Nom complet</label>
-        <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
-      </div>
+    <div>
+      <label for="email">Email</label>
+      <input class="input" id="email" name="email" placeholder="vous@example.com" required type="email"/>
+    </div>
 
-      <div>
-        <label for="phone">Numéro de téléphone</label>
-        <input class="input" id="phone" name="phone" pattern="^\+?[0-9\s\-]{6,20}$" placeholder="+41 79 123 45 67" required type="tel"/>
-      </div>
+    <div>
+      <label for="password">Mot de passe</label>
+      <input class="input" id="password" name="password" placeholder="Min. 6 caractères" minlength="6" required type="password"/>
+      <div class="help">Utilisé à l’activation de votre compte.</div>
+    </div>
 
-      <div class="full">
-        <label for="address">Adresse complète</label>
-        <textarea class="input" id="address" name="address" placeholder="Rue, NPA, Ville, Pays" required></textarea>
-      </div>
+    <!-- Coordonnées -->
+    <div>
+      <label for="fullname">Nom complet</label>
+      <input class="input" id="fullname" name="fullname" placeholder="Prénom Nom" required type="text"/>
+    </div>
 
-      <div>
-        <label for="country">Pays</label>
-        <input class="input" id="country" name="country" placeholder="Suisse, France…" required type="text"/>
-      </div>
+    <div>
+      <label for="phone">Téléphone</label>
+      <input class="input" id="phone" name="phone" placeholder="+41 ..." required type="tel"/>
+    </div>
 
-      <div>
-        <label for="dob">Date de naissance</label>
-        <input class="input" id="dob" name="dob" required type="date"/>
-      </div>
+    <div>
+      <label for="address">Adresse</label>
+      <input class="input" id="address" name="address" placeholder="Rue, numéro, ville" required type="text"/>
+    </div>
 
-      <div class="full">
-        <label>Je suis</label>
-        <div class="row-inline" id="role">
-          <label><input type="radio" name="role" value="Créatrice" required/> Créatrice</label>
-          <label><input type="radio" name="role" value="Client" required/> Client</label>
-        </div>
-      </div>
+    <div>
+      <label for="country">Pays</label>
+      <input class="input" id="country" name="country" placeholder="Votre pays" required type="text"/>
+    </div>
 
-      <!-- Médias & vérification d’âge -->
-      <div>
-        <label for="avatar">Avatar (photo de profil) (jpg/png)</label>
-        <input accept=".jpg,.jpeg,.png" class="input" id="avatar" name="avatar" type="file"/>
-      </div>
+    <div>
+      <label for="dob">Date de naissance</label>
+      <input class="input" id="dob" name="dob" required type="date"/>
+    </div>
 
-      <div class="full">
-        <label for="id_front">Pièce d’identité — recto (jpg/png/pdf)</label>
-        <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_front" name="id_front" required type="file"/>
-      </div>
+    <!-- Rôle -->
+    <fieldset>
+      <legend>Vous êtes :</legend>
+      <label><input type="radio" name="role" value="creator" required/> Créatrice</label>
+      <label><input type="radio" name="role" value="client" required/> Client</label>
+    </fieldset>
 
-      <div class="full">
-        <label for="id_back">Pièce d’identité — verso (jpg/png/pdf)</label>
-        <input accept=".jpg,.jpeg,.png,.pdf" class="input" id="id_back" name="id_back" required type="file"/>
-      </div>
+    <!-- Uploads -->
+    <div>
+      <label for="avatar">Photo de profil</label>
+      <input class="input" id="avatar" name="avatar" type="file" accept=".jpg,.jpeg,.png"/>
+    </div>
 
-      <div class="full">
-        <label for="selfie">Selfie avec pièce d’identité (jpg/png)</label>
-        <input accept=".jpg,.jpeg,.png" class="input" id="selfie" name="selfie" required type="file"/>
-      </div>
+    <div>
+      <label for="id_front">Pièce d’identité (recto)</label>
+      <input class="input" id="id_front" name="id_front" type="file" required accept=".jpg,.jpeg,.png"/>
+    </div>
 
-      <div class="full row-inline">
-        <input id="consent" name="consent" required type="checkbox"/>
-        <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents (conformité & sécurité).</label>
-      </div>
+    <div>
+      <label for="id_back">Pièce d’identité (verso)</label>
+      <input class="input" id="id_back" name="id_back" type="file" required accept=".jpg,.jpeg,.png"/>
+    </div>
 
-      <!-- Actions -->
-      <div class="full form-actions">
-        <button class="btn gold" type="submit">Envoyer ma demande</button>
-        <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
-      </div>
-      <div id="signup-msg" class="help" style="text-align:center;margin-top:10px;"></div>
-    </form>
+    <div>
+      <label for="selfie">Selfie avec pièce d’identité</label>
+      <input class="input" id="selfie" name="selfie" type="file" required accept=".jpg,.jpeg,.png"/>
+    </div>
 
-    <p class="help" style="text-align:center;margin-top:14px">
-      <strong>Important (créatrices) :</strong> les paiements des revenus se font <u>uniquement via PayPal</u>. Veillez à disposer d’un compte PayPal valide afin de pouvoir être réglée chaque semaine.
-    </p>
-  </div>
+    <!-- Consentement -->
+    <div>
+      <input id="consent" name="consent" type="checkbox" required/>
+      <label for="consent">Je certifie avoir 18 ans révolus et j’accepte la modération humaine de mes documents.</label>
+    </div>
 
-  <footer class="footer">
-    <a href="legal.html">Mentions légales &amp; CGU</a>
-  </footer>
+    <!-- Bouton -->
+    <div class="form-actions">
+      <button class="btn gold" type="submit">Envoyer ma demande</button>
+      <a class="btn" href="login.html">Déjà inscrit(e) ? Se connecter</a>
+    </div>
+  </form>
 
-  <!-- JS : envoi MULTIPART vers ta Function signup-upload (aucun widget externe) -->
-  <script>
-  (() => {
-    const $ = s => document.querySelector(s);
-    const form = $('#signupForm');
-    const msg  = $('#signup-msg');
+  <p class="help" style="text-align:center; margin-top:14px">
+    Pour les créatrices, vos paiements seront envoyés uniquement via PayPal.<br>
+    Merci de renseigner votre adresse PayPal dans votre espace privé après validation.
+  </p>
+</div>
 
-    if (!form) return;
+<footer class="footer">
+  <a href="legal.html">Mentions légales & CGU</a>
+</footer>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = 'Envoi en cours…';
-
-      // Validation douce
-      const must = ['username','email','password','fullname','phone','address','country','dob'];
-      for (const id of must) {
-        const el = document.getElementById(id);
-        if (!el || !el.value.trim()) { msg.textContent = 'Merci de compléter tous les champs.'; msg.style.color='#ff6b6b'; return; }
-      }
-      if (!document.querySelector('input[name="role"]:checked')) { msg.textContent='Merci de choisir votre rôle.'; msg.style.color='#ff6b6b'; return; }
-      if (!document.getElementById('id_front').files[0] ||
-          !document.getElementById('id_back').files[0] ||
-          !document.getElementById('selfie').files[0]) {
-        msg.textContent = "Merci d'ajouter vos pièces d'identité et le selfie.";
-        msg.style.color = '#ff6b6b';
-        return;
-      }
-
-      try {
-        const fd = new FormData(form);
-        const res = await fetch('/.netlify/functions/signup-upload', { method:'POST', body: fd });
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          msg.textContent = '❌ ' + (data.error || 'Erreur serveur');
-          msg.style.color = '#ff6b6b';
-          return;
-        }
-
-        msg.textContent = '✅ Demande envoyée. Validation sous peu.';
-        msg.style.color = '#7CFC00';
-        // Redirection automatique vers la page de remerciement
-        window.location.href = "thanks.html";
-      } catch (err) {
-        msg.textContent = '⚠️ Erreur réseau. Réessayez.';
-        msg.style.color = '#ff6b6b';
-      }
-    });
-  })();
-  </script>
+<!-- Script -->
 <script>
-document.querySelector('#signupForm').addEventListener('submit', async (e) => {
-  e.preventDefault(); // empêche rechargement classique
-  const form = e.target;
-  const data = new FormData(form);
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('#signupForm');
+  if (!form) return;
 
-  try {
-    const r = await fetch('/.netlify/functions/signup', {
-      method: 'POST',
-      body: data
-    });
+  form.removeAttribute('data-netlify');
+  form.removeAttribute('netlify');
+  form.removeAttribute('action');
 
-    if (!r.ok) throw new Error('Erreur serveur');
-    const j = await r.json();
+  const msg = document.createElement('div');
+  msg.id = 'signup-msg';
+  msg.style.marginTop = '10px';
+  form.appendChild(msg);
 
-    if (j.ok) {
-      // ✅ Succès → redirection
-      window.location.href = "/thanks.html";
-    } else {
-      alert(j.error || "Erreur lors de l'inscription.");
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    msg.textContent = 'Envoi en cours…';
+    msg.style.color = '#aaa';
+
+    try {
+      const fd = new FormData(form);
+      const r = await fetch('/.netlify/functions/signup', { method: 'POST', body: fd });
+      const j = await r.json().catch(() => ({}));
+
+      if (r.ok && j && j.success) {
+        msg.textContent = '✅ Demande envoyée. Validation sous peu…';
+        msg.style.color = '#7CFC00';
+        setTimeout(() => { window.location.href = 'thanks.html'; }, 800);
+      } else {
+        msg.textContent = j.error || 'Erreur lors de l’inscription.';
+        msg.style.color = '#ff6b6b';
+      }
+    } catch (err) {
+      msg.textContent = 'Erreur réseau. Réessayez.';
+      msg.style.color = '#ff6b6b';
+      console.error(err);
     }
-  } catch (err) {
-    console.error(err);
-    alert("Impossible d’envoyer le formulaire, réessaie.");
-  }
+  });
 });
 </script>
+
 </body>
 </html>
