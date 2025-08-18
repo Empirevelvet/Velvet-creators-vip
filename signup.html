@@ -22,7 +22,7 @@
     </p>
 
     <!-- FORMULAIRE — mêmes classes que ton site -->
-    <form id="signupForm" class="form-grid" autocomplete="off" enctype="multipart/form-data" novalidate>
+    <form id="signup-form" class="form-grid" enctype="multipart/form-data" novalidate>
       <!-- Identifiants (une seule fois, en haut) -->
       <div>
         <label for="username">Pseudo (obligatoire)</label>
@@ -168,5 +168,29 @@
     });
   })();
   </script>
+  <script>
+(() => {
+  const form = document.getElementById('signup-form'); // ou 'signupForm' si Option B
+  if (!form) return;
+
+  const msg = document.getElementById('msg') || (() => {
+    const d = document.createElement('div');
+    d.id = 'msg';
+    d.style.marginTop = '10px';
+    form.appendChild(d);
+    return d;
+  })();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // ⛔️ évite le reload
+    ...
+    const fd = new FormData(form);
+    const res  = await fetch('/.netlify/functions/signup-upload', { method:'POST', body: fd });
+    const data = await res.json().catch(()=>({}));
+    if (!res.ok || data.error || data.success===false) { ... return; }
+    window.location.href = 'thanks.html';
+  });
+})();
+</script>
 </body>
 </html>
