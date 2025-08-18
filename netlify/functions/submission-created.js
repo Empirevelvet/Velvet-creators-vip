@@ -1,75 +1,93 @@
 // netlify/functions/submission-created.js
-const fs = require('fs');
-const path = require('path');
+// Copie chaque soumission Netlify Forms (creator-application) dans les blobs "users"
+// + index "by_username" pour bloquer les doublons
 
-const DB = (p) => path.join(__dirname, '..', '..', 'data', p);
-function readJSON(name, fallback) {
-  try { return JSON.parse(fs.readFileSync(DB(name), 'utf8')); }
-  catch { return fallback; }
-}
-function writeJSON(name, data) {
-  fs.mkdirSync(path.dirname(DB(name)), { recursive: true });
-  fs.writeFileSync(DB(name), JSON.stringify(data, null, 2));
-}
+import { getStore } from '@netlify/blobs';
 
-exports.handler = async (event) => {
+/** Utilitaire pour réponse JSON */
+const ok = (body, status = 200) => ({
+  statusCode: status,
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+});
+
+export const handler = async (event) => {
   try {
-    // Payload envoyé par Netlify Forms
-    const body = JSON.parse(event.body || '{}');
-    const { payload } = body || {};
-    if (!payload || !payload.data) {
-      return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'no payload' }) };
+    // Netlify envoie { payload: {...} } pour les events de formulaire
+    const { payload } = JSON.parse(event.body || '{}');
+    if (!payload) return ok({ error: 'No payload' }, 400);
+
+    // On ne traite que le formulaire "creator-application"
+    if (payload.form_name !== 'creator-application') {
+      return ok({ skip: true });
     }
 
-    // On ne traite que le formulaire "signup"
-    const formName = payload.form_name || payload.formName || '';
-    if (String(formName).toLowerCase() !== 'signup') {
-      return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'ignored form' }) };
+    // Champs saisis
+    const data = payload.data || {};
+    const email = String(data.email || '').trim();
+    const usernameClean = String(data.username || '').trim();
+    const usernameNorm = usernameClean.toLowerCase();
+
+    if (!email || !usernameClean) {
+      return ok({ error: 'Champs manquants' }, 400);
     }
 
-    const d = payload.data || {};
-    // Champs attendus depuis ton <form name="signup"> :
-    // handle, fullname, email, phone, address, role (creatrice|client), country, dob ...
-    const username = d.handle ? String(d.handle).trim() : '';
-    const email    = d.email  ? String(d.email).trim()  : '';
-    const role     = d.role   ? String(d.role).trim()   : 'client';
+    // Stores
+    const users = getStore('users');
+    const byUsername = getStore('by_username');
 
-    if (!username || !email) {
-      return { statusCode: 200, body: JSON.stringify({ ok: false, note: 'missing username/email' }) };
-    }
+    // Doublons
+    const emailNorm = email.toLowerCase();
+    const existingByEmail = await users.get(emailNorm);
+    if (existingByEmail) return ok({ error: 'Email déjà utilisé' }, 409);
 
-    const users = readJSON('users.json', []);
-    // Anti‑doublon (email ou username)
-    const exists = users.find(u => (u.email||'').toLowerCase()===email.toLowerCase() ||
-                                   (u.username||'').toLowerCase()===username.toLowerCase());
-    if (exists) {
-      // On ne double pas — on peut aussi mettre à jour des champs si besoin
-      return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'already exists' }) };
-    }
+    const existingEmailForUsername = await byUsername.get(usernameNorm);
+    if (existingEmailForUsername) return ok({ error: 'Pseudo déjà pris' }, 409);
 
-    const nowIso = new Date().toISOString();
-    const user = {
-      id: 'u_' + Date.now().toString(36),
-      username,
-      email,
-      role,               // "creatrice" ou "client"
-      status: 'pending',  // à valider manuellement dans admin-users.html
-      createdAt: nowIso,
-      lastSeen: nowIso,
-      // En bonus tu peux stocker d’autres champs (non affichés) :
-      fullname: d.fullname || '',
-      phone: d.phone || '',
-      address: d.address || '',
-      country: d.country || '',
-      dob: d.dob || ''
+    // Fichiers (Netlify Forms fournit des liens dans le payload)
+    // Suivant la config, tu peux trouver data.avatar, data.id_front, etc.
+    // On stocke les noms/URLs si présents, sinon vide.
+    const files = {
+      avatar: data.avatar || '',
+      idFront: data.id_front || '',
+      idBack: data.id_back || '',
+      selfie: data.selfie || '',
     };
 
-    users.push(user);
-    writeJSON('users.json', users);
+    // Document utilisateur
+    const now = new Date().toISOString();
+    const uid = 'user_' + Date.now();
 
-    return { statusCode: 200, body: JSON.stringify({ ok: true, id: user.id }) };
-  } catch (e) {
-    console.error('submission-created error', e);
-    return { statusCode: 200, body: JSON.stringify({ ok: false }) };
+    const userDoc = {
+      id: uid,
+      email: emailNorm,
+      username: usernameClean,
+      usernameLower: usernameNorm,
+      createdAt: now,
+      status: 'pending', // en attente de validation
+      role: data.role === 'client' ? 'client' : 'creator',
+      profile: {
+        fullname: data.fullname || '',
+        phone: data.phone || '',
+        address: data.address || '',
+        country: data.country || '',
+        dob: data.dob || '',
+      },
+      files,
+      // (Optionnel) garde une trace brute de la soumission
+      form: {
+        submission_id: payload.id,
+        site_url: payload.site_url,
+      },
+    };
+
+    // Sauvegarde atomique : index d’abord, puis fiche user
+    await byUsername.set(usernameNorm, emailNorm);
+    await users.set(emailNorm, JSON.stringify(userDoc));
+
+    return ok({ ok: true, id: uid });
+  } catch (err) {
+    console.error('submission-created error', err);
+    return ok({ error: 'Server error' }, 500);
   }
 };
