@@ -2,9 +2,30 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Inscription - Velvet Creators VIP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styles.css" />
+  <title>Inscription — Velvet Creators VIP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0b0b0b; --panel:#111; --text:#f2f2f2; --muted:#b8b8b8; --gold:#c8a64d; --gold2:#ffd369; --bad:#ff6b6b; }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto}
+    header{padding:14px 18px;border-bottom:1px solid #222;background:#0a0a0a;position:sticky;top:0;z-index:2}
+    header nav{display:flex;gap:16px;align-items:center;justify-content:flex-end}
+    header a{color:var(--text);text-decoration:none;opacity:.9} header a:hover{opacity:1}
+    .panel{max-width:920px;margin:8vh auto 10vh;padding:18px}
+    h1{margin:0 0 10px;font-size:28px;color:var(--gold2)}
+    .lead{color:var(--muted)}
+    form.form-grid{background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:24px;box-shadow:0 0 18px rgba(200,166,77,.25)}
+    label,legend{font-weight:600;color:var(--gold2)}
+    input[type="text"],input[type="email"],input[type="password"],input[type="tel"],input[type="date"],input[type="file"]{
+      width:100%;padding:10px 12px;margin:8px 0 18px;border:1px solid var(--gold);border-radius:6px;background:#1a1a1a;color:#fff}
+    input:focus{outline:none;border-color:var(--gold2);background:#141414}
+    fieldset{border:1px dashed #333;padding:10px 12px;border-radius:8px;margin:2px 0 16px}
+    .form-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-block;padding:12px 18px;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#000;border:0;font-weight:700;cursor:pointer}
+    .btn:hover{filter:brightness(1.05)}
+    .help{color:var(--muted);font-size:13px;margin-top:-10px;margin-bottom:14px}
+    footer{padding:30px 18px;border-top:1px solid #222;text-align:center}
+    footer a{color:var(--gold2);text-decoration:none}
+  </style>
 </head>
 <body>
   <header>
@@ -14,14 +35,13 @@
     </nav>
   </header>
 
-  <main class="panel" style="max-width:920px;margin:8vh auto 10vh;">
+  <main class="panel">
     <h1>Inscription</h1>
-    <p class="lead" style="text-align:center;margin:0 0 14px;">
-      Remplissez ce formulaire pour soumettre votre demande.  
-      Nous validerons votre profil (majorité & conformité).
+    <p class="lead" style="text-align:center">
+      Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
     </p>
 
-    <!-- ✅ Formulaire Netlify -->
+    <!-- ✅ Netlify Forms avec redirection automatique -->
     <form name="creator-application"
           id="signupForm"
           method="POST"
@@ -31,7 +51,6 @@
           enctype="multipart/form-data"
           class="form-grid">
 
-      <!-- Champs requis par Netlify Forms -->
       <input type="hidden" name="form-name" value="creator-application" />
       <input type="text" name="bot-field" style="display:none" />
 
@@ -110,15 +129,24 @@
       <div>
         <label>
           <input type="checkbox" name="consent" required />
-          J’atteste être majeur(e) et j’accepte les conditions.
+          J’atteste être majeur(e) et j’accepte les conditions & la modération.
         </label>
       </div>
 
-      <!-- Bouton -->
-      <div>
-        <button type="submit">S’inscrire</button>
+      <!-- Boutons -->
+      <div class="form-actions">
+        <button type="submit" class="btn">Envoyer ma demande</button>
+        <a class="btn" href="login.html" style="background:#222;color:#fff;border:1px solid var(--gold)">Déjà inscrit(e) ?</a>
       </div>
     </form>
+
+    <p class="help" style="text-align:center;margin-top:14px">
+      Pour les créatrices : paiements uniquement via PayPal (à configurer dans votre espace après validation).
+    </p>
   </main>
+
+  <footer>
+    <a href="legal.html">Mentions légales & CGU</a>
+  </footer>
 </body>
 </html>
