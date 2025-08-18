@@ -1,34 +1,62 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Velvet — Merci !</title>
-<style>
-  .ui{--bg:#0f1115;--panel:#171923;--ink:#e8ecf3;--muted:#9aa4b2;--line:#262a36;--brand:#8b5cf6;--radius:14px;
-      background:var(--bg);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,Inter,Roboto,Arial}
-  .wrap{max-width:760px;margin:0 auto;padding:26px 16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-  h1{font-size:28px;margin:0 0 8px}
-  .muted{color:var(--muted)}
-  .btn{appearance:none;background:var(--brand);color:#fff;border:0;padding:10px 14px;border-radius:11px;font-weight:800;cursor:pointer}
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merci pour ton inscription - Velvet</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0d0d0d;
+      color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      background: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+      border: 1px solid #FFD700;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #FFD700;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      color: #ddd;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #FFD700;
+      color: #0d0d0d;
+      font-weight: bold;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #e6c200;
+    }
+  </style>
 </head>
-<body class="ui">
-  <main class="wrap">
-    <div class="card">
-      <h1>Merci 🎉</h1>
-      <p class="muted">Nous avons bien reçu votre demande d’inscription. L’équipe Velvet vérifiera vos documents (majorité & conformité) dans les prochaines heures.</p>
-      <ul class="muted">
-        <li>Vous recevrez un e‑mail quand votre compte sera validé.</li>
-        <li>Après validation, vous pourrez compléter votre profil et renseigner vos coordonnées de paiement.</li>
-      </ul>
-      <div class="row">
-        <a class="btn" href="index.html">Retour à l’accueil</a>
-        <a class="btn" style="background:#0f1115;border:1px solid #262a36;color:#e8ecf3" href="login.html">Se connecter</a>
-      </div>
-    </div>
-  </main>
+<body>
+  <div class="container">
+    <h1>✨ Merci pour ton inscription ✨</h1>
+    <p>
+      Ton profil a bien été enregistré et sera validé sous peu.  
+      Tu recevras une confirmation par email dès que ton compte sera activé.
+    </p>
+    <a href="index.html" class="btn">Retour à l’accueil</a>
+  </div>
 </body>
 </html>
