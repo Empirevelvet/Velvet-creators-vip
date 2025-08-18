@@ -120,45 +120,94 @@
 
 <!-- Script -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector('#signupForm');
+(() => {
+  const form = document.getElementById('signupForm');
   if (!form) return;
 
-  form.removeAttribute('data-netlify');
-  form.removeAttribute('netlify');
-  form.removeAttribute('action');
+  const $  = (id) => document.getElementById(id);
+  const msg = document.getElementById('msg') || (() => {
+    const d = document.createElement('div'); d.id = 'msg'; d.className='help'; form.appendChild(d); return d;
+  })();
 
-  const msg = document.createElement('div');
-  msg.id = 'signup-msg';
-  msg.style.marginTop = '10px';
-  form.appendChild(msg);
+  // lit un fichier en base64 (sans préfixe data:)
+  function readAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) return resolve("");
+      const fr = new FileReader();
+      fr.onload = () => {
+        const s = String(fr.result || "");
+        const comma = s.indexOf(",");
+        resolve(comma > -1 ? s.slice(comma + 1) : s); // enlever "data:...;base64,"
+      };
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
+    });
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    msg.textContent = 'Envoi en cours…';
-    msg.style.color = '#aaa';
+    msg.textContent = "Envoi en cours…";
+    msg.style.color = "#ccc";
 
     try {
-      const fd = new FormData(form);
-      const r = await fetch('/.netlify/functions/signup', { method: 'POST', body: fd });
-      const j = await r.json().catch(() => ({}));
+      // champs texte
+      const payload = {
+        username:  ($('#username')?.value || "").trim(),
+        email:     ($('#email')?.value || "").trim(),
+        password:  ($('#password')?.value || "").trim(),
+        fullname:  ($('#fullname')?.value || "").trim(),
+        phone:     ($('#phone')?.value || "").trim(),
+        address:   ($('#address')?.value || "").trim(),
+        country:   ($('#country')?.value || "").trim(),
+        dob:       ($('#dob')?.value || "").trim(),
+        role:      (document.querySelector('input[name="role"]:checked')?.value || "").trim(),
+        files: {}
+      };
 
-      if (r.ok && j && j.success) {
-        msg.textContent = '✅ Demande envoyée. Validation sous peu…';
-        msg.style.color = '#7CFC00';
-        setTimeout(() => { window.location.href = 'thanks.html'; }, 800);
-      } else {
-        msg.textContent = j.error || 'Erreur lors de l’inscription.';
-        msg.style.color = '#ff6b6b';
+      // fichiers -> base64
+      const avatar   = $('#avatar')?.files?.[0];
+      const idFront  = $('#id_front')?.files?.[0];
+      const idBack   = $('#id_back')?.files?.[0];
+      const selfie   = $('#selfie')?.files?.[0];
+
+      if (avatar) payload.files.avatar = {
+        name: avatar.name, type: avatar.type, data: await readAsBase64(avatar)
+      };
+      if (idFront) payload.files.idFront = {
+        name: idFront.name, type: idFront.type, data: await readAsBase64(idFront)
+      };
+      if (idBack) payload.files.idBack = {
+        name: idBack.name, type: idBack.type, data: await readAsBase64(idBack)
+      };
+      if (selfie) payload.files.selfie = {
+        name: selfie.name, type: selfie.type, data: await readAsBase64(selfie)
+      };
+
+      // POST JSON vers la fonction
+      const res = await fetch('/.netlify/functions/signup', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json().catch(()=>({}));
+      if (!res.ok || !data.success) {
+        msg.textContent = data?.error || "Erreur d’inscription.";
+        msg.style.color = "#ff6b6b";
+        return;
       }
+
+      // succès
+      msg.textContent = "✅ Demande envoyée. Validation sous peu.";
+      msg.style.color = "#7CFC00";
+      setTimeout(() => { location.href = 'thanks.html'; }, 600);
     } catch (err) {
-      msg.textContent = 'Erreur réseau. Réessayez.';
-      msg.style.color = '#ff6b6b';
       console.error(err);
+      msg.textContent = "Erreur réseau. Réessaie.";
+      msg.style.color = "#ff6b6b";
     }
   });
-});
+})();
 </script>
 
 </body>
