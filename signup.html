@@ -4,156 +4,166 @@
   <meta charset="UTF-8" />
   <title>Inscription — Velvet Creators VIP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- CSS scoped pour éviter les conflits -->
   <style>
-    :root{--bg:#0b0b0b;--panel:#111;--text:#f2f2f2;--muted:#b8b8b8;--gold:#c8a64d;--gold2:#ffd369}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto}
-    header{padding:14px 18px;border-bottom:1px solid #222;background:#0a0a0a;position:sticky;top:0}
-    header nav{display:flex;gap:16px;justify-content:flex-end}
-    header a{color:#fff;text-decoration:none;opacity:.9} header a:hover{opacity:1}
-    .panel{max-width:920px;margin:8vh auto 10vh;padding:18px}
-    h1{margin:0 0 10px;font-size:28px;color:var(--gold2)}
-    .lead{color:var(--muted);text-align:center;margin-bottom:14px}
-    form.form-grid{background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:24px;box-shadow:0 0 18px rgba(200,166,77,.22)}
-    label,legend{font-weight:600;color:var(--gold2)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    @media (max-width:720px){.row{grid-template-columns:1fr}}
-    input[type="text"],input[type="email"],input[type="password"],input[type="tel"],input[type="date"],input[type="file"],textarea,select{
-      width:100%;padding:10px 12px;margin:8px 0 18px;border:1px solid var(--gold);border-radius:6px;background:#1a1a1a;color:#fff}
-    input:focus,textarea:focus,select:focus{outline:none;border-color:#ffe08a;background:#141414}
-    fieldset{border:1px dashed #333;padding:10px 12px;border-radius:8px;margin:0 0 16px}
-    .help{color:var(--muted);font-size:13px;margin-top:-10px;margin-bottom:14px}
-    .form-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{display:inline-block;padding:12px 18px;border-radius:6px;background:linear-gradient(90deg,var(--gold),var(--gold2));color:#000;border:0;font-weight:700;cursor:pointer}
-    .btn.ghost{background:#222;color:#fff;border:1px solid var(--gold)}
-    footer{padding:30px 18px;border-top:1px solid #222;text-align:center}
-    footer a{color:var(--gold2);text-decoration:none}
+    :root{--vf-bg:#0a0a0a;--vf-panel:#111;--vf-text:#f3f3f3;--vf-muted:#b9b9b9;--vf-gold:#c8a64d;--vf-gold2:#ffd369;--vf-line:#232323}
+    .vf-body{margin:0;background:var(--vf-bg);color:var(--vf-text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto}
+    .vf-header{padding:14px 18px;border-bottom:1px solid var(--vf-line);background:#0b0b0b;position:sticky;top:0;z-index:3}
+    .vf-nav{display:flex;gap:16px;justify-content:flex-end}
+    .vf-nav a{color:#fff;text-decoration:none;opacity:.92}
+    .vf-nav a:hover{opacity:1}
+    .vf-wrap{max-width:920px;margin:8vh auto 10vh;padding:18px}
+    .vf-title{margin:0 0 8px;color:var(--vf-gold2);font-size:28px}
+    .vf-lead{color:var(--vf-muted);text-align:center;margin:0 0 14px}
+    .vf-form{background:var(--vf-panel);border:1px solid var(--vf-gold);border-radius:12px;padding:24px;box-shadow:0 0 20px rgba(200,166,77,.22)}
+    .vf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:720px){.vf-row{grid-template-columns:1fr}}
+    .vf-label,.vf-legend{display:block;font-weight:700;color:var(--vf-gold2);margin-bottom:6px}
+    .vf-input,.vf-textarea,.vf-select{
+      width:100%;padding:11px 12px;border:1px solid var(--vf-gold);border-radius:8px;
+      background:#171717;color:#fff;appearance:none
+    }
+    .vf-input:focus,.vf-textarea:focus,.vf-select:focus{outline:none;border-color:#ffe08a;background:#131313;box-shadow:0 0 0 2px rgba(200,166,77,.15)}
+    .vf-help{color:var(--vf-muted);font-size:13px;margin:6px 0 10px}
+    .vf-fieldset{border:1px dashed var(--vf-line);border-radius:10px;padding:12px;margin:2px 0 16px}
+    .vf-radio{display:inline-flex;align-items:center;gap:8px;margin-right:16px}
+    .vf-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+    .vf-btn{display:inline-block;padding:12px 18px;border-radius:8px;border:0;font-weight:800;cursor:pointer}
+    .vf-btn--gold{background:linear-gradient(90deg,var(--vf-gold),var(--vf-gold2));color:#000}
+    .vf-btn--ghost{background:#1a1a1a;color:#fff;border:1px solid var(--vf-gold)}
+    .vf-btn:hover{filter:brightness(1.05)}
+    .vf-footer{padding:28px 18px;border-top:1px solid var(--vf-line);text-align:center}
+    .vf-footer a{color:var(--vf-gold2);text-decoration:none}
   </style>
 </head>
-<body>
-  <header>
-    <nav>
+<body class="vf-body">
+  <header class="vf-header">
+    <nav class="vf-nav">
       <a href="index.html">Accueil</a>
       <a href="login.html">Se connecter</a>
     </nav>
   </header>
 
-  <main class="panel">
-    <h1>Inscription</h1>
-    <p class="lead">
+  <main class="vf-wrap">
+    <h1 class="vf-title">Inscription</h1>
+    <p class="vf-lead">
       Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
     </p>
 
-    <!-- ✅ Netlify Forms (avec redirection automatique) -->
-    <form name="creator-application"
-          id="signupForm"
-          method="POST"
-          action="/thanks.html"
-          data-netlify="true"
-          netlify-honeypot="bot-field"
-          enctype="multipart/form-data"
-          class="form-grid">
+    <!-- ✅ Netlify Forms : redirection automatique vers thanks.html -->
+    <form
+      class="vf-form"
+      name="creator-application"
+      id="signupForm"
+      method="POST"
+      action="/thanks.html"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      enctype="multipart/form-data">
 
-      <!-- requis par Netlify Forms -->
+      <!-- requis Netlify -->
       <input type="hidden" name="form-name" value="creator-application" />
       <input type="text" name="bot-field" style="display:none" />
 
       <!-- Identifiants -->
-      <div class="row">
+      <div class="vf-row">
         <div>
-          <label for="username">Pseudo (obligatoire)</label>
-          <input id="username" name="username" placeholder="@pseudo" type="text" required />
-          <div class="help">Ce pseudo sera affiché publiquement sur votre profil.</div>
+          <label class="vf-label" for="username">Pseudo (obligatoire)</label>
+          <input class="vf-input" id="username" name="username" placeholder="@pseudo" type="text" required />
+          <div class="vf-help">Affiché publiquement sur votre profil.</div>
         </div>
         <div>
-          <label for="email">Email</label>
-          <input id="email" name="email" placeholder="vous@example.com" type="email" required />
-        </div>
-      </div>
-
-      <div class="row">
-        <div>
-          <label for="password">Mot de passe</label>
-          <input id="password" name="password" placeholder="Min. 6 caractères" type="password" minlength="6" required />
-        </div>
-        <div>
-          <label for="phone">Téléphone</label>
-          <input id="phone" name="phone" placeholder="+41 79 123 45 67" type="tel" />
+          <label class="vf-label" for="email">Email</label>
+          <input class="vf-input" id="email" name="email" placeholder="vous@example.com" type="email" required />
         </div>
       </div>
 
-      <div class="row">
+      <div class="vf-row">
         <div>
-          <label for="fullname">Nom complet</label>
-          <input id="fullname" name="fullname" placeholder="Prénom Nom" type="text" required />
+          <label class="vf-label" for="password">Mot de passe</label>
+          <input class="vf-input" id="password" name="password" placeholder="Min. 6 caractères" type="password" minlength="6" required />
         </div>
         <div>
-          <label for="country">Pays</label>
-          <input id="country" name="country" placeholder="Suisse, France…" type="text" />
+          <label class="vf-label" for="phone">Téléphone</label>
+          <input class="vf-input" id="phone" name="phone" placeholder="+41 79 123 45 67" type="tel" />
         </div>
       </div>
 
-      <div class="row">
+      <!-- Coordonnées -->
+      <div class="vf-row">
         <div>
-          <label for="address">Adresse complète</label>
-          <input id="address" name="address" placeholder="Rue, N°, Ville" type="text" />
+          <label class="vf-label" for="fullname">Nom complet</label>
+          <input class="vf-input" id="fullname" name="fullname" placeholder="Prénom Nom" type="text" required />
         </div>
         <div>
-          <label for="dob">Date de naissance</label>
-          <input id="dob" name="dob" type="date" required />
+          <label class="vf-label" for="country">Pays</label>
+          <input class="vf-input" id="country" name="country" placeholder="Suisse, France…" type="text" />
+        </div>
+      </div>
+
+      <div class="vf-row">
+        <div>
+          <label class="vf-label" for="address">Adresse complète</label>
+          <input class="vf-input" id="address" name="address" placeholder="Rue, N°, Ville" type="text" />
+        </div>
+        <div>
+          <label class="vf-label" for="dob">Date de naissance</label>
+          <input class="vf-input" id="dob" name="dob" type="date" required />
         </div>
       </div>
 
       <!-- Rôle -->
-      <fieldset>
-        <legend>Vous êtes :</legend>
-        <label><input type="radio" name="role" value="creatrice" required /> Créatrice</label>
-        <label><input type="radio" name="role" value="client" /> Client</label>
+      <fieldset class="vf-fieldset">
+        <legend class="vf-legend">Vous êtes :</legend>
+        <label class="vf-radio"><input type="radio" name="role" value="creatrice" required /> Créatrice</label>
+        <label class="vf-radio"><input type="radio" name="role" value="client" /> Client</label>
       </fieldset>
 
       <!-- Fichiers -->
-      <div class="row">
+      <div class="vf-row">
         <div>
-          <label for="avatar">Photo de profil (avatar)</label>
-          <input id="avatar" name="avatar" type="file" accept="image/*" />
+          <label class="vf-label" for="avatar">Photo de profil (avatar)</label>
+          <input class="vf-input" id="avatar" name="avatar" type="file" accept="image/*" />
         </div>
         <div>
-          <label for="selfie">Selfie avec la pièce d’identité</label>
-          <input id="selfie" name="selfie" type="file" accept="image/*" required />
+          <label class="vf-label" for="selfie">Selfie avec la pièce d’identité</label>
+          <input class="vf-input" id="selfie" name="selfie" type="file" accept="image/*" required />
         </div>
       </div>
 
-      <div class="row">
+      <div class="vf-row">
         <div>
-          <label for="id_front">Pièce d’identité — recto</label>
-          <input id="id_front" name="id_front" type="file" accept="image/*,application/pdf" required />
+          <label class="vf-label" for="id_front">Pièce d’identité — recto</label>
+          <input class="vf-input" id="id_front" name="id_front" type="file" accept="image/*,application/pdf" required />
         </div>
         <div>
-          <label for="id_back">Pièce d’identité — verso</label>
-          <input id="id_back" name="id_back" type="file" accept="image/*,application/pdf" required />
+          <label class="vf-label" for="id_back">Pièce d’identité — verso</label>
+          <input class="vf-input" id="id_back" name="id_back" type="file" accept="image/*,application/pdf" required />
         </div>
       </div>
 
       <!-- Consentement -->
       <div>
-        <label>
+        <label class="vf-label">Consentement</label>
+        <label class="vf-radio" style="margin:0">
           <input type="checkbox" name="consent" required />
           J’atteste avoir 18 ans révolus et j’accepte la modération de mes documents (conformité & sécurité).
         </label>
       </div>
 
       <!-- Actions -->
-      <div class="form-actions">
-        <button type="submit" class="btn">Envoyer ma demande</button>
-        <a class="btn ghost" href="login.html">Déjà inscrit(e) ?</a>
+      <div class="vf-actions">
+        <button type="submit" class="vf-btn vf-btn--gold">Envoyer ma demande</button>
+        <a class="vf-btn vf-btn--ghost" href="login.html">Déjà inscrit(e) ?</a>
       </div>
     </form>
 
-    <p class="help" style="text-align:center;margin-top:14px">
+    <p class="vf-help" style="text-align:center;margin-top:14px">
       Pour les créatrices : paiements uniquement via PayPal (à configurer après validation).
     </p>
   </main>
 
-  <footer>
+  <footer class="vf-footer">
     <a href="legal.html">Mentions légales & CGU</a>
   </footer>
 </body>
