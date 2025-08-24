@@ -4,11 +4,13 @@
   <meta charset="UTF-8" />
   <title>Velvet — Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark">
   <style>
-    :root{--bg:#0a0a0a;--panel:#111;--text:#f1f1f1;--muted:#b9b9b9;--gold:#c8a64d;--gold2:#ffd369;--bad:#ff6b6b}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14.5px/1.55 system-ui,-apple-system,Segoe UI,Roboto}
+    html.velvet, html.velvet body { background:#0a0a0a !important; color:#f1f1f1 !important; }
+    html.velvet *{ box-sizing:border-box }
+    :root{--bg:#0a0a0a;--panel:#111;--text:#f1f1f1;--muted:#b9b9b9;--gold:#c8a64d;--gold2:#ffd369;--line:#1f1f1f;--bad:#ff6b6b}
     .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-    .sidebar{background:#0b0b0b;border-right:1px solid #1f1f1f;padding:18px;display:flex;flex-direction:column;gap:16px}
+    .sidebar{background:#0b0b0b;border-right:1px solid var(--line);padding:18px;display:flex;flex-direction:column;gap:16px}
     .sidebar h2{margin:4px 0 8px;color:var(--gold2);font-size:18px;letter-spacing:.5px}
     .nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:8px;color:#ddd;text-decoration:none}
     .nav a:hover{background:#151515}
@@ -17,16 +19,16 @@
     .main{padding:18px 20px}
     .topbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
     .search{display:flex;gap:8px;align-items:center}
-    .input{background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:10px 12px;color:#fff;min-width:260px}
+    .input{background:#1a1a1a !important;border:1px solid #333 !important;border-radius:6px;padding:10px 12px;color:#fff !important;min-width:260px}
     .btn{background:linear-gradient(90deg,var(--gold),var(--gold2));border:0;border-radius:6px;padding:10px 14px;color:#000;font-weight:700;cursor:pointer}
     .btn.ghost{background:#222;color:#fff;border:1px solid var(--gold)}
     .chip{background:#16140e;border:1px solid var(--gold);color:#fff;border-radius:999px;padding:8px 11px}
     .grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px}
-    .card{background:var(--panel);border:1px solid #1f1f1f;border-radius:10px;padding:14px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
     .card h3{margin:0 0 8px;color:var(--gold2);font-size:15px}
     .card .value{font-size:24px;font-weight:800}
     .card .bad{color:var(--bad)}
-    .section{margin-top:18px;background:var(--panel);border:1px solid #1f1f1f;border-radius:10px;padding:14px}
+    .section{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
     h2{margin:0 0 12px;color:var(--gold2)}
     table{width:100%;border-collapse:collapse}
     th,td{padding:10px;border-bottom:1px solid #222;text-align:left}
@@ -96,7 +98,7 @@
         <h2>Détail des ventes</h2>
         <table id="t-ledger">
           <thead><tr><th>Date</th><th>Créatrice</th><th>Type</th><th>Montant</th><th>Txn</th><th>Email client</th><th>Statut</th><th>Action</th></tr></thead>
-        <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
+          <tbody><tr><td colspan="8">Chargement…</td></tr></tbody>
         </table>
       </section>
 
@@ -123,13 +125,16 @@
   </div>
 
   <script>
-    // ===== Helpers =====
+    // Activer le thème "velvet"
+    document.documentElement.classList.add('velvet');
+
+    // Helpers
     const $  = (s, c=document) => c.querySelector(s);
     const $$ = (s, c=document) => Array.from(c.querySelectorAll(s));
     const api = (p,opt={}) => fetch(p,{headers:{'Content-Type':'application/json'}, ...opt});
     const fmt = n => Number(n||0).toFixed(2);
 
-    // ===== Tabs via hash =====
+    // Onglets via hash
     function activateFromHash() {
       const hash = location.hash || '#overview';
       $$('.nav a').forEach(a => a.classList.toggle('active', a.getAttribute('href')===hash));
@@ -138,7 +143,7 @@
     window.addEventListener('hashchange', activateFromHash);
     document.addEventListener('DOMContentLoaded', activateFromHash);
 
-    // ===== Rendus =====
+    // Rendus
     function renderLastSales(rows=[]) {
       const tb = $('#t-last tbody'); if(!tb) return;
       tb.innerHTML = '';
@@ -156,7 +161,6 @@
         tb.appendChild(tr);
       });
     }
-
     function renderCreatorsRecap(map={}) {
       const tb = $('#t-creators tbody'); if(!tb) return;
       tb.innerHTML = '';
@@ -176,7 +180,6 @@
         tb.appendChild(tr);
       });
     }
-
     function renderLedger(rows=[]) {
       const tb = $('#t-ledger tbody'); if(!tb) return;
       tb.innerHTML = '';
@@ -196,7 +199,6 @@
         tb.appendChild(tr);
       });
     }
-
     function renderConvs(rows=[]) {
       const tb = $('#t-conv tbody'); if(!tb) return;
       tb.innerHTML = '';
@@ -214,7 +216,6 @@
         tb.appendChild(tr);
       });
     }
-
     function renderLives(rows=[]) {
       const tb = $('#t-live tbody'); if(!tb) return;
       tb.innerHTML = '';
@@ -233,10 +234,9 @@
       });
     }
 
-    // ===== Chargement global =====
+    // Chargement global
     async function loadDashboard() {
       try{
-        // stats/ledger
         const r = await api('/api/list-ledger');
         const j = await r.json().catch(()=> ({}));
         $('#k-online') && ($('#k-online').textContent = j.online ?? 0);
@@ -247,23 +247,10 @@
         renderCreatorsRecap(j.creators||{});
         renderLedger(j.ledger||[]);
       }catch(e){ console.warn('list-ledger ko', e); }
-
-      // conversations
-      try{
-        const rc = await api('/api/list-conversations');
-        const jc = await rc.json().catch(()=> ({}));
-        renderConvs(jc.rows||[]);
-      }catch(e){ console.warn('list-conversations ko', e); }
-
-      // lives
-      try{
-        const rl = await api('/api/list-lives');
-        const jl = await rl.json().catch(()=> ({}));
-        renderLives(jl.rows||[]);
-      }catch(e){ console.warn('list-lives ko', e); }
+      try{ const rc = await api('/api/list-conversations'); renderConvs((await rc.json()).rows||[]);}catch(e){}
+      try{ const rl = await api('/api/list-lives');         renderLives((await rl.json()).rows||[]);}catch(e){}
     }
 
-    // ===== Actions =====
     async function markPaid(id) {
       try{
         const r = await api('/api/mark-paid',{method:'POST',body:JSON.stringify({id})});
@@ -272,35 +259,30 @@
         await loadDashboard();
       }catch(e){ alert('Erreur marquage payé'); }
     }
-    async function markAllForCreator(name) {
-      if(!confirm('Marquer tout impayé comme versé ?')) return;
-      markPaid('creator:'+name);
-    }
-    async function purgeInactive90d(){
-      if(!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
-      try{
-        const r = await api('/api/purge-inactive',{method:'POST'});
-        const j = await r.json();
-        alert(j.ok?('Supprimés: '+(j.count||0)):(j.error||'Erreur'));
-        await loadDashboard();
-      }catch(e){ alert('Erreur purge'); }
-    }
+    function markAllForCreator(name){ if(confirm('Marquer tout impayé comme versé ?')) markPaid('creator:'+name); }
+    async function purgeInactive90d(){ if(!confirm('Supprimer les comptes inactifs depuis 90 jours ?')) return;
+      try{ const r=await api('/api/purge-inactive',{method:'POST'}); const j=await r.json(); alert(j.ok?('Supprimés: '+(j.count||0)):(j.error||'Erreur')); loadDashboard(); }catch(e){ alert('Erreur purge'); } }
 
-    // ===== Événements globaux =====
     document.addEventListener('click',(e)=>{
       const b=e.target.closest('button[data-pay]'); if(b) return markPaid(b.dataset.pay);
       const c=e.target.closest('button[data-bulk]'); if(c) return markAllForCreator(c.dataset.bulk);
     });
     $('#btnReload') && ($('#btnReload').onclick = loadDashboard);
-    $('#btnCsv') && ($('#btnCsv').onclick = ()=>window.location='/api/list-ledger?format=csv');
-    $('#btnFilter') && ($('#btnFilter').onclick = ()=>{ const q=$('#q')?.value||''; location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); });
+    $('#btnCsv')   && ($('#btnCsv').onclick   = ()=>window.location='/api/list-ledger?format=csv');
+    $('#btnFilter')&& ($('#btnFilter').onclick= ()=>{ const q=$('#q')?.value||''; location.href='/admin-users.html'+(q?('?q='+encodeURIComponent(q)):''); });
     $('#btnPurge') && ($('#btnPurge').onclick = purgeInactive90d);
+
     setInterval(()=>{ const c=$('#clock'); if(c) c.textContent=new Date().toLocaleTimeString(); },1000);
     setInterval(loadDashboard, 30_000);
 
-    // init
-    activateFromHash();
-    loadDashboard();
+    document.documentElement.classList.add('velvet');
+    activateFromHash(); loadDashboard();
+
+    function activateFromHash(){ const hash=location.hash||'#overview';
+      document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===hash));
+      document.querySelectorAll('[data-tab]').forEach(sec=>{sec.hidden = ('#'+sec.id !== hash);});
+    }
+    window.addEventListener('hashchange', activateFromHash);
   </script>
 </body>
 </html>
