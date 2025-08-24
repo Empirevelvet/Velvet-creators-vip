@@ -4,39 +4,56 @@
   <meta charset="UTF-8" />
   <title>Inscription — Velvet Creators VIP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- CSS scoped pour éviter les conflits -->
+  <meta name="color-scheme" content="dark">
   <style>
-    :root{--vf-bg:#0a0a0a;--vf-panel:#111;--vf-text:#f3f3f3;--vf-muted:#b9b9b9;--vf-gold:#c8a64d;--vf-gold2:#ffd369;--vf-line:#232323}
-    .vf-body{margin:0;background:var(--vf-bg);color:var(--vf-text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto}
-    .vf-header{padding:14px 18px;border-bottom:1px solid var(--vf-line);background:#0b0b0b;position:sticky;top:0;z-index:3}
+    /* ====== Velvet global hard override ====== */
+    html.velvet, html.velvet body { background:#0a0a0a !important; color:#f2f2f2 !important; }
+    /* Empêche tout reset externe de casser la mise en page */
+    html.velvet * { box-sizing: border-box; }
+    /* ====== Layout ====== */
+    .vf-wrap{max-width:920px;margin:8vh auto 10vh;padding:18px}
+    .vf-title{margin:0 0 10px;color:#ffd369;font:700 28px/1.2 system-ui,-apple-system,Segoe UI,Roboto}
+    .vf-lead{color:#b9b9b9;text-align:center;margin:0 0 14px}
+    .vf-form{
+      background:#111 !important;border:1px solid #c8a64d !important;border-radius:12px !important;
+      padding:24px !important; box-shadow:0 0 20px rgba(200,166,77,.22) !important;
+    }
+    .vf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media (max-width:720px){.vf-row{grid-template-columns:1fr}}
+
+    /* ====== Inputs ultra-lisibles ====== */
+    .vf-label,.vf-legend{display:block;font-weight:700;color:#ffd369;margin:0 0 6px}
+    .vf-input,.vf-textarea,.vf-select{
+      width:100% !important; padding:12px 13px !important; margin:8px 0 18px !important;
+      border:1px solid #c8a64d !important; border-radius:8px !important;
+      background:#171717 !important; color:#fff !important; font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto !important;
+    }
+    .vf-input:focus,.vf-textarea:focus,.vf-select:focus{
+      outline:none !important; border-color:#ffd369 !important; background:#131313 !important;
+      box-shadow:0 0 0 2px rgba(200,166,77,.15) !important;
+    }
+    input[type="file"].vf-input{padding:10px !important;background:#111 !important}
+
+    .vf-fieldset{border:1px dashed #2a2a2a !important;border-radius:10px !important;padding:12px !important;margin:2px 0 16px !important}
+    .vf-radio{display:inline-flex;align-items:center;gap:8px;margin-right:16px}
+    .vf-help{color:#b9b9b9;font-size:13px;margin:6px 0 10px}
+
+    /* ====== Boutons ====== */
+    .vf-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+    .vf-btn{display:inline-block;padding:12px 18px;border-radius:8px;border:0;font-weight:800;cursor:pointer}
+    .vf-btn--gold{background:linear-gradient(90deg,#c8a64d,#ffd369);color:#000}
+    .vf-btn--ghost{background:#1a1a1a;color:#fff;border:1px solid #c8a64d}
+    .vf-btn:hover{filter:brightness(1.05)}
+    /* ====== Header/Footer ====== */
+    .vf-header{padding:14px 18px;border-bottom:1px solid #222;background:#0b0b0b;position:sticky;top:0;z-index:5}
     .vf-nav{display:flex;gap:16px;justify-content:flex-end}
     .vf-nav a{color:#fff;text-decoration:none;opacity:.92}
     .vf-nav a:hover{opacity:1}
-    .vf-wrap{max-width:920px;margin:8vh auto 10vh;padding:18px}
-    .vf-title{margin:0 0 8px;color:var(--vf-gold2);font-size:28px}
-    .vf-lead{color:var(--vf-muted);text-align:center;margin:0 0 14px}
-    .vf-form{background:var(--vf-panel);border:1px solid var(--vf-gold);border-radius:12px;padding:24px;box-shadow:0 0 20px rgba(200,166,77,.22)}
-    .vf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    @media (max-width:720px){.vf-row{grid-template-columns:1fr}}
-    .vf-label,.vf-legend{display:block;font-weight:700;color:var(--vf-gold2);margin-bottom:6px}
-    .vf-input,.vf-textarea,.vf-select{
-      width:100%;padding:11px 12px;border:1px solid var(--vf-gold);border-radius:8px;
-      background:#171717;color:#fff;appearance:none
-    }
-    .vf-input:focus,.vf-textarea:focus,.vf-select:focus{outline:none;border-color:#ffe08a;background:#131313;box-shadow:0 0 0 2px rgba(200,166,77,.15)}
-    .vf-help{color:var(--vf-muted);font-size:13px;margin:6px 0 10px}
-    .vf-fieldset{border:1px dashed var(--vf-line);border-radius:10px;padding:12px;margin:2px 0 16px}
-    .vf-radio{display:inline-flex;align-items:center;gap:8px;margin-right:16px}
-    .vf-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
-    .vf-btn{display:inline-block;padding:12px 18px;border-radius:8px;border:0;font-weight:800;cursor:pointer}
-    .vf-btn--gold{background:linear-gradient(90deg,var(--vf-gold),var(--vf-gold2));color:#000}
-    .vf-btn--ghost{background:#1a1a1a;color:#fff;border:1px solid var(--vf-gold)}
-    .vf-btn:hover{filter:brightness(1.05)}
-    .vf-footer{padding:28px 18px;border-top:1px solid var(--vf-line);text-align:center}
-    .vf-footer a{color:var(--vf-gold2);text-decoration:none}
+    .vf-footer{padding:28px 18px;border-top:1px solid #222;text-align:center}
+    .vf-footer a{color:#ffd369;text-decoration:none}
   </style>
 </head>
-<body class="vf-body">
+<body class="velvet">
   <header class="vf-header">
     <nav class="vf-nav">
       <a href="index.html">Accueil</a>
@@ -50,7 +67,7 @@
       Remplissez ce formulaire pour soumettre votre demande. Nous validerons votre profil (majorité & conformité).
     </p>
 
-    <!-- ✅ Netlify Forms : redirection automatique vers thanks.html -->
+    <!-- Netlify Forms + redirection thanks.html -->
     <form
       class="vf-form"
       name="creator-application"
@@ -61,7 +78,6 @@
       netlify-honeypot="bot-field"
       enctype="multipart/form-data">
 
-      <!-- requis Netlify -->
       <input type="hidden" name="form-name" value="creator-application" />
       <input type="text" name="bot-field" style="display:none" />
 
@@ -166,5 +182,10 @@
   <footer class="vf-footer">
     <a href="legal.html">Mentions légales & CGU</a>
   </footer>
+
+  <script>
+    // Force la classe "velvet" sur <html> pour activer les overrides
+    document.documentElement.classList.add('velvet');
+  </script>
 </body>
 </html>
